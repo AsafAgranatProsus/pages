@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Room Remembers You</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --burgundy: #4a0e1a;
+  --deep-burgundy: #2a0509;
+  --parchment: #e8d5a3;
+  --aged-parchment: #c9b47a;
+  --bile: #8a7a1a;
+  --bruised: #3d1a4a;
+  --flesh: #c4956a;
+  --ink: #1a0a05;
+}
+
+html { scroll-behavior: auto; }
+
+body {
+  background: var(--deep-burgundy);
+  color: var(--parchment);
+  font-family: Georgia, 'Times New Roman', serif;
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* WALLPAPER CANVAS */
+#wallpaper {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  opacity: 0.18;
+}
+
+/* SECTIONS */
+.section {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 40px;
+  opacity: 0;
+  transition: none;
+}
+
+.section.visible { opacity: 1; }
+
+/* ENTRY */
+#entry {
+  background: linear-gradient(180deg, rgba(42,5,9,0.95) 0%, rgba(42,5,9,0.7) 100%);
+}
+
+.door-frame {
+  border: 6px double var(--aged-parchment);
+  width: 220px;
+  height: 380px;
+  position: relative;
+  margin-bottom: 60px;
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 0 60px rgba(74,14,26,0.6);
+}
+
+.door-frame::before {
+  content: '';
+  position: absolute;
+  top: 12px; left: 12px; right: 12px; bottom: 12px;
+  border: 2px solid var(--bile);
+  opacity: 0.5;
+}
+
+.door-knob {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--aged-parchment);
+  box-shadow: 0 0 8px var(--bile);
+}
+
+.entry-clock {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.entry-text {
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  text-align: center;
+  font-style: italic;
+  text-shadow: 0 0 20px var(--burgundy);
+}
+
+.entry-subtext {
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  color: var(--bile);
+  letter-spacing: 0.2em;
+  margin-top: 20px;
+  opacity: 0.6;
+}
+
+/* THE ROOM */
+#the-room {
+  background: rgba(42,5,9,0.85);
+  padding: 120px 40px;
+}
+
+.room-text {
+  max-width: 600px;
+  text-align: center;
+  line-height: 2.2;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+}
+
+.room-text .aging-word {
+  display: inline-block;
+  transition: color 0.3s, letter-spacing 0.3s;
+}
+
+.room-ornament {
+  width: 300px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--aged-parchment), transparent);
+  margin: 40px auto;
+}
+
+/* THE CLOCKS */
+#the-clocks {
+  background: rgba(61,26,74,0.7);
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 60px;
+}
+
+.clock-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.clock-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  color: var(--bile);
+  text-transform: uppercase;
+}
+
+/* THE RECEIPT */
+#the-receipt {
+  background: rgba(26,10,5,0.9);
+  align-items: flex-start;
+  padding: 80px;
+}
+
+.receipt-container {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--aged-parchment);
+  line-height: 2;
+  max-width: 500px;
+  border-left: 1px solid var(--bile);
+  padding-left: 30px;
+}
+
+.receipt-header {
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  margin-bottom: 30px;
+  color: var(--parchment);
+  border-bottom: 1px dashed var(--bile);
+  padding-bottom: 20px;
+}
+
+.receipt-item {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.4s, transform 0.4s;
+  color: var(--aged-parchment);
+}
+
+.receipt-item.printed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.receipt-item .timestamp {
+  color: var(--bile);
+  margin-right: 16px;
+}
+
+/* THE EXIT */
+#the-exit {
+  background: linear-gradient(0deg, rgba(42,5,9,0.98) 0%, rgba(42,5,9,0.7) 100%);
+}
+
+#the-exit .door-frame {
+  transform: scaleX(-1);
+  border-color: var(--bile);
+}
+
+#the-exit .entry-text {
+  color: var(--aged-parchment);
+  letter-spacing: 0.5em;
+  font-size: clamp(1rem, 2.5vw, 1.6rem);
+}
+
+/* SCROLL INDICATOR */
+.scroll-hint {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  color: var(--bile);
+  opacity: 0.5;
+  z-index: 10;
+  animation: fadeHint 3s ease-in-out infinite;
+}
+
+@keyframes fadeHint {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.6; }
+}
+
+/* PARALLAX LAYERS */
+.parallax-layer {
+  position: absolute;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<canvas id="wallpaper"></canvas>
+<div class="scroll-hint">SCROLL TO REMEMBER</div>
+
+<!-- SECTION 1: ENTRY -->
+<section class="section" id="entry">
+  <div class="entry-clock">
+    <svg id="clock-entry" width="80" height="80" viewBox="0 0 80 80"></svg>
+  </div>
+  <div class="door-frame">
+    <div class="door-knob"></div>
+  </div>
+  <p class="entry-text">You have been here before.</p>
+  <p class="entry-subtext">[ session duration: <span id="session-time">00:00:00</span> ]</p>
+</section>
+
+<!-- SECTION 2: THE ROOM -->
+<section class="section" id="the-room">
+  <div class="room-ornament"></div>
+  <div class="room-text" id="room-text">
+    <p>Rooms do not forget. They absorb the weight of every hour spent inside them — the particular quality of light at 4pm in November, the sound a chair makes when someone who is no longer here used to sit in it. The wallpaper has been watching. It has been watching since before you arrived. It will continue watching after you leave. This is not a metaphor. The pattern repeats but it is never quite the same twice. You have been counting the repetitions without knowing it. You have lost count. You started over. You lost count again.</p>
+  </div>
+  <div class="room-ornament"></div>
+</section>
+
+<!-- SECTION 3: THE CLOCKS -->
+<section class="section" id="the-clocks">
+  <div class="clock-container">
+    <svg id="clock-1" width="140" height="140" viewBox="0 0 140 140"></svg>
+    <span class="clock-label">the clock in the kitchen</span>
+  </div>
+  <div class="clock-container">
+    <svg id="clock-2" width="180" height="180" viewBox="0 0 180 180"></svg>
+    <span class="clock-label">the clock you forgot to wind</span>
+  </div>
+  <div class="clock-container">
+    <svg id="clock-3" width="120" height="120" viewBox="0 0 120 120"></svg>
+    <span class="clock-label">the clock that runs fast</span>
+  </div>
+</section>
+
+<!-- SECTION 4: THE RECEIPT -->
+<section class="section" id="the-receipt">
+  <div class="receipt-container">
+    <div class="receipt-header">
+      ITEMISED ACCOUNT OF TIME SPENT<br>
+      ─────────────────────────────
+    </div>
+    <div id="receipt-items"></div>
+  </div>
+</section>
+
+<!-- SECTION 5: THE EXIT -->
+<section class="section" id="the-exit">
+  <div class="door-frame">
+    <div class="door-knob"></div>
+  </div>
+  <p class="entry-text">You have been here before.</p>
+  <p class="entry-subtext" style="margin-top:20px; letter-spacing:0.4em;">[ the door is the same door ]</p>
+</section>
+
+<script>
+// ─── WALLPAPER CANVAS (breathing Victorian pattern) ───────────────────────
+const wallpaperCanvas = document.getElementById('wallpaper');
+const wctx = wallpaperCanvas.getContext('2d');
+let ww, wh;
+
+function resizeWallpaper() {
+  ww = wallpaperCanvas.width = window.innerWidth;
+  wh = wallpaperCanvas.height = window.innerHeight;
+}
+resizeWallpaper();
+window.addEventListener('resize', resizeWallpaper);
+
+function drawVictorianTile(ctx, x, y, size, t, breathe) {
+  const s = size * (1 + breathe * 0.04);
+  const cx = x + size/2, cy = y + size/2;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(t * 0.002);
+
+  // Outer diamond
+  ctx.beginPath();
+  ctx.moveTo(0, -s*0.45);
+  ctx.lineTo(s*0.45, 0);
+  ctx.lineTo(0, s*0.45);
+  ctx.lineTo(-s*0.45, 0);
+  ctx.closePath();
+  ctx.strokeStyle = `rgba(200,180,120,${0.4 + breathe * 0.15})`;
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+
+  // Inner petals
+  for (let i = 0; i < 4; i++) {
+    ctx.save();
+    ctx.rotate((i * Math.PI) / 2 + t * 0.001);
+    ctx.beginPath();
+    ctx.ellipse(0, -s*0.2, s*0.06, s*0.18, 0, 0, Math.PI*2);
+    ctx.strokeStyle = `rgba(138,122,26,${0.3 + breathe * 0.1})`;
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Center dot
+  ctx.beginPath();
+  ctx.arc(0, 0, s*0.04, 0, Math.PI*2);
+  ctx.fillStyle = `rgba(200,180,120,${0.5 + breathe * 0.2})`;
+  ctx.fill();
+
+  ctx.restore();
+}
+
+let wallpaperTime = 0;
+function animateWallpaper() {
+  wallpaperTime += 0.5;
+  wctx.clearRect(0, 0, ww, wh);
+
+  const tileSize = 80;
+  const scrollOffset = window.scrollY * 0.1;
+  const breathe = Math.sin(wallpaperTime * 0.02) * 0.5 + 0.5;
+
+  for (let x = -tileSize; x < ww + tileSize; x += tileSize) {
+    for (let y = -tileSize + (scrollOffset % tileSize); y < wh + tileSize; y += tileSize) {
+      drawVictorianTile(wctx, x, y, tileSize, wallpaperTime, breathe);
+    }
+  }
+
+  requestAnimationFrame(animateWallpaper);
+}
+animateWallpaper();
+
+// ─── WEB AUDIO TICKING ────────────────────────────────────────────────────
+let audioCtx = null;
+let tickInterval = null;
+let lastScrollY = 0;
+let scrollVelocity = 0;
+let tickRate = 1000; // ms between ticks
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function tick(velocity) {
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+
+  // Main tick
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.frequency.setValueAtTime(800 + velocity * 2, now);
+  osc.type = 'square';
+  gain.gain.setValueAtTime(0.04, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+  osc.start(now);
+  osc.stop(now + 0.04);
+
+  // Subtle resonance
+  const osc2 = audioCtx.createOscillator();
+  const gain2 = audioCtx.createGain();
+  osc2.connect(gain2);
+  gain2.connect(audioCtx.destination);
+  osc2.frequency.setValueAtTime(400, now + 0.01);
+  osc2.type = 'sine';
+  gain2.gain.setValueAtTime(0.015, now + 0.01);
+  gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+  osc2.start(now + 0.01);
+  osc2.stop(now + 0.08);
+}
+
+function scheduleTicks() {
+  if (tickInterval) clearInterval(tickInterval);
+  const rate = Math.max(150, Math.min(1200, tickRate));
+  tickInterval = setInterval(() => tick(scrollVelocity), rate);
+}
+
+scheduleTicks();
+
+// ─── SCROLL ENGINE ────────────────────────────────────────────────────────
+let scrollY = 0;
+let targetScrollY = 0;
+
+window.addEventListener('scroll', () => {
+  targetScrollY = window.scrollY;
+  scrollVelocity = Math.abs(targetScrollY - lastScrollY);
+  lastScrollY = targetScrollY;
+
+  // Adjust tick rate based on scroll speed
+  tickRate = Math.max(150, 1000 - scrollVelocity * 8);
+  scheduleTicks();
+
+  initAudio();
+}, { passive: true });
+
+// ─── SECTION VISIBILITY ───────────────────────────────────────────────────
+const sections = document.querySelectorAll('.section');
+
+function checkVisibility() {
+  const vh = window.innerHeight;
+  sections.forEach(section => {
+    const rect = section.getBoundingClientRect();
+    if (rect.top < vh * 0.85) {
+      section.classList.add('visible');
+    }
+  });
+}
+
+// Stutter-fade sections in
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      // Stuttered reveal
+      let opacity = 0;
+      const steps = [0, 0.3, 0.1, 0.5, 0.3, 0.7, 0.5, 0.85, 1.0];
+      let i = 0;
+      const stutter = setInterval(() => {
+        el.style.opacity = steps[i];
+        i++;
+        if (i >= steps.length) {
+          clearInterval(stutter);
+          el.style.opacity = 1;
+        }
+      }, 80);
+    }
+  });
+}, { threshold: 0.15 });
+
+sections.forEach(s => observer.observe(s));
+
+// ─── SVG CLOCK BUILDER ────────────────────────────────────────────────────
+function buildClock(svgEl, r, wrongHour, wrongMin, distortFn) {
+  const cx = r, cy = r;
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // Face
+  const face = document.createElementNS(ns, 'circle');
+  face.setAttribute('cx', cx); face.setAttribute('cy', cy); face.setAttribute('r', r - 4);
+  face.setAttribute('fill', 'rgba(26,10,5,0.85)');
+  face.setAttribute('stroke', '#c9b47a'); face.setAttribute('stroke-width', '2');
+  svgEl.appendChild(face);
+
+  // Hour markers
+  for (let i = 0; i < 12; i++) {
+    const angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
+    const x1 = cx + Math.cos(angle) * (r - 12);
+    const y1 = cy + Math.sin(angle) * (r - 12);
+    const x2 = cx + Math.cos(angle) * (r - 20);
+    const y2 = cy + Math.sin(angle) * (r - 20);
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', '#8a7a1a'); line.setAttribute('stroke-width', i % 3 === 0 ? '2' : '1');
+    svgEl.appendChild(line);
+  }
+
+  // Hour hand
+  const hourHand = document.createElementNS(ns, 'line');
+  hourHand.setAttribute('x1', cx); hourHand.setAttribute('y1', cy);
+  hourHand.setAttribute('stroke', '#c9b47a'); hourHand.setAttribute('stroke-width', '3');
+  hourHand.setAttribute('stroke-linecap', 'round');
+  svgEl.appendChild(hourHand);
+
+  // Minute hand
+  const minHand = document.createElementNS(ns, 'line');
+  minHand.setAttribute('x1', cx); minHand.setAttribute('y1', cy);
+  minHand.setAttribute('stroke', '#e8d5a3'); minHand.setAttribute('stroke-width', '2');
+  minHand.setAttribute('stroke-linecap', 'round');
+  svgEl.appendChild(minHand);
+
+  // Second hand
+  const secHand = document.createElementNS(ns, 'line');
+  secHand.setAttribute('x1', cx); secHand.setAttribute('y1', cy);
+  secHand.setAttribute('stroke', '#8a7a1a'); secHand.setAttribute('stroke-width', '1');
+  svgEl.appendChild(secHand);
+
+  // Center dot
+  const dot = document.createElementNS(ns, 'circle');
+  dot.setAttribute('cx', cx); dot.setAttribute('cy', cy); dot.setAttribute('r', '3');
+  dot.setAttribute('fill', '#c9b47a');
+  svgEl.appendChild(dot);
+
+  return { hourHand, minHand, secHand, cx, cy, r, wrongHour, wrongMin, distortFn };
+}
+
+function updateClock(clock, t, scrollProgress) {
+  const { hourHand, minHand, secHand, cx, cy, r, wrongHour, wrongMin, distortFn } = clock;
+  const distort = distortFn ? distortFn(scrollProgress) : 0;
+
+  const secAngle = (t % 60) / 60 * Math.PI * 2 - Math.PI / 2 + distort;
+  const minAngle = ((wrongMin + t / 60) % 60) / 60 * Math.PI * 2 - Math.PI / 2 + distort * 0.3;
+  const hourAngle = ((wrongHour + wrongMin / 60) % 12) / 12 * Math.PI * 2 - Math.PI / 2 + distort * 0.1;
+
+  const secLen = r - 16;
+  const minLen = r - 22;
+  const hourLen = r - 32;
+
+  secHand.setAttribute('x2', cx + Math.cos(secAngle) * secLen);
+  secHand.setAttribute('y2', cy + Math.sin(secAngle) * secLen);
+  minHand.setAttribute('x2', cx + Math.cos(minAngle) * minLen);
+  minHand.setAttribute('y2', cy + Math.sin(minAngle) * minLen);
+  hourHand.setAttribute('x2', cx + Math.cos(hourAngle) * hourLen);
+  hourHand.setAttribute('y2', cy + Math.sin(hourAngle) * hourLen);
+}
+
+// Build all clocks
+const clockEntry = buildClock(document.getElementById('clock-entry'), 40, 3, 47, null);
+const clock1 = buildClock(document.getElementById('clock-1'), 70, 11, 58, (s) => Math.sin(s * 3) * 0.4);
+const clock2 = buildClock(document.getElementById('clock-2'), 90, 7, 23, (s) => s * Math.PI * 0.5);
+const clock3 = buildClock(document.getElementById('clock-3'), 60, 13, 7, (s) => Math.cos(s * 2) * 0.6);
+
+// ─── RECEIPT ITEMS ────────────────────────────────────────────────────────
+const receiptData = [
+  ['3:47am', 'you were awake. you did not know why.'],
+  ['age 7', 'the smell of rain on hot pavement'],
+  ['14:23', 'a conversation you cannot fully reconstruct'],
+  ['age 12', 'the last time you ran without thinking about running'],
+  ['23:58', 'two minutes before something changed'],
+  ['age 4', 'a yellow room. someone laughing. you do not know who.'],
+  ['09:15', 'the meeting that did not need to happen'],
+  ['age 31', 'the first time a room felt too large'],
+  ['04:02', 'the sound of a house settling'],
+  ['age 9', 'a song you cannot name but can still hear'],
+  ['17:44', 'the light through a window you no longer have access to'],
+  ['age 16', 'the specific weight of a summer afternoon'],
+  ['02:17', 'you checked the time. you immediately forgot it.'],
+  ['age 23', 'a door closing. not dramatically. just closing.'],
+  ['11:11', 'you noticed. you always notice.'],
+  ['age 38', 'the realisation that you have been counting wrong'],
+  ['00:00', 'the day resets. the room does not.'],
+];
+
+const receiptContainer = document.getElementById('receipt-items');
+receiptData.forEach((item, i) => {
+  const div = document.createElement('div');
+  div.className = 'receipt-item';
+  div.innerHTML = `<span class="timestamp">${item[0]}</span>${item[1]}`;
+  receiptContainer.appendChild(div);
+});
+
+// Print receipt items as section scrolls into view
+const receiptSection = document.getElementById('the-receipt');
+let receiptPrinted = 0;
+
+function printNextReceiptItem() {
+  const items = document.querySelectorAll('.receipt-item');
+  if (receiptPrinted < items.length) {
+    items[receiptPrinted].classList.add('printed');
+    receiptPrinted++;
+    setTimeout(printNextReceiptItem, 180 + Math.random() * 200);
+  }
+}
+
+const receiptObserver = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting && receiptPrinted === 0) {
+    setTimeout(printNextReceiptItem, 400);
+  }
+}, { threshold: 0.2 });
+receiptObserver.observe(receiptSection);
+
+// ─── SESSION TIMER ────────────────────────────────────────────────────────
+const sessionStart = Date.now();
+function updateSessionTime() {
+  const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+  const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+  const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+  const s = String(elapsed % 60).padStart(2, '0');
+  document.getElementById('session-time').textContent = `${h}:${m}:${s}`;
+}
+setInterval(updateSessionTime, 1000);
+
+// ─── MAIN ANIMATION LOOP ──────────────────────────────────────────────────
+let startTime = Date.now();
+
+function animate() {
+  const t = (Date.now() - startTime) / 1000;
+  const scrollProgress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+
+  updateClock(clockEntry, t, 0);
+  updateClock(clock1, t, scrollProgress);
+  updateClock(clock2, t * 0.7, scrollProgress);
+  updateClock(clock3, t * 1.4, scrollProgress);
+
+  // Scroll-driven clock distortion (CSS transform)
+  const clocks = document.querySelectorAll('#the-clocks svg');
+  clocks.forEach((c, i) => {
+    const distort = Math.sin(scrollProgress * Math.PI * 2 + i * 1.2) * 15;
+    const skew = Math.cos(scrollProgress * Math.PI + i) * 8;
+    c.style.transform = `skewX(${skew}deg) translateY(${distort}px)`;
+  });
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>
