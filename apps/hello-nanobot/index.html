@@ -138,18 +138,22 @@
             }
         `;
 
+        // Random seed for pattern variation
+        const seed = Math.random() * 10.0;
+
         // Fragment shader - metaball-like fluid with cursor influence
         const fragmentShaderSource = `
             precision highp float;
             uniform vec2 resolution;
             uniform float time;
             uniform vec2 mouse;
+            uniform float seed;
 
             vec3 palette(float t) {
                 vec3 a = vec3(0.5, 0.5, 0.5);
                 vec3 b = vec3(0.5, 0.5, 0.5);
                 vec3 c = vec3(1.0, 1.0, 1.0);
-                vec3 d = vec3(0.263, 0.416, 0.557);
+                vec3 d = vec3(0.263 + seed * 0.1, 0.416 + seed * 0.15, 0.557 + seed * 0.2);
                 return a + b * cos(6.28318 * (c * t + d));
             }
 
@@ -161,15 +165,15 @@
                 float influence = 0.3 / (dist + 0.1);
 
                 vec2 p = uv;
-                float t = time * 0.3;
+                float t = time * (0.2 + seed * 0.1);
 
                 for(float i = 0.0; i < 3.0; i++) {
-                    p = abs(p) / dot(p, p) - vec2(0.9 + sin(t + i) * 0.2);
-                    p += mouseUV * influence * 0.1;
+                    p = abs(p) / dot(p, p) - vec2(0.9 + sin(t + i + seed) * 0.2);
+                    p += mouseUV * influence * (0.08 + seed * 0.02);
                 }
 
                 float d = length(p);
-                vec3 col = palette(d + t * 0.4 + influence * 0.2);
+                vec3 col = palette(d + t * 0.4 + influence * 0.2 + seed * 0.3);
 
                 col = mix(col, vec3(1.0), influence * 0.15);
 
@@ -219,6 +223,7 @@
         const resolutionLocation = gl.getUniformLocation(program, 'resolution');
         const timeLocation = gl.getUniformLocation(program, 'time');
         const mouseLocation = gl.getUniformLocation(program, 'mouse');
+        const seedLocation = gl.getUniformLocation(program, 'seed');
 
         document.addEventListener('mousemove', (e) => {
             targetX = e.clientX;
@@ -242,6 +247,7 @@
             gl.uniform2f(resolutionLocation, width, height);
             gl.uniform1f(timeLocation, time);
             gl.uniform2f(mouseLocation, mouseX, height - mouseY);
+            gl.uniform1f(seedLocation, seed);
 
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
