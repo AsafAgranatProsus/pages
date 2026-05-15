@@ -244,6 +244,86 @@ body {
   position: absolute;
   pointer-events: none;
 }
+
+/* ─── MOBILE ─────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .section {
+    padding: 60px 20px;
+  }
+
+  #the-room {
+    padding: 60px 20px;
+  }
+
+  #the-receipt {
+    padding: 60px 20px;
+    align-items: center;
+  }
+
+  .door-frame {
+    width: 140px;
+    height: 240px;
+  }
+
+  .room-ornament {
+    width: 80%;
+    max-width: 260px;
+  }
+
+  .room-text {
+    font-size: clamp(0.9rem, 4vw, 1.1rem);
+    max-width: 100%;
+  }
+
+  #the-clocks {
+    gap: 30px;
+    padding: 60px 20px;
+  }
+
+  .receipt-container {
+    font-size: 0.75rem;
+    padding-left: 14px;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .receipt-item {
+    word-break: break-word;
+    white-space: normal;
+  }
+
+  .receipt-item .timestamp {
+    display: inline-block;
+    margin-right: 8px;
+    min-width: 52px;
+  }
+
+  .entry-text {
+    font-size: clamp(0.9rem, 4vw, 1.4rem);
+    letter-spacing: 0.15em;
+  }
+
+  .entry-subtext {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+  }
+
+  .scroll-hint {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    white-space: nowrap;
+  }
+
+  /* Scale down clocks slightly on mobile */
+  #clock-1 { width: 100px; height: 100px; }
+  #clock-2 { width: 120px; height: 120px; }
+  #clock-3 { width: 90px;  height: 90px;  }
+}
 </style>
 </head>
 <body>
@@ -275,15 +355,15 @@ body {
 <!-- SECTION 3: THE CLOCKS -->
 <section class="section" id="the-clocks">
   <div class="clock-container">
-    <svg id="clock-1" width="140" height="140" viewBox="0 0 140 140"></svg>
+    <svg id="clock-1" width="140" height="140" viewBox="0 0 140 140" style="max-width:100%;height:auto;"></svg>
     <span class="clock-label">the clock in the kitchen</span>
   </div>
   <div class="clock-container">
-    <svg id="clock-2" width="180" height="180" viewBox="0 0 180 180"></svg>
+    <svg id="clock-2" width="180" height="180" viewBox="0 0 180 180" style="max-width:100%;height:auto;"></svg>
     <span class="clock-label">the clock you forgot to wind</span>
   </div>
   <div class="clock-container">
-    <svg id="clock-3" width="120" height="120" viewBox="0 0 120 120"></svg>
+    <svg id="clock-3" width="120" height="120" viewBox="0 0 120 120" style="max-width:100%;height:auto;"></svg>
     <span class="clock-label">the clock that runs fast</span>
   </div>
 </section>
