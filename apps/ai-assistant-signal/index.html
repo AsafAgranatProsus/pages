@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Users Want From AI Life Assistants</title>
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface2: #222222;
+      --border: #2e2e2e;
+      --text: #e8e8e8;
+      --muted: #888;
+      --accent: #c8f060;
+      --accent2: #60c8f0;
+      --accent3: #f06090;
+      --warn: #f0a060;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent2); text-decoration: none; }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 60px 24px 100px;
+    }
+
+    /* ── Header ── */
+    .header {
+      margin-bottom: 64px;
+    }
+
+    .header .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .header h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    .header h1 span {
+      color: var(--accent);
+    }
+
+    .header .subtitle {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 520px;
+    }
+
+    /* ── Hero stat ── */
+    .hero-stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      padding: 36px 40px;
+      margin-bottom: 64px;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .hero-stat .number {
+      font-size: clamp(48px, 10vw, 80px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--accent);
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .hero-stat .number sup {
+      font-size: 0.4em;
+      vertical-align: super;
+      letter-spacing: 0;
+    }
+
+    .hero-stat .label {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hero-stat .label strong {
+      display: block;
+      font-size: 18px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Finding cards ── */
+    .findings {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 64px;
+    }
+
+    .finding {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .finding::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--finding-color, var(--accent));
+    }
+
+    .finding .rank {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .finding h3 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .finding .desc {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .finding .meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .badge.highlight {
+      background: rgba(200, 240, 96, 0.08);
+      border-color: rgba(200, 240, 96, 0.3);
+      color: var(--accent);
+    }
+
+    .finding blockquote {
+      margin-top: 16px;
+      padding: 14px 18px;
+      background: var(--surface2);
+      border-left: 3px solid var(--border);
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: #aaa;
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    .finding blockquote cite {
+      display: block;
+      margin-top: 6px;
+      font-style: normal;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── Divergence section ── */
+    .divergence {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 36px 40px;
+      margin-bottom: 64px;
+    }
+
+    .divergence h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    .vs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .vs-card {
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .vs-card.wrong {
+      background: rgba(240, 96, 144, 0.05);
+      border-color: rgba(240, 96, 144, 0.2);
+    }
+
+    .vs-card.right {
+      background: rgba(200, 240, 96, 0.05);
+      border-color: rgba(200, 240, 96, 0.2);
+    }
+
+    .vs-card .vs-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .vs-card.wrong .vs-label { color: var(--accent3); }
+    .vs-card.right .vs-label { color: var(--accent); }
+
+    .vs-card p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .divergence .punchline {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 1.4;
+      padding: 20px 0 0;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Bottom line ── */
+    .bottom-line {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 36px 40px;
+      margin-bottom: 48px;
+    }
+
+    .bottom-line h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .bottom-line p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .bottom-line p:last-child { margin-bottom: 0; }
+
+    .bottom-line .call {
+      font-size: 17px;
+      color: var(--text);
+      font-weight: 500;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Footnote ── */
+    .footnote {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.6;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footnote strong { color: #666; }
+
+    /* ── Responsive ── */
+    @media (max-width: 560px) {
+      .hero-stat {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 28px 24px;
+      }
+      .vs-grid {
+        grid-template-columns: 1fr;
+      }
+      .finding { padding: 22px 20px; }
+      .divergence, .bottom-line { padding: 28px 24px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="eyebrow">User signal brief — May 2026</div>
+    <h1>What users actually want from<br><span>AI life assistants</span></h1>
+    <p class="subtitle">5 independent research runs. Reddit, App Store, Hacker News, G2, Product Hunt. 3 primary corpora with source counts and engagement metrics.</p>
+  </div>
+
+  <!-- Hero stat -->
+  <div class="hero-stat">
+    <div class="number">5,000<sup>+</sup></div>
+    <div class="label">
+      <strong>Minimum engaged users on the #1 finding</strong>
+      Confirmed across all 3 primary sources. This is a floor — excludes threads where engagement wasn't quantified, excludes secondary corpus, excludes non-English sources.
+    </div>
+  </div>
+
+  <!-- Findings -->
+  <div class="section-title">5 confirmed findings — all 3 primary sources agree</div>
+
+  <div class="findings">
+
+    <div class="finding" style="--finding-color: #c8f060;">
+      <div class="rank">Finding 01 — #1 ranked</div>
+      <h3>Memory and continuity is the dominant unmet need</h3>
+      <p class="desc">Users don't want more features. They want the AI to remember them — decisions made, constraints set, prior attempts, project context. Every session starting from zero is the top complaint across every platform.</p>
+      <div class="meta">
+        <span class="badge highlight">23 distinct sources</span>
+        <span class="badge highlight">5,000+ engaged users</span>
+        <span class="badge">All 3 primary corpora</span>
+      </div>
+      <blockquote>
+        "Every session, I end up re-explaining: why decisions were made, previous failed attempts, project-specific constraints, debugging history, feature intent."
+        <cite>— r/ObsidianMD</cite>
+      </blockquote>
+    </div>
+
+    <div class="finding" style="--finding-color: #60c8f0;">
+      <div class="rank">Finding 02</div>
+      <h3>Trust is the gating constraint — not features, not price</h3>
+      <p class="desc">16 distinct sources. 855+ minimum engaged users. Users will give an AI their life context — if they can see it, edit it, and know it won't leak. This is not a privacy policy problem. It's a product design problem.</p>
+      <div class="meta">
+        <span class="badge highlight">16 distinct sources</span>
+        <span class="badge highlight">855+ engaged users</span>
+        <span class="badge">All 3 primary corpora</span>
+      </div>
+      <blockquote>
+        "I don't know what it knows about me. I don't know where it uses it. I don't know how to delete it."
+        <cite>— r/ChatGPT (composite from multiple threads)</cite>
+      </blockquote>
+    </div>
+
+    <div class="finding" style="--finding-color: #f0a060;">
+      <div class="rank">Finding 03</div>
+      <h3>Hallucination — especially false confidence about user-provided context</h3>
+      <p class="desc">The life-assistant-specific failure mode: "pretends it read the file." Not just wrong answers — confidently wrong answers about things the user explicitly provided. Confirmed across all 3 primary sources.</p>
+      <div class="meta">
+        <span class="badge">All 3 primary corpora</span>
+      </div>
+    </div>
+
+    <div class="finding" style="--finding-color: #a060f0;">
+      <div class="rank">Finding 04</div>
+      <h3>Instruction-following degrades within a session</h3>
+      <p class="desc">#2 ranked complaint in the ChatGPT research run. Users set constraints at the start of a session; the AI ignores them by the end. Directly undermines any relationship-building behavior.</p>
+      <div class="meta">
+        <span class="badge">All 3 primary corpora</span>
+      </div>
+    </div>
+
+    <div class="finding" style="--finding-color: #f06090;">
+      <div class="rank">Finding 05</div>
+      <h3>Agentic products that don't actually act</h3>
+      <p class="desc">Motion, Reclaim, Copilot — all named. Users bought the "AI that does things for you" promise. What they got was a chatbot with a calendar integration. The gap between the pitch and the product is the complaint.</p>
+      <div class="meta">
+        <span class="badge">All 3 primary corpora</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Divergence -->
+  <div class="divergence">
+    <h2>The divergence that defines the bet</h2>
+    <p style="font-size:14px; color: var(--muted); margin-bottom: 24px;">The research splits on how to frame the memory problem. The framing determines the product response.</p>
+
+    <div class="vs-grid">
+      <div class="vs-card wrong">
+        <div class="vs-label">What everyone else is solving</div>
+        <p>Context window is too small. Tokens get cut. Advertised limits aren't real. Fix: more tokens.</p>
+      </div>
+      <div class="vs-card right">
+        <div class="vs-label">What users are actually describing</div>
+        <p>Continuity of decisions, constraints, prior attempts, and project state. A relationship problem, not an architecture problem.</p>
+      </div>
+    </div>
+
+    <div class="punchline">Everyone else is solving tokens.<br>That's the wrong problem.</div>
+  </div>
+
+  <!-- Bottom line -->
+  <div class="bottom-line">
+    <h2>Bottom line</h2>
+    <p>The market has told us what it wants. Clearly, repeatedly, at scale.</p>
+    <p>An AI that remembers you — not just facts, but context, decisions, constraints, history. An AI you can trust with that information because you can see it, edit it, and know it won't be used against you.</p>
+    <p class="call">The research didn't generate this insight. It confirmed the problem we've been building toward for 6 months. The question is whether we build fast enough to own it.</p>
+  </div>
+
+  <!-- Footnote -->
+  <div class="footnote">
+    <strong>Method:</strong> 5 independent research runs (Gemini Deep Research, ChatGPT, Kimi Deep Research + 2 secondary). Sources: Reddit, App Store, Google Play, G2, Capterra, Hacker News, Product Hunt. 3 primary corpora with source counts and engagement metrics. All frequency claims grounded in retrieved sources only — no inference from general knowledge. Engagement figures are floors (upvotes + comments as minimum proxy). Non-English sources excluded. May 2026.
+  </div>
+
+</div>
+</body>
+</html>
