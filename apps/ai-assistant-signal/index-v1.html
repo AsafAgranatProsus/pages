@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Users Want From AI Life Assistants</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: #ffffff;
+      color: #111111;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    /* ── GRID ── */
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 56px 48px 72px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      border-top: 4px solid #111111;
+      padding-top: 20px;
+      margin-bottom: 64px;
+    }
+
+    .header-left {}
+
+    .header-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 10px;
+    }
+
+    .header h1 {
+      font-size: clamp(22px, 3vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: #111111;
+      max-width: 640px;
+    }
+
+    .header-meta {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #999;
+      text-align: right;
+      padding-bottom: 4px;
+    }
+
+    /* ── HERO STAT ── */
+    .hero-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-top: 1px solid #ddd;
+      margin-bottom: 64px;
+    }
+
+    .hero-stat {
+      padding: 40px 48px 40px 0;
+      border-right: 1px solid #ddd;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 16px;
+    }
+
+    .hero-number {
+      font-size: clamp(72px, 10vw, 120px);
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      color: #e62020;
+      line-height: 0.85;
+    }
+
+    .hero-number sup {
+      font-size: 0.35em;
+      vertical-align: super;
+      font-weight: 700;
+    }
+
+    .hero-desc {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #111111;
+      line-height: 1.3;
+    }
+
+    .hero-sub {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      max-width: 380px;
+    }
+
+    .trust-block {
+      padding: 40px 0 40px 48px;
+    }
+
+    .trust-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #e62020;
+      margin-bottom: 16px;
+    }
+
+    .trust-heading {
+      font-size: clamp(18px, 2.2vw, 26px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: #111111;
+      margin-bottom: 16px;
+    }
+
+    .trust-body {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.65;
+      max-width: 400px;
+    }
+
+    .trust-nums {
+      display: flex;
+      gap: 40px;
+      margin-top: 28px;
+    }
+
+    .trust-n-val {
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: #111111;
+      line-height: 1;
+    }
+
+    .trust-n-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    /* ── BAR CHART ── */
+    .chart-section {
+      margin-bottom: 64px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 24px;
+    }
+
+    .bars {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 28px 200px 1fr 56px;
+      align-items: center;
+      gap: 20px;
+      padding: 18px 0;
+      border-top: 1px solid #e8e8e8;
+    }
+
+    .bar-row:last-child {
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .bar-rank {
+      font-size: 11px;
+      font-weight: 700;
+      color: #bbb;
+      letter-spacing: 0.06em;
+    }
+
+    .bar-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111111;
+      line-height: 1.3;
+    }
+
+    .bar-track {
+      height: 8px;
+      background: #f0f0f0;
+    }
+
+    .bar-fill {
+      height: 100%;
+    }
+
+    .bar-count {
+      font-size: 15px;
+      font-weight: 700;
+      color: #111111;
+      text-align: right;
+    }
+
+    .bar-count span {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #bbb;
+    }
+
+    /* ── BOTTOM ROW ── */
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-top: 1px solid #ddd;
+    }
+
+    .framing-block {
+      padding: 40px 48px 40px 0;
+      border-right: 1px solid #ddd;
+    }
+
+    .framing-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 24px;
+    }
+
+    .fork-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .fork-col-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e8e8e8;
+    }
+
+    .fork-col:last-child .fork-col-label {
+      border-bottom-color: #e62020;
+      color: #e62020;
+    }
+
+    .fork-col p {
+      font-size: 15px;
+      color: #444;
+      line-height: 1.55;
+    }
+
+    .punchline {
+      font-size: clamp(16px, 1.8vw, 20px);
+      font-weight: 700;
+      color: #111111;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+
+    .punchline em {
+      color: #e62020;
+      font-style: normal;
+    }
+
+    /* ── QUOTE ── */
+    .quote-block {
+      padding: 40px 0 40px 48px;
+    }
+
+    .quote-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 24px;
+    }
+
+    blockquote {
+      font-size: clamp(15px, 1.6vw, 18px);
+      color: #333;
+      line-height: 1.65;
+      font-weight: 400;
+      border-left: 3px solid #e62020;
+      padding-left: 20px;
+      margin-bottom: 16px;
+    }
+
+    cite {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #999;
+      font-style: normal;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 64px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-note {
+      font-size: 11px;
+      color: #aaa;
+      letter-spacing: 0.06em;
+    }
+
+    .footer-date {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #aaa;
+    }
+
+    /* ── RESPONSIVE ── */
+
+    /* Tablet: ~768px */
+    @media (max-width: 860px) {
+      .page {
+        padding: 36px 28px 56px;
+      }
+
+      .header {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .header-meta {
+        text-align: left;
+      }
+
+      .hero-row {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stat {
+        padding: 32px 0;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .trust-block {
+        padding: 32px 0;
+      }
+
+      .bar-row {
+        grid-template-columns: 24px 1fr 48px;
+        gap: 12px;
+      }
+
+      /* hide bar track on narrow tablet, show just rank + name + count */
+      .bar-track {
+        display: none;
+      }
+
+      .bottom-row {
+        grid-template-columns: 1fr;
+      }
+
+      .framing-block {
+        padding: 32px 0;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .quote-block {
+        padding: 32px 0;
+      }
+    }
+
+    /* Mobile: ~480px */
+    @media (max-width: 520px) {
+      .page {
+        padding: 24px 20px 48px;
+      }
+
+      .header {
+        margin-bottom: 40px;
+      }
+
+      .hero-row,
+      .chart-section,
+      .bottom-row {
+        margin-bottom: 40px;
+      }
+
+      .hero-number {
+        font-size: clamp(64px, 18vw, 96px);
+      }
+
+      .hero-desc {
+        font-size: 16px;
+      }
+
+      .trust-heading {
+        font-size: 18px;
+      }
+
+      .trust-body {
+        font-size: 14px;
+      }
+
+      .bar-row {
+        grid-template-columns: 24px 1fr 44px;
+        gap: 10px;
+        padding: 14px 0;
+      }
+
+      .bar-name {
+        font-size: 14px;
+      }
+
+      .bar-track {
+        display: none;
+      }
+
+      .fork-cols {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .punchline {
+        font-size: 16px;
+      }
+
+      blockquote {
+        font-size: 15px;
+      }
+
+      .footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-kicker">Signal brief</div>
+      <h1>What users actually want from AI life assistants</h1>
+    </div>
+    <div class="header-meta">May 2026&nbsp;&nbsp;·&nbsp;&nbsp;3 primary corpora</div>
+  </div>
+
+  <!-- Hero row -->
+  <div class="hero-row">
+    <div class="hero-stat">
+      <div class="hero-eyebrow">Top finding — engaged users</div>
+      <div class="hero-number">5,000<sup>+</sup></div>
+      <div class="hero-desc">Memory &amp; continuity failure</div>
+      <div class="hero-sub">Minimum floor across 23 distinct sources. Confirmed in all 3 primary corpora.</div>
+    </div>
+    <div class="trust-block">
+      <div class="trust-eyebrow">Gating constraint</div>
+      <div class="trust-heading">Trust blocks everything above it</div>
+      <div class="trust-body">Users will share life context with an AI — if they can see it, edit it, and know it won't leak. Not a policy problem. A product design problem.</div>
+      <div class="trust-nums">
+        <div>
+          <div class="trust-n-val">16</div>
+          <div class="trust-n-label">sources</div>
+        </div>
+        <div>
+          <div class="trust-n-val">855<sup style="font-size:0.45em; vertical-align:super">+</sup></div>
+          <div class="trust-n-label">users</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bar chart -->
+  <div class="chart-section">
+    <div class="section-label">Findings ranked by source count — confirmed across 3 primary corpora</div>
+    <div class="bars">
+
+      <div class="bar-row">
+        <div class="bar-rank">01</div>
+        <div class="bar-name">Memory &amp; continuity</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%; background:#111111;"></div></div>
+        <div class="bar-count">23<span>sources</span></div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-rank">02</div>
+        <div class="bar-name">Agentic products that don't act</div>
+        <div class="bar-track"><div class="bar-fill" style="width:83%; background:#e62020;"></div></div>
+        <div class="bar-count">19<span>sources</span></div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-rank">03</div>
+        <div class="bar-name">Hallucination — false confidence</div>
+        <div class="bar-track"><div class="bar-fill" style="width:74%; background:#555;"></div></div>
+        <div class="bar-count">17<span>sources</span></div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-rank">04</div>
+        <div class="bar-name">Trust &amp; data control</div>
+        <div class="bar-track"><div class="bar-fill" style="width:70%; background:#888;"></div></div>
+        <div class="bar-count">16<span>sources</span></div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-rank">05</div>
+        <div class="bar-name">Instruction-following degrades</div>
+        <div class="bar-track"><div class="bar-fill" style="width:65%; background:#aaa;"></div></div>
+        <div class="bar-count">15<span>sources</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom row -->
+  <div class="bottom-row">
+    <div class="framing-block">
+      <div class="framing-eyebrow">Where the field is going wrong</div>
+      <div class="fork-cols">
+        <div class="fork-col">
+          <div class="fork-col-label">Everyone else</div>
+          <p>Context window too small. Fix: more tokens.</p>
+        </div>
+        <div class="fork-col">
+          <div class="fork-col-label">What users say</div>
+          <p>Continuity of decisions, constraints, history. A relationship problem.</p>
+        </div>
+      </div>
+      <div class="punchline">Everyone else is solving tokens.<br><em>That's the wrong problem.</em></div>
+    </div>
+
+    <div class="quote-block">
+      <div class="quote-eyebrow">Verbatim signal</div>
+      <blockquote>"Every session, I end up re-explaining: why decisions were made, previous failed attempts, project-specific constraints, debugging history, feature intent."</blockquote>
+      <cite>— r/ObsidianMD</cite>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-note">5 independent research runs &nbsp;·&nbsp; 3 primary corpora &nbsp;·&nbsp; all findings confirmed across all sources &nbsp;·&nbsp; engagement figures are floors (upvotes + comments)</div>
+    <div class="footer-date">May 2026</div>
+  </div>
+
+</div>
+</body>
+</html>

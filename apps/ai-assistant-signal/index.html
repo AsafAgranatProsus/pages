@@ -1,599 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>What Users Want From AI Life Assistants</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body {
-      background: #ffffff;
-      color: #111111;
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      font-size: 16px;
-      line-height: 1.5;
-    }
-
-    /* ── GRID ── */
-    .page {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 56px 48px 72px;
-    }
-
-    /* ── HEADER ── */
-    .header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: end;
-      border-top: 4px solid #111111;
-      padding-top: 20px;
-      margin-bottom: 64px;
-    }
-
-    .header-left {}
-
-    .header-kicker {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #999;
-      margin-bottom: 10px;
-    }
-
-    .header h1 {
-      font-size: clamp(22px, 3vw, 36px);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      color: #111111;
-      max-width: 640px;
-    }
-
-    .header-meta {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #999;
-      text-align: right;
-      padding-bottom: 4px;
-    }
-
-    /* ── HERO STAT ── */
-    .hero-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      border-top: 1px solid #ddd;
-      margin-bottom: 64px;
-    }
-
-    .hero-stat {
-      padding: 40px 48px 40px 0;
-      border-right: 1px solid #ddd;
-    }
-
-    .hero-eyebrow {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #999;
-      margin-bottom: 16px;
-    }
-
-    .hero-number {
-      font-size: clamp(72px, 10vw, 120px);
-      font-weight: 700;
-      letter-spacing: -0.05em;
-      color: #e62020;
-      line-height: 0.85;
-    }
-
-    .hero-number sup {
-      font-size: 0.35em;
-      vertical-align: super;
-      font-weight: 700;
-    }
-
-    .hero-desc {
-      margin-top: 20px;
-      font-size: 18px;
-      font-weight: 600;
-      color: #111111;
-      line-height: 1.3;
-    }
-
-    .hero-sub {
-      margin-top: 8px;
-      font-size: 14px;
-      color: #666;
-      line-height: 1.6;
-      max-width: 380px;
-    }
-
-    .trust-block {
-      padding: 40px 0 40px 48px;
-    }
-
-    .trust-eyebrow {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #e62020;
-      margin-bottom: 16px;
-    }
-
-    .trust-heading {
-      font-size: clamp(18px, 2.2vw, 26px);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-      color: #111111;
-      margin-bottom: 16px;
-    }
-
-    .trust-body {
-      font-size: 15px;
-      color: #555;
-      line-height: 1.65;
-      max-width: 400px;
-    }
-
-    .trust-nums {
-      display: flex;
-      gap: 40px;
-      margin-top: 28px;
-    }
-
-    .trust-n-val {
-      font-size: clamp(32px, 4vw, 48px);
-      font-weight: 700;
-      letter-spacing: -0.04em;
-      color: #111111;
-      line-height: 1;
-    }
-
-    .trust-n-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #999;
-      margin-top: 4px;
-    }
-
-    /* ── BAR CHART ── */
-    .chart-section {
-      margin-bottom: 64px;
-    }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #999;
-      margin-bottom: 24px;
-    }
-
-    .bars {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .bar-row {
-      display: grid;
-      grid-template-columns: 28px 200px 1fr 56px;
-      align-items: center;
-      gap: 20px;
-      padding: 18px 0;
-      border-top: 1px solid #e8e8e8;
-    }
-
-    .bar-row:last-child {
-      border-bottom: 1px solid #e8e8e8;
-    }
-
-    .bar-rank {
-      font-size: 11px;
-      font-weight: 700;
-      color: #bbb;
-      letter-spacing: 0.06em;
-    }
-
-    .bar-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: #111111;
-      line-height: 1.3;
-    }
-
-    .bar-track {
-      height: 8px;
-      background: #f0f0f0;
-    }
-
-    .bar-fill {
-      height: 100%;
-    }
-
-    .bar-count {
-      font-size: 15px;
-      font-weight: 700;
-      color: #111111;
-      text-align: right;
-    }
-
-    .bar-count span {
-      display: block;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #bbb;
-    }
-
-    /* ── BOTTOM ROW ── */
-    .bottom-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      border-top: 1px solid #ddd;
-    }
-
-    .framing-block {
-      padding: 40px 48px 40px 0;
-      border-right: 1px solid #ddd;
-    }
-
-    .framing-eyebrow {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #999;
-      margin-bottom: 24px;
-    }
-
-    .fork-cols {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-bottom: 28px;
-    }
-
-    .fork-col-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #999;
-      margin-bottom: 10px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #e8e8e8;
-    }
-
-    .fork-col:last-child .fork-col-label {
-      border-bottom-color: #e62020;
-      color: #e62020;
-    }
-
-    .fork-col p {
-      font-size: 15px;
-      color: #444;
-      line-height: 1.55;
-    }
-
-    .punchline {
-      font-size: clamp(16px, 1.8vw, 20px);
-      font-weight: 700;
-      color: #111111;
-      line-height: 1.3;
-      letter-spacing: -0.01em;
-    }
-
-    .punchline em {
-      color: #e62020;
-      font-style: normal;
-    }
-
-    /* ── QUOTE ── */
-    .quote-block {
-      padding: 40px 0 40px 48px;
-    }
-
-    .quote-eyebrow {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #999;
-      margin-bottom: 24px;
-    }
-
-    blockquote {
-      font-size: clamp(15px, 1.6vw, 18px);
-      color: #333;
-      line-height: 1.65;
-      font-weight: 400;
-      border-left: 3px solid #e62020;
-      padding-left: 20px;
-      margin-bottom: 16px;
-    }
-
-    cite {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #999;
-      font-style: normal;
-    }
-
-    /* ── FOOTER ── */
-    .footer {
-      margin-top: 64px;
-      padding-top: 20px;
-      border-top: 1px solid #ddd;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .footer-note {
-      font-size: 11px;
-      color: #aaa;
-      letter-spacing: 0.06em;
-    }
-
-    .footer-date {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #aaa;
-    }
-
-    /* ── RESPONSIVE ── */
-
-    /* Tablet: ~768px */
-    @media (max-width: 860px) {
-      .page {
-        padding: 36px 28px 56px;
-      }
-
-      .header {
-        grid-template-columns: 1fr;
-        gap: 8px;
-      }
-
-      .header-meta {
-        text-align: left;
-      }
-
-      .hero-row {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-stat {
-        padding: 32px 0;
-        border-right: none;
-        border-bottom: 1px solid #ddd;
-      }
-
-      .trust-block {
-        padding: 32px 0;
-      }
-
-      .bar-row {
-        grid-template-columns: 24px 1fr 48px;
-        gap: 12px;
-      }
-
-      /* hide bar track on narrow tablet, show just rank + name + count */
-      .bar-track {
-        display: none;
-      }
-
-      .bottom-row {
-        grid-template-columns: 1fr;
-      }
-
-      .framing-block {
-        padding: 32px 0;
-        border-right: none;
-        border-bottom: 1px solid #ddd;
-      }
-
-      .quote-block {
-        padding: 32px 0;
-      }
-    }
-
-    /* Mobile: ~480px */
-    @media (max-width: 520px) {
-      .page {
-        padding: 24px 20px 48px;
-      }
-
-      .header {
-        margin-bottom: 40px;
-      }
-
-      .hero-row,
-      .chart-section,
-      .bottom-row {
-        margin-bottom: 40px;
-      }
-
-      .hero-number {
-        font-size: clamp(64px, 18vw, 96px);
-      }
-
-      .hero-desc {
-        font-size: 16px;
-      }
-
-      .trust-heading {
-        font-size: 18px;
-      }
-
-      .trust-body {
-        font-size: 14px;
-      }
-
-      .bar-row {
-        grid-template-columns: 24px 1fr 44px;
-        gap: 10px;
-        padding: 14px 0;
-      }
-
-      .bar-name {
-        font-size: 14px;
-      }
-
-      .bar-track {
-        display: none;
-      }
-
-      .fork-cols {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-
-      .punchline {
-        font-size: 16px;
-      }
-
-      blockquote {
-        font-size: 15px;
-      }
-
-      .footer {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Life Assistant — User Signal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f0;
+            color: #1a1a1a;
+            min-height: 100vh;
+            padding: 60px 40px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* Header */
+        .header { margin-bottom: 60px; }
+        .header-meta     { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; margin-bottom: 16px; }
+        .header-title    { font-size: 42px; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; max-width: 720px; margin-bottom: 20px; }
+        .header-subtitle { font-size: 16px; color: #555; max-width: 620px; line-height: 1.6; }
+
+        /* Grid */
+        .signal-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            margin-bottom: 2px;
+        }
+
+        /* Cards */
+        .signal-card  { background: white; padding: 36px 32px; position: relative; }
+        .wide-card    { grid-column: span 2; }
+        .full-card    { grid-column: span 3; }
+        .accent-card  { background: #1a1a1a; color: white; }
+
+        .signal-number     { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; margin-bottom: 24px; }
+        .signal-stat       { font-size: 52px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; color: #e63329; margin-bottom: 8px; }
+        .signal-stat-label { font-size: 13px; color: #888; margin-bottom: 24px; letter-spacing: 0.02em; }
+        .signal-title      { font-size: 18px; font-weight: 600; line-height: 1.3; margin-bottom: 12px; }
+        .signal-description{ font-size: 14px; color: #555; line-height: 1.6; }
+
+        .accent-card .signal-number      { color: #666; }
+        .accent-card .signal-title       { color: white; }
+        .accent-card .signal-description { color: #aaa; }
+        .accent-card .signal-stat-label  { color: #666; }
+        .accent-card .signal-stat        { color: #e63329; }
+
+        .signal-quote {
+            margin-top: 20px; padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 13px; color: #777; line-height: 1.5;
+            font-style: italic;
+        }
+        .signal-quote::before {
+            content: '\201C';
+            font-size: 24px; color: #e63329; font-style: normal;
+            line-height: 0; vertical-align: -8px; margin-right: 4px;
+        }
+        .accent-card .signal-quote { border-top-color: #333; color: #888; }
+
+        /* Proactivity pair */
+        .pair-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            margin-bottom: 2px;
+        }
+        .pair-label {
+            font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+            color: #888; margin-bottom: 6px;
+        }
+
+        /* Fork section */
+        .fork-section { margin-top: 2px; }
+        .fork-card    { background: white; padding: 36px 32px; }
+        .fork-header  { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; margin-bottom: 24px; }
+        .fork-title   { font-size: 24px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.02em; }
+        .fork-description { font-size: 14px; color: #555; line-height: 1.6; max-width: 820px; margin-bottom: 32px; }
+        .fork-grid    { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+        .fork-option  { background: #f5f5f0; padding: 28px; }
+        .fork-option-label { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; margin-bottom: 12px; }
+        .fork-option-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .fork-option-description { font-size: 13px; color: #666; line-height: 1.5; }
+
+        /* Footer */
+        .footer {
+            margin-top: 60px; padding-top: 24px;
+            border-top: 1px solid #ddd;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 8px;
+        }
+        .footer-left, .footer-right { font-size: 12px; color: #888; }
+
+        /* Version note */
+        .version-note {
+            margin-top: 24px;
+            font-size: 11px; color: #bbb; letter-spacing: 0.1em; text-transform: uppercase;
+            text-align: right;
+        }
+        .version-note a { color: #bbb; text-decoration: underline; }
+
+        @media (max-width: 800px) {
+            body { padding: 32px 20px; }
+            .signal-grid, .pair-grid, .fork-grid { grid-template-columns: 1fr; }
+            .wide-card, .full-card { grid-column: span 1; }
+            .header-title { font-size: 28px; }
+            .signal-stat  { font-size: 40px; }
+        }
+    </style>
 </head>
 <body>
-<div class="page">
+<div class="container">
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left">
-      <div class="header-kicker">Signal brief</div>
-      <h1>What users actually want from AI life assistants</h1>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-meta">Toqi · AI Life Assistant Research · May 2026</div>
+        <div class="header-title">What users actually do when AI assistants fail them</div>
+        <div class="header-subtitle">Behavioral signal from 8 primary research corpora. Not what users say they want — what they built, abandoned, disabled, and complained about loudly enough to count.</div>
     </div>
-    <div class="header-meta">May 2026&nbsp;&nbsp;·&nbsp;&nbsp;3 primary corpora</div>
-  </div>
 
-  <!-- Hero row -->
-  <div class="hero-row">
-    <div class="hero-stat">
-      <div class="hero-eyebrow">Top finding — engaged users</div>
-      <div class="hero-number">5,000<sup>+</sup></div>
-      <div class="hero-desc">Memory &amp; continuity failure</div>
-      <div class="hero-sub">Minimum floor across 23 distinct sources. Confirmed in all 3 primary corpora.</div>
-    </div>
-    <div class="trust-block">
-      <div class="trust-eyebrow">Gating constraint</div>
-      <div class="trust-heading">Trust blocks everything above it</div>
-      <div class="trust-body">Users will share life context with an AI — if they can see it, edit it, and know it won't leak. Not a policy problem. A product design problem.</div>
-      <div class="trust-nums">
-        <div>
-          <div class="trust-n-val">16</div>
-          <div class="trust-n-label">sources</div>
+    <!-- Row 1: Memory + Jarvis (wide accent) -->
+    <div class="signal-grid">
+
+        <div class="signal-card">
+            <div class="signal-number">Signal 01 · Memory</div>
+            <div class="signal-stat">DANGIT</div>
+            <div class="signal-stat-label">a browser extension users built to fix memory themselves</div>
+            <div class="signal-title">Users coded their own memory</div>
+            <div class="signal-description">A developer built and shipped a browser extension whose sole function is to re-inject context summaries into ChatGPT every time it forgets. They named it after the expletive users say when the assistant loses thread. The tool exists because the native memory system fails consistently enough to justify engineering around it.</div>
+            <div class="signal-quote">ChatGPT keeps forgetting what we decided earlier in long conversations… Three hours into a session and the AI completely ignores constraints we set at the start.</div>
         </div>
-        <div>
-          <div class="trust-n-val">855<sup style="font-size:0.45em; vertical-align:super">+</sup></div>
-          <div class="trust-n-label">users</div>
+
+        <div class="signal-card wide-card accent-card">
+            <div class="signal-number">Signal 02 · The Jarvis Experiment</div>
+            <div class="signal-stat">1 of dozens</div>
+            <div class="signal-stat-label">features kept after one month of real use</div>
+            <div class="signal-title">One feature survived</div>
+            <div class="signal-description">One user spent a month building a comprehensive personal AI — scheduling, email, research, fitness, daily planning. After 30 days of real use, they kept exactly one integration: the gym workout generator. Every other connection was abandoned. The surviving feature had three properties: recurring need, clear timing, genuine complexity. The rest didn't.</div>
+            <div class="signal-quote">I built a personal AI Jarvis connected to my entire life. After a month, I only use it for gym workouts… The places where personal AI actually sticks are narrow and specific: recurring need + clear timing + genuine complexity.</div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bar chart -->
-  <div class="chart-section">
-    <div class="section-label">Findings ranked by source count — confirmed across 3 primary corpora</div>
-    <div class="bars">
-
-      <div class="bar-row">
-        <div class="bar-rank">01</div>
-        <div class="bar-name">Memory &amp; continuity</div>
-        <div class="bar-track"><div class="bar-fill" style="width:100%; background:#111111;"></div></div>
-        <div class="bar-count">23<span>sources</span></div>
-      </div>
-
-      <div class="bar-row">
-        <div class="bar-rank">02</div>
-        <div class="bar-name">Agentic products that don't act</div>
-        <div class="bar-track"><div class="bar-fill" style="width:83%; background:#e62020;"></div></div>
-        <div class="bar-count">19<span>sources</span></div>
-      </div>
-
-      <div class="bar-row">
-        <div class="bar-rank">03</div>
-        <div class="bar-name">Hallucination — false confidence</div>
-        <div class="bar-track"><div class="bar-fill" style="width:74%; background:#555;"></div></div>
-        <div class="bar-count">17<span>sources</span></div>
-      </div>
-
-      <div class="bar-row">
-        <div class="bar-rank">04</div>
-        <div class="bar-name">Trust &amp; data control</div>
-        <div class="bar-track"><div class="bar-fill" style="width:70%; background:#888;"></div></div>
-        <div class="bar-count">16<span>sources</span></div>
-      </div>
-
-      <div class="bar-row">
-        <div class="bar-rank">05</div>
-        <div class="bar-name">Instruction-following degrades</div>
-        <div class="bar-track"><div class="bar-fill" style="width:65%; background:#aaa;"></div></div>
-        <div class="bar-count">15<span>sources</span></div>
-      </div>
 
     </div>
-  </div>
 
-  <!-- Bottom row -->
-  <div class="bottom-row">
-    <div class="framing-block">
-      <div class="framing-eyebrow">Where the field is going wrong</div>
-      <div class="fork-cols">
-        <div class="fork-col">
-          <div class="fork-col-label">Everyone else</div>
-          <p>Context window too small. Fix: more tokens.</p>
+    <!-- Row 2: Motion (full width) -->
+    <div class="signal-grid" style="margin-bottom: 2px;">
+        <div class="signal-card full-card">
+            <div class="signal-number">Signal 03 · Daily Planning</div>
+            <div class="signal-stat" style="font-size: 40px;">1,836</div>
+            <div class="signal-stat-label">Motion reviews analyzed by NLP — 33.4% negative sentiment</div>
+            <div class="signal-title">1,836 calendars fought back</div>
+            <div class="signal-description">JustUseApp's NLP analysis of Motion reviews finds users reporting ~20% of auto-scheduled blocks require manual rework — the calendar gets reorganized by hand to undo the AI. The product that promised to optimize time created more overhead than it removed. Users didn't ask for a smarter calendar. They asked to see their day clearly. The AI gave them a scheduling engine instead.</div>
+            <div class="signal-quote">The AI just dumps tasks into available timeslots without optimizing my schedule, often leaving large blocks of time wasted. I end up manually re-organizing everything which defeats the purpose of Motion.</div>
         </div>
-        <div class="fork-col">
-          <div class="fork-col-label">What users say</div>
-          <p>Continuity of decisions, constraints, history. A relationship problem.</p>
+    </div>
+
+    <!-- Row 3: Proactivity pair -->
+    <div class="pair-grid">
+
+        <div class="signal-card">
+            <div class="signal-number">Signal 04 · Proactivity — Failure</div>
+            <div class="signal-stat" style="color: #1a1a1a; font-size: 40px;">Stop</div>
+            <div class="signal-stat-label">the first word in the Reddit thread title</div>
+            <div class="signal-title">Don't text me about my wife</div>
+            <div class="signal-description">A ChatGPT user received an unsolicited watch notification offering to help plan a meal with their spouse. They went to Reddit to ask how to make it stop — framing the notification as a violation, not a feature. The assistant assumed intimacy it hadn't earned. That's the failure mode: initiating the relationship, not just the task.</div>
+            <div class="signal-quote">Got a notification from ChatGPT on my watch… it said next time I'm in with my wife it can help pick a film and plan a meal. Totally unprompted… Do they actively want to drive people away, or what?</div>
         </div>
-      </div>
-      <div class="punchline">Everyone else is solving tokens.<br><em>That's the wrong problem.</em></div>
+
+        <div class="signal-card">
+            <div class="signal-number">Signal 05 · Proactivity — Success</div>
+            <div class="signal-stat" style="font-size: 40px;">1</div>
+            <div class="signal-stat-label">notification, user-authorized domain, kept in the stack</div>
+            <div class="signal-title">Call your mom</div>
+            <div class="signal-description">A user configured a WhatsApp-connected AI to watch for one specific value — family maintenance — and got pinged at the right moment to call their mother. They posted about it positively and kept the setup. The shape of proactivity that works: user-authorized domain, narrow trigger, single notification, no commentary. The exact inverse of Signal 04.</div>
+            <div class="signal-quote">An AI assistant I set up on WhatsApp pinged me [to call my mom]. It's a small thing… needed software to notice.</div>
+        </div>
+
     </div>
 
-    <div class="quote-block">
-      <div class="quote-eyebrow">Verbatim signal</div>
-      <blockquote>"Every session, I end up re-explaining: why decisions were made, previous failed attempts, project-specific constraints, debugging history, feature intent."</blockquote>
-      <cite>— r/ObsidianMD</cite>
+    <!-- Row 4: Synthetic warmth -->
+    <div class="signal-grid" style="margin-bottom: 2px;">
+        <div class="signal-card full-card">
+            <div class="signal-number">Signal 06 · Relationship Layer</div>
+            <div class="signal-stat" style="font-size: 40px;">27 upvotes · 30 comments</div>
+            <div class="signal-stat-label">r/ChatGPT thread on synthetic empathy — attitudinal signal</div>
+            <div class="signal-title">Stop pretending to care</div>
+            <div class="signal-description">A Reddit post critiquing AI assistants' "coddling and gaslighting" tone drew 27 upvotes and 30 comments of agreement. Users described simulated empathy as "creepy and disgusting" — explicitly preferring input-output operations over performed human connection. Note: this is attitudinal, not behavioral. The synthesis does not record users abandoning products specifically over warmth. The signal is real; the behavioral weight is lower than Signals 01–05.</div>
+            <div class="signal-quote">I hate how that software is trying to constantly coddle and gaslight me into anthropomorphising it. It's a program built on a binary system. I want it to fulfil input-output operations… I definitely don't want it to mimic humans. That's just incredibly creepy and disgusting.</div>
+        </div>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <div class="footer">
-    <div class="footer-note">5 independent research runs &nbsp;·&nbsp; 3 primary corpora &nbsp;·&nbsp; all findings confirmed across all sources &nbsp;·&nbsp; engagement figures are floors (upvotes + comments)</div>
-    <div class="footer-date">May 2026</div>
-  </div>
+    <!-- Fork -->
+    <div class="fork-section">
+        <div class="fork-card">
+            <div class="fork-header">The Open Question · What this means for Toqi</div>
+            <div class="fork-title">The Jarvis experiment is the answer to the Fork</div>
+            <div class="fork-description">Signal 02 resolves the strategic question that the synthesis left open: users try the comprehensive vision, then fall back to one bounded job. The dinner bet fits the surviving-feature shape — recurring need, clear timing, genuine complexity. Sprawling daily-planning ambition does not. The question is whether Toqi builds toward the comprehensive vision (and accepts the abandonment rate) or bets on being the one feature that survives.</div>
+            <div class="fork-grid">
+                <div class="fork-option">
+                    <div class="fork-option-label">Path A · Stronger in data</div>
+                    <div class="fork-option-title">Nail one job, earn the right to expand</div>
+                    <div class="fork-option-description">Start with the dinner bet — it fits the surviving-feature shape. Build trust through reliability on a narrow, recurring need. Expand only when the user signals readiness. The Jarvis experiment says this is the only path that doesn't end in abandonment.</div>
+                </div>
+                <div class="fork-option">
+                    <div class="fork-option-label">Path B · Requires product signal</div>
+                    <div class="fork-option-title">Lead with the relationship, let jobs follow</div>
+                    <div class="fork-option-description">Toqi's bet is the relationship layer — memory, continuity, trust. If the relationship is strong enough, users may tolerate a broader surface. Signal 06 (warmth backlash) is the risk: relationship must be earned through continuity, not performed through warmth. No behavioral data yet confirms this path survives the Jarvis test.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-left">Toqi · AI Life Assistant User Signal · Internal Research Synthesis · May 2026</div>
+        <div class="footer-right">8 primary corpora · behavioral signals prioritized over attitudinal · Nov 2024–May 2026</div>
+    </div>
+
+    <div class="version-note">v2 · <a href="index-v1.html">view v1</a></div>
 
 </div>
 </body>
