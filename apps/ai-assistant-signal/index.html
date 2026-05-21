@@ -344,6 +344,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .footer-note {
@@ -358,6 +360,128 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: #aaa;
+    }
+
+    /* ── RESPONSIVE ── */
+
+    /* Tablet: ~768px */
+    @media (max-width: 860px) {
+      .page {
+        padding: 36px 28px 56px;
+      }
+
+      .header {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .header-meta {
+        text-align: left;
+      }
+
+      .hero-row {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stat {
+        padding: 32px 0;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .trust-block {
+        padding: 32px 0;
+      }
+
+      .bar-row {
+        grid-template-columns: 24px 1fr 48px;
+        gap: 12px;
+      }
+
+      /* hide bar track on narrow tablet, show just rank + name + count */
+      .bar-track {
+        display: none;
+      }
+
+      .bottom-row {
+        grid-template-columns: 1fr;
+      }
+
+      .framing-block {
+        padding: 32px 0;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .quote-block {
+        padding: 32px 0;
+      }
+    }
+
+    /* Mobile: ~480px */
+    @media (max-width: 520px) {
+      .page {
+        padding: 24px 20px 48px;
+      }
+
+      .header {
+        margin-bottom: 40px;
+      }
+
+      .hero-row,
+      .chart-section,
+      .bottom-row {
+        margin-bottom: 40px;
+      }
+
+      .hero-number {
+        font-size: clamp(64px, 18vw, 96px);
+      }
+
+      .hero-desc {
+        font-size: 16px;
+      }
+
+      .trust-heading {
+        font-size: 18px;
+      }
+
+      .trust-body {
+        font-size: 14px;
+      }
+
+      .bar-row {
+        grid-template-columns: 24px 1fr 44px;
+        gap: 10px;
+        padding: 14px 0;
+      }
+
+      .bar-name {
+        font-size: 14px;
+      }
+
+      .bar-track {
+        display: none;
+      }
+
+      .fork-cols {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .punchline {
+        font-size: 16px;
+      }
+
+      blockquote {
+        font-size: 15px;
+      }
+
+      .footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
     }
   </style>
 </head>
