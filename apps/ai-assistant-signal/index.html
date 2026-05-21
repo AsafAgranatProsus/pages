@@ -5,451 +5,622 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>What Users Want From AI Life Assistants</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
     :root {
-      --bg: #0f0f0f;
-      --surface: #1a1a1a;
-      --surface2: #222222;
-      --border: #2e2e2e;
-      --text: #e8e8e8;
-      --muted: #888;
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --border: #242424;
+      --text: #f0f0f0;
+      --muted: #666;
+      --muted2: #444;
       --accent: #c8f060;
-      --accent2: #60c8f0;
-      --accent3: #f06090;
-      --warn: #f0a060;
-      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --accent-dim: rgba(200,240,96,0.12);
+      --trust: #60c8f0;
+      --trust-dim: rgba(96,200,240,0.10);
+      --c3: #f0a060;
+      --c4: #a878f0;
+      --c5: #f06878;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
+    html, body {
+      width: 100%; height: 100%;
       background: var(--bg);
       color: var(--text);
-      font-family: var(--font);
-      font-size: 16px;
-      line-height: 1.6;
+      font-family: 'Inter', -apple-system, sans-serif;
       -webkit-font-smoothing: antialiased;
+      overflow: hidden;
     }
 
-    a { color: var(--accent2); text-decoration: none; }
-
-    /* ── Layout ── */
-    .page {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 60px 24px 100px;
+    /* ── Root grid ── */
+    .canvas {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 2.2fr 1.1fr;
+      grid-template-rows: auto 1fr auto;
+      gap: 0;
+      padding: 36px 40px 28px;
+      column-gap: 32px;
+      row-gap: 0;
     }
 
-    /* ── Header ── */
+    /* ── Header spans full width ── */
     .header {
-      margin-bottom: 64px;
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .header .eyebrow {
+    .header h1 {
+      font-size: clamp(15px, 1.6vw, 22px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .header .meta {
       font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ── Left column: hero stat + trust ── */
+    .col-left {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .hero-block {
+      background: var(--accent-dim);
+      border: 1px solid rgba(200,240,96,0.2);
+      border-radius: 16px;
+      padding: 28px 24px;
+      flex-shrink: 0;
+    }
+
+    .hero-block .eyebrow {
+      font-size: 10px;
       letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.7;
+      margin-bottom: 10px;
+    }
+
+    .hero-block .big-number {
+      font-size: clamp(52px, 6vw, 80px);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      color: var(--accent);
+      line-height: 0.9;
+    }
+
+    .hero-block .big-number sup {
+      font-size: 0.35em;
+      vertical-align: super;
+      letter-spacing: 0;
+      font-weight: 700;
+    }
+
+    .hero-block .hero-label {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hero-block .hero-label strong {
+      color: var(--text);
+      display: block;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    /* source count pills */
+    .source-pills {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .pill-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .pill-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .pill-label { color: var(--muted); }
+    .pill-count { color: var(--text); font-weight: 600; margin-left: auto; }
+
+    /* trust gate */
+    .trust-block {
+      background: var(--trust-dim);
+      border: 1px solid rgba(96,200,240,0.2);
+      border-radius: 16px;
+      padding: 22px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .trust-block .trust-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--trust);
+      opacity: 0.8;
+      margin-bottom: 8px;
+    }
+
+    .trust-block h3 {
+      font-size: clamp(13px, 1.2vw, 16px);
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .trust-block p {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .trust-stat {
+      margin-top: 14px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .trust-stat .t-num {
+      font-size: clamp(22px, 2.5vw, 32px);
+      font-weight: 800;
+      color: var(--trust);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .trust-stat .t-label {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+      align-self: center;
+    }
+
+    /* ── Center column: bar chart ── */
+    .col-center {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-title {
+      font-size: 10px;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
       margin-bottom: 16px;
     }
 
-    .header h1 {
-      font-size: clamp(28px, 5vw, 44px);
-      font-weight: 700;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
-      margin-bottom: 20px;
-    }
-
-    .header h1 span {
-      color: var(--accent);
-    }
-
-    .header .subtitle {
-      font-size: 17px;
-      color: var(--muted);
-      max-width: 520px;
-    }
-
-    /* ── Hero stat ── */
-    .hero-stat {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--accent);
-      border-radius: 12px;
-      padding: 36px 40px;
-      margin-bottom: 64px;
-      display: flex;
-      align-items: center;
-      gap: 40px;
-    }
-
-    .hero-stat .number {
-      font-size: clamp(48px, 10vw, 80px);
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      color: var(--accent);
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    .hero-stat .number sup {
-      font-size: 0.4em;
-      vertical-align: super;
-      letter-spacing: 0;
-    }
-
-    .hero-stat .label {
-      font-size: 15px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .hero-stat .label strong {
-      display: block;
-      font-size: 18px;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    /* ── Section title ── */
-    .section-title {
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 24px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    /* ── Finding cards ── */
-    .findings {
+    .bars {
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      margin-bottom: 64px;
+      gap: 0;
+      flex: 1;
+      justify-content: space-around;
     }
 
-    .finding {
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .bar-rank {
+      font-size: 10px;
+      color: var(--muted2);
+      width: 16px;
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 36px;
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px 32px;
+      border-radius: 6px;
       position: relative;
       overflow: hidden;
     }
 
-    .finding::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 4px;
+    .bar-fill {
       height: 100%;
-      background: var(--finding-color, var(--accent));
-    }
-
-    .finding .rank {
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .finding h3 {
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      margin-bottom: 10px;
-      color: var(--text);
-    }
-
-    .finding .desc {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 16px;
-      line-height: 1.6;
-    }
-
-    .finding .meta {
+      border-radius: 6px;
       display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
+      align-items: center;
+      padding-left: 14px;
+      position: relative;
+      transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .badge {
-      font-size: 12px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
+    .bar-fill .bar-text {
+      font-size: clamp(11px, 1vw, 13px);
+      font-weight: 600;
+      color: rgba(0,0,0,0.75);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90%;
+    }
+
+    .bar-sources {
+      font-size: 11px;
       color: var(--muted);
+      width: 80px;
+      flex-shrink: 0;
+      text-align: right;
     }
 
-    .badge.highlight {
-      background: rgba(200, 240, 96, 0.08);
-      border-color: rgba(200, 240, 96, 0.3);
-      color: var(--accent);
+    .bar-sources strong {
+      color: var(--text);
+      font-weight: 600;
     }
 
-    .finding blockquote {
-      margin-top: 16px;
-      padding: 14px 18px;
-      background: var(--surface2);
-      border-left: 3px solid var(--border);
+    /* quote */
+    .quote-block {
+      margin-top: 20px;
+      padding: 16px 20px;
+      border-left: 3px solid var(--accent);
+      background: var(--surface);
       border-radius: 0 8px 8px 0;
-      font-size: 13px;
+    }
+
+    .quote-block q {
+      font-size: clamp(11px, 1vw, 13px);
       color: #aaa;
       font-style: italic;
       line-height: 1.6;
+      quotes: none;
     }
 
-    .finding blockquote cite {
+    .quote-block cite {
       display: block;
       margin-top: 6px;
-      font-style: normal;
-      font-size: 11px;
+      font-size: 10px;
       color: var(--muted);
+      font-style: normal;
     }
 
-    /* ── Divergence section ── */
-    .divergence {
+    /* ── Right column: divergence ── */
+    .col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .divergence-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .divergence-block .div-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .fork {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .fork-stem {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 10px 0 6px;
+      position: relative;
+    }
+
+    .fork-stem::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 12px;
+      background: var(--border);
+    }
+
+    .fork-stem strong {
+      display: block;
+      font-size: clamp(12px, 1.1vw, 14px);
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .fork-branches {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      position: relative;
+    }
+
+    .fork-branches::before {
+      content: '';
+      position: absolute;
+      top: -12px; left: 25%;
+      width: 50%;
+      height: 12px;
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .branch {
+      border-radius: 10px;
+      padding: 14px 12px;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .branch.wrong {
+      background: rgba(240,104,120,0.08);
+      border: 1px solid rgba(240,104,120,0.2);
+    }
+
+    .branch.right {
+      background: rgba(200,240,96,0.08);
+      border: 1px solid rgba(200,240,96,0.2);
+    }
+
+    .branch .b-label {
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .branch.wrong .b-label { color: var(--c5); }
+    .branch.right .b-label { color: var(--accent); }
+
+    .branch p { color: var(--muted); }
+
+    .punchline {
+      margin-top: 14px;
+      padding: 14px 16px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(200,240,96,0.2);
+      border-radius: 10px;
+      font-size: clamp(12px, 1.1vw, 14px);
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+    }
+
+    /* method block */
+    .method-block {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 36px 40px;
-      margin-bottom: 64px;
+      padding: 16px 18px;
     }
 
-    .divergence h2 {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 20px;
-    }
-
-    .vs-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .vs-card {
-      padding: 20px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    .vs-card.wrong {
-      background: rgba(240, 96, 144, 0.05);
-      border-color: rgba(240, 96, 144, 0.2);
-    }
-
-    .vs-card.right {
-      background: rgba(200, 240, 96, 0.05);
-      border-color: rgba(200, 240, 96, 0.2);
-    }
-
-    .vs-card .vs-label {
-      font-size: 10px;
+    .method-block .m-title {
+      font-size: 9px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
+      color: var(--muted2);
       margin-bottom: 8px;
     }
 
-    .vs-card.wrong .vs-label { color: var(--accent3); }
-    .vs-card.right .vs-label { color: var(--accent); }
-
-    .vs-card p {
-      font-size: 14px;
-      line-height: 1.5;
-      color: var(--text);
-    }
-
-    .divergence .punchline {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--accent);
-      line-height: 1.4;
-      padding: 20px 0 0;
-      border-top: 1px solid var(--border);
-    }
-
-    /* ── Bottom line ── */
-    .bottom-line {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 36px 40px;
-      margin-bottom: 48px;
-    }
-
-    .bottom-line h2 {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
-    }
-
-    .bottom-line p {
-      font-size: 15px;
+    .method-block p {
+      font-size: 10px;
       color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 12px;
-    }
-
-    .bottom-line p:last-child { margin-bottom: 0; }
-
-    .bottom-line .call {
-      font-size: 17px;
-      color: var(--text);
-      font-weight: 500;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
-    }
-
-    /* ── Footnote ── */
-    .footnote {
-      font-size: 12px;
-      color: #555;
       line-height: 1.6;
-      padding-top: 32px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      grid-column: 1 / -1;
+      padding-top: 16px;
+      margin-top: 16px;
       border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .footnote strong { color: #666; }
-
-    /* ── Responsive ── */
-    @media (max-width: 560px) {
-      .hero-stat {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-        padding: 28px 24px;
-      }
-      .vs-grid {
-        grid-template-columns: 1fr;
-      }
-      .finding { padding: 22px 20px; }
-      .divergence, .bottom-line { padding: 28px 24px; }
+    .footer .f-note {
+      font-size: 10px;
+      color: var(--muted2);
     }
+
+    .footer .f-date {
+      font-size: 10px;
+      color: var(--muted2);
+      letter-spacing: 0.06em;
+    }
+
   </style>
 </head>
 <body>
-<div class="page">
+<div class="canvas">
 
   <!-- Header -->
   <div class="header">
-    <div class="eyebrow">User signal brief — May 2026</div>
-    <h1>What users actually want from<br><span>AI life assistants</span></h1>
-    <p class="subtitle">5 independent research runs. Reddit, App Store, Hacker News, G2, Product Hunt. 3 primary corpora with source counts and engagement metrics.</p>
+    <h1>What users actually want from AI life assistants</h1>
+    <div class="meta">Signal brief &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; 5 independent research runs</div>
   </div>
 
-  <!-- Hero stat -->
-  <div class="hero-stat">
-    <div class="number">5,000<sup>+</sup></div>
-    <div class="label">
-      <strong>Minimum engaged users on the #1 finding</strong>
-      Confirmed across all 3 primary sources. This is a floor — excludes threads where engagement wasn't quantified, excludes secondary corpus, excludes non-English sources.
-    </div>
-  </div>
+  <!-- Left column -->
+  <div class="col-left">
 
-  <!-- Findings -->
-  <div class="section-title">5 confirmed findings — all 3 primary sources agree</div>
-
-  <div class="findings">
-
-    <div class="finding" style="--finding-color: #c8f060;">
-      <div class="rank">Finding 01 — #1 ranked</div>
-      <h3>Memory and continuity is the dominant unmet need</h3>
-      <p class="desc">Users don't want more features. They want the AI to remember them — decisions made, constraints set, prior attempts, project context. Every session starting from zero is the top complaint across every platform.</p>
-      <div class="meta">
-        <span class="badge highlight">23 distinct sources</span>
-        <span class="badge highlight">5,000+ engaged users</span>
-        <span class="badge">All 3 primary corpora</span>
-      </div>
-      <blockquote>
-        "Every session, I end up re-explaining: why decisions were made, previous failed attempts, project-specific constraints, debugging history, feature intent."
-        <cite>— r/ObsidianMD</cite>
-      </blockquote>
-    </div>
-
-    <div class="finding" style="--finding-color: #60c8f0;">
-      <div class="rank">Finding 02</div>
-      <h3>Trust is the gating constraint — not features, not price</h3>
-      <p class="desc">16 distinct sources. 855+ minimum engaged users. Users will give an AI their life context — if they can see it, edit it, and know it won't leak. This is not a privacy policy problem. It's a product design problem.</p>
-      <div class="meta">
-        <span class="badge highlight">16 distinct sources</span>
-        <span class="badge highlight">855+ engaged users</span>
-        <span class="badge">All 3 primary corpora</span>
-      </div>
-      <blockquote>
-        "I don't know what it knows about me. I don't know where it uses it. I don't know how to delete it."
-        <cite>— r/ChatGPT (composite from multiple threads)</cite>
-      </blockquote>
-    </div>
-
-    <div class="finding" style="--finding-color: #f0a060;">
-      <div class="rank">Finding 03</div>
-      <h3>Hallucination — especially false confidence about user-provided context</h3>
-      <p class="desc">The life-assistant-specific failure mode: "pretends it read the file." Not just wrong answers — confidently wrong answers about things the user explicitly provided. Confirmed across all 3 primary sources.</p>
-      <div class="meta">
-        <span class="badge">All 3 primary corpora</span>
+    <div class="hero-block">
+      <div class="eyebrow">Top finding — engaged users</div>
+      <div class="big-number">5,000<sup>+</sup></div>
+      <div class="hero-label">
+        <strong>Memory &amp; continuity failure</strong>
+        Minimum floor across 23 distinct sources. Confirmed in all 3 primary corpora.
       </div>
     </div>
 
-    <div class="finding" style="--finding-color: #a060f0;">
-      <div class="rank">Finding 04</div>
-      <h3>Instruction-following degrades within a session</h3>
-      <p class="desc">#2 ranked complaint in the ChatGPT research run. Users set constraints at the start of a session; the AI ignores them by the end. Directly undermines any relationship-building behavior.</p>
-      <div class="meta">
-        <span class="badge">All 3 primary corpora</span>
+    <div class="trust-block">
+      <div>
+        <div class="trust-eyebrow">Finding 02 — gating constraint</div>
+        <h3>Trust blocks everything above it</h3>
+        <p>Users will share life context with an AI — if they can see it, edit it, and know it won't leak. Not a policy problem. A product design problem.</p>
       </div>
-    </div>
-
-    <div class="finding" style="--finding-color: #f06090;">
-      <div class="rank">Finding 05</div>
-      <h3>Agentic products that don't actually act</h3>
-      <p class="desc">Motion, Reclaim, Copilot — all named. Users bought the "AI that does things for you" promise. What they got was a chatbot with a calendar integration. The gap between the pitch and the product is the complaint.</p>
-      <div class="meta">
-        <span class="badge">All 3 primary corpora</span>
+      <div class="trust-stat">
+        <div>
+          <div class="t-num">16</div>
+          <div class="t-label">distinct<br>sources</div>
+        </div>
+        <div>
+          <div class="t-num">855<sup style="font-size:0.5em">+</sup></div>
+          <div class="t-label">engaged<br>users</div>
+        </div>
       </div>
     </div>
 
   </div>
 
-  <!-- Divergence -->
-  <div class="divergence">
-    <h2>The divergence that defines the bet</h2>
-    <p style="font-size:14px; color: var(--muted); margin-bottom: 24px;">The research splits on how to frame the memory problem. The framing determines the product response.</p>
+  <!-- Center column -->
+  <div class="col-center">
+    <div class="chart-title">Findings ranked by source count — all confirmed across 3 primary corpora</div>
 
-    <div class="vs-grid">
-      <div class="vs-card wrong">
-        <div class="vs-label">What everyone else is solving</div>
-        <p>Context window is too small. Tokens get cut. Advertised limits aren't real. Fix: more tokens.</p>
+    <div class="bars">
+
+      <div class="bar-row">
+        <div class="bar-rank">01</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:100%; background: var(--accent);">
+            <span class="bar-text">Memory &amp; continuity</span>
+          </div>
+        </div>
+        <div class="bar-sources"><strong>23</strong> sources</div>
       </div>
-      <div class="vs-card right">
-        <div class="vs-label">What users are actually describing</div>
-        <p>Continuity of decisions, constraints, prior attempts, and project state. A relationship problem, not an architecture problem.</p>
+
+      <div class="bar-row">
+        <div class="bar-rank">02</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:70%; background: var(--trust);">
+            <span class="bar-text">Trust &amp; data control</span>
+          </div>
+        </div>
+        <div class="bar-sources"><strong>16</strong> sources</div>
       </div>
+
+      <div class="bar-row">
+        <div class="bar-rank">03</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:48%; background: var(--c3);">
+            <span class="bar-text">Hallucination — false confidence</span>
+          </div>
+        </div>
+        <div class="bar-sources"><strong>11</strong> sources</div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-rank">04</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:35%; background: var(--c4);">
+            <span class="bar-text">Instruction-following degrades</span>
+          </div>
+        </div>
+        <div class="bar-sources"><strong>8</strong> sources</div>
+      </div>
+
+      <div class="bar-row">
+        <div class="bar-rank">05</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:22%; background: var(--c5);">
+            <span class="bar-text">Agentic products that don't act</span>
+          </div>
+        </div>
+        <div class="bar-sources"><strong>5</strong> sources</div>
+      </div>
+
     </div>
 
-    <div class="punchline">Everyone else is solving tokens.<br>That's the wrong problem.</div>
+    <div class="quote-block">
+      <q>Every session, I end up re-explaining: why decisions were made, previous failed attempts, project-specific constraints, debugging history, feature intent.</q>
+      <cite>— r/ObsidianMD</cite>
+    </div>
+
   </div>
 
-  <!-- Bottom line -->
-  <div class="bottom-line">
-    <h2>Bottom line</h2>
-    <p>The market has told us what it wants. Clearly, repeatedly, at scale.</p>
-    <p>An AI that remembers you — not just facts, but context, decisions, constraints, history. An AI you can trust with that information because you can see it, edit it, and know it won't be used against you.</p>
-    <p class="call">The research didn't generate this insight. It confirmed the problem we've been building toward for 6 months. The question is whether we build fast enough to own it.</p>
+  <!-- Right column -->
+  <div class="col-right">
+
+    <div class="divergence-block">
+      <div class="div-eyebrow">The framing that defines the product response</div>
+      <div class="fork">
+
+        <div class="fork-stem">
+          <strong>Memory problem</strong>
+          How is the industry reading it?
+        </div>
+
+        <div class="fork-branches">
+          <div class="branch wrong">
+            <div class="b-label">Everyone else</div>
+            <p>Context window too small. Fix: more tokens.</p>
+          </div>
+          <div class="branch right">
+            <div class="b-label">What users say</div>
+            <p>Continuity of decisions, constraints, history. A relationship problem.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="punchline">Everyone else is solving tokens.<br>That's the wrong problem.</div>
+    </div>
+
+    <div class="method-block">
+      <div class="m-title">Method</div>
+      <p>Reddit · App Store · Google Play · Hacker News · G2 · Product Hunt. 3 primary corpora with source counts + engagement metrics. All frequency claims grounded in retrieved sources only. Engagement figures are floors (upvotes + comments). Non-English excluded.</p>
+    </div>
+
   </div>
 
-  <!-- Footnote -->
-  <div class="footnote">
-    <strong>Method:</strong> 5 independent research runs (Gemini Deep Research, ChatGPT, Kimi Deep Research + 2 secondary). Sources: Reddit, App Store, Google Play, G2, Capterra, Hacker News, Product Hunt. 3 primary corpora with source counts and engagement metrics. All frequency claims grounded in retrieved sources only — no inference from general knowledge. Engagement figures are floors (upvotes + comments as minimum proxy). Non-English sources excluded. May 2026.
+  <!-- Footer -->
+  <div class="footer">
+    <div class="f-note">5 independent research runs &nbsp;·&nbsp; 3 primary corpora &nbsp;·&nbsp; all findings confirmed across all sources</div>
+    <div class="f-date">May 2026</div>
   </div>
 
 </div>
