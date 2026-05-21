@@ -10,12 +10,11 @@
     :root {
       --bg: #0a0a0a;
       --surface: #141414;
-      --border: #242424;
+      --border: #2a2a2a;
       --text: #f0f0f0;
-      --muted: #666;
-      --muted2: #444;
+      --muted: #777;
       --accent: #c8f060;
-      --accent-dim: rgba(200,240,96,0.12);
+      --accent-dim: rgba(200,240,96,0.10);
       --trust: #60c8f0;
       --trust-dim: rgba(96,200,240,0.10);
       --c3: #f0a060;
@@ -26,199 +25,154 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      width: 100%; height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: 'Inter', -apple-system, sans-serif;
       -webkit-font-smoothing: antialiased;
-      overflow: hidden;
+      min-height: 100%;
     }
 
-    /* ── Root grid ── */
+    /* ─────────────────────────────────────────
+       DESKTOP: single-screen grid (≥900px)
+    ───────────────────────────────────────── */
     .canvas {
       width: 100vw;
-      height: 100vh;
+      min-height: 100vh;
+      padding: 32px 36px 24px;
       display: grid;
-      grid-template-columns: 1fr 2.2fr 1.1fr;
+      grid-template-columns: 220px 1fr 240px;
       grid-template-rows: auto 1fr auto;
-      gap: 0;
-      padding: 36px 40px 28px;
-      column-gap: 32px;
+      column-gap: 28px;
       row-gap: 0;
     }
 
-    /* ── Header spans full width ── */
+    /* ── Header ── */
     .header {
       grid-column: 1 / -1;
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      padding-bottom: 24px;
-      margin-bottom: 24px;
+      padding-bottom: 20px;
+      margin-bottom: 20px;
       border-bottom: 1px solid var(--border);
     }
-
     .header h1 {
-      font-size: clamp(15px, 1.6vw, 22px);
+      font-size: clamp(14px, 1.4vw, 20px);
       font-weight: 700;
       letter-spacing: -0.02em;
-      color: var(--text);
     }
-
     .header .meta {
       font-size: 11px;
       color: var(--muted);
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
-    /* ── Left column: hero stat + trust ── */
+    /* ── Left column ── */
     .col-left {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
     }
 
     .hero-block {
       background: var(--accent-dim);
       border: 1px solid rgba(200,240,96,0.2);
-      border-radius: 16px;
-      padding: 28px 24px;
-      flex-shrink: 0;
+      border-radius: 14px;
+      padding: 24px 20px;
     }
-
-    .hero-block .eyebrow {
-      font-size: 10px;
+    .eyebrow {
+      font-size: 9px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--accent);
-      opacity: 0.7;
-      margin-bottom: 10px;
+      opacity: 0.8;
+      margin-bottom: 8px;
     }
-
-    .hero-block .big-number {
-      font-size: clamp(52px, 6vw, 80px);
+    .big-number {
+      font-size: clamp(48px, 5vw, 72px);
       font-weight: 900;
       letter-spacing: -0.05em;
       color: var(--accent);
       line-height: 0.9;
     }
-
-    .hero-block .big-number sup {
+    .big-number sup {
       font-size: 0.35em;
       vertical-align: super;
-      letter-spacing: 0;
       font-weight: 700;
     }
-
-    .hero-block .hero-label {
-      margin-top: 12px;
-      font-size: 12px;
+    .hero-label {
+      margin-top: 10px;
+      font-size: 11px;
       color: var(--muted);
       line-height: 1.5;
     }
-
-    .hero-block .hero-label strong {
+    .hero-label strong {
       color: var(--text);
       display: block;
-      font-size: 13px;
+      font-size: 12px;
       margin-bottom: 2px;
     }
 
-    /* source count pills */
-    .source-pills {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .pill-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-    }
-
-    .pill-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .pill-label { color: var(--muted); }
-    .pill-count { color: var(--text); font-weight: 600; margin-left: auto; }
-
-    /* trust gate */
     .trust-block {
       background: var(--trust-dim);
       border: 1px solid rgba(96,200,240,0.2);
-      border-radius: 16px;
-      padding: 22px 24px;
+      border-radius: 14px;
+      padding: 20px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      gap: 12px;
     }
-
-    .trust-block .trust-eyebrow {
-      font-size: 10px;
+    .trust-eyebrow {
+      font-size: 9px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--trust);
       opacity: 0.8;
-      margin-bottom: 8px;
     }
-
     .trust-block h3 {
-      font-size: clamp(13px, 1.2vw, 16px);
+      font-size: clamp(12px, 1.1vw, 15px);
       font-weight: 700;
       line-height: 1.3;
       color: var(--text);
-      margin-bottom: 10px;
     }
-
     .trust-block p {
       font-size: 11px;
       color: var(--muted);
       line-height: 1.6;
     }
-
     .trust-stat {
-      margin-top: 14px;
       display: flex;
       gap: 16px;
+      margin-top: auto;
     }
-
-    .trust-stat .t-num {
-      font-size: clamp(22px, 2.5vw, 32px);
+    .t-num {
+      font-size: clamp(20px, 2vw, 28px);
       font-weight: 800;
       color: var(--trust);
       letter-spacing: -0.03em;
       line-height: 1;
     }
-
-    .trust-stat .t-label {
-      font-size: 11px;
+    .t-label {
+      font-size: 10px;
       color: var(--muted);
       line-height: 1.4;
       align-self: center;
     }
 
-    /* ── Center column: bar chart ── */
+    /* ── Center column: bars ── */
     .col-center {
       display: flex;
       flex-direction: column;
     }
-
     .chart-title {
-      font-size: 10px;
+      font-size: 9px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
-
     .bars {
       display: flex;
       flex-direction: column;
@@ -226,90 +180,80 @@
       flex: 1;
       justify-content: space-around;
     }
-
     .bar-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      position: relative;
+      gap: 10px;
+      padding: 6px 0;
     }
-
     .bar-rank {
       font-size: 10px;
-      color: var(--muted2);
-      width: 16px;
+      font-weight: 700;
+      color: var(--muted);
+      width: 20px;
       flex-shrink: 0;
-      text-align: right;
+      letter-spacing: 0.05em;
     }
-
     .bar-track {
       flex: 1;
-      height: 36px;
+      height: 32px;
       background: var(--surface);
       border-radius: 6px;
-      position: relative;
       overflow: hidden;
+      border: 1px solid var(--border);
     }
-
     .bar-fill {
       height: 100%;
       border-radius: 6px;
       display: flex;
       align-items: center;
-      padding-left: 14px;
-      position: relative;
-      transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+      padding-left: 12px;
+      min-width: 40px;
     }
-
-    .bar-fill .bar-text {
-      font-size: clamp(11px, 1vw, 13px);
+    .bar-text {
+      font-size: 11px;
       font-weight: 600;
       color: rgba(0,0,0,0.75);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 90%;
     }
-
     .bar-sources {
       font-size: 11px;
       color: var(--muted);
-      width: 80px;
+      width: 72px;
       flex-shrink: 0;
       text-align: right;
     }
-
     .bar-sources strong {
       color: var(--text);
-      font-weight: 600;
+      font-weight: 700;
     }
 
-    /* quote */
     .quote-block {
-      margin-top: 20px;
-      padding: 16px 20px;
-      border-left: 3px solid var(--accent);
-      background: var(--surface);
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-left: 2px solid var(--accent);
+      background: var(--accent-dim);
       border-radius: 0 8px 8px 0;
     }
-
     .quote-block q {
-      font-size: clamp(11px, 1vw, 13px);
-      color: #aaa;
-      font-style: italic;
+      font-size: 11px;
+      color: var(--muted);
       line-height: 1.6;
+      font-style: italic;
       quotes: none;
     }
-
     .quote-block cite {
       display: block;
       margin-top: 6px;
       font-size: 10px;
-      color: var(--muted);
+      color: var(--accent);
       font-style: normal;
+      letter-spacing: 0.04em;
     }
 
-    /* ── Right column: divergence ── */
+    /* ── Right column: fork + method ── */
     .col-right {
       display: flex;
       flex-direction: column;
@@ -319,133 +263,101 @@
     .divergence-block {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 22px 20px;
+      border-radius: 14px;
+      padding: 20px;
       flex: 1;
       display: flex;
       flex-direction: column;
+      gap: 14px;
     }
-
-    .divergence-block .div-eyebrow {
-      font-size: 10px;
+    .div-eyebrow {
+      font-size: 9px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 14px;
     }
 
-    .fork {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      flex: 1;
-      justify-content: center;
-    }
-
-    .fork-stem {
+    /* Fork — pure CSS, no SVG, no pseudo-elements */
+    .fork-stem-box {
       text-align: center;
-      font-size: 11px;
-      color: var(--muted);
-      padding: 10px 0 6px;
-      position: relative;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
     }
-
-    .fork-stem::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 50%;
-      transform: translateX(-50%);
-      width: 1px;
-      height: 12px;
-      background: var(--border);
-    }
-
-    .fork-stem strong {
+    .fork-stem-box strong {
       display: block;
-      font-size: clamp(12px, 1.1vw, 14px);
+      font-size: 12px;
+      font-weight: 700;
       color: var(--text);
-      font-weight: 600;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
+    }
+    .fork-stem-box span {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .fork-arrow {
+      text-align: center;
+      font-size: 18px;
+      color: var(--border);
+      line-height: 1;
     }
 
     .fork-branches {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      position: relative;
     }
-
-    .fork-branches::before {
-      content: '';
-      position: absolute;
-      top: -12px; left: 25%;
-      width: 50%;
-      height: 12px;
-      border-top: 1px solid var(--border);
-      border-left: 1px solid var(--border);
-      border-right: 1px solid var(--border);
-      border-radius: 4px 4px 0 0;
-    }
-
     .branch {
       border-radius: 10px;
-      padding: 14px 12px;
+      padding: 12px 10px;
       font-size: 11px;
       line-height: 1.5;
     }
-
     .branch.wrong {
       background: rgba(240,104,120,0.08);
-      border: 1px solid rgba(240,104,120,0.2);
+      border: 1px solid rgba(240,104,120,0.25);
     }
-
     .branch.right {
       background: rgba(200,240,96,0.08);
-      border: 1px solid rgba(200,240,96,0.2);
+      border: 1px solid rgba(200,240,96,0.25);
     }
-
-    .branch .b-label {
+    .b-label {
       font-size: 9px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      margin-bottom: 6px;
-      font-weight: 600;
+      font-weight: 700;
+      margin-bottom: 5px;
     }
-
     .branch.wrong .b-label { color: var(--c5); }
     .branch.right .b-label { color: var(--accent); }
-
-    .branch p { color: var(--muted); }
+    .branch p { color: var(--muted); font-size: 11px; }
 
     .punchline {
-      margin-top: 14px;
-      padding: 14px 16px;
+      padding: 12px 14px;
       background: var(--accent-dim);
       border: 1px solid rgba(200,240,96,0.2);
       border-radius: 10px;
-      font-size: clamp(12px, 1.1vw, 14px);
+      font-size: 12px;
       font-weight: 700;
       color: var(--accent);
       line-height: 1.4;
-      letter-spacing: -0.01em;
     }
 
-    /* method block */
     .method-block {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 16px 18px;
     }
-
-    .method-block .m-title {
+    .m-title {
       font-size: 9px;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--muted2);
+      color: var(--muted);
       margin-bottom: 8px;
     }
-
     .method-block p {
       font-size: 10px;
       color: var(--muted);
@@ -455,25 +367,77 @@
     /* ── Footer ── */
     .footer {
       grid-column: 1 / -1;
-      padding-top: 16px;
-      margin-top: 16px;
-      border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding-top: 16px;
+      margin-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .f-note { font-size: 10px; color: var(--muted); }
+    .f-date { font-size: 10px; color: var(--muted); }
+
+    /* ─────────────────────────────────────────
+       MOBILE: single column, scrollable (< 900px)
+    ───────────────────────────────────────── */
+    @media (max-width: 899px) {
+      html, body { overflow: auto; }
+
+      .canvas {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-height: 100vh;
+        padding: 20px 16px 32px;
+        gap: 16px;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 0;
+        padding-bottom: 16px;
+      }
+      .header h1 { font-size: 16px; }
+
+      /* Hero + trust side by side on tablet, stacked on phone */
+      .col-left {
+        flex-direction: row;
+        gap: 12px;
+      }
+      .hero-block, .trust-block { flex: 1; }
+
+      @media (max-width: 599px) {
+        .col-left { flex-direction: column; }
+        .trust-block { flex: unset; }
+      }
+
+      /* Bars: full width, taller rows */
+      .col-center { gap: 0; }
+      .bar-row { padding: 8px 0; }
+      .bar-track { height: 38px; }
+      .bar-text { font-size: 12px; }
+      .bar-sources { font-size: 12px; width: 80px; }
+
+      /* Fork: stack vertically */
+      .fork-branches {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      /* Right col: full width */
+      .col-right { gap: 12px; }
+
+      .footer {
+        flex-direction: column;
+        gap: 4px;
+        text-align: center;
+      }
     }
 
-    .footer .f-note {
-      font-size: 10px;
-      color: var(--muted2);
+    @media (max-width: 599px) {
+      .col-left { flex-direction: column; }
     }
-
-    .footer .f-date {
-      font-size: 10px;
-      color: var(--muted2);
-      letter-spacing: 0.06em;
-    }
-
   </style>
 </head>
 <body>
@@ -482,14 +446,14 @@
   <!-- Header -->
   <div class="header">
     <h1>What users actually want from AI life assistants</h1>
-    <div class="meta">Signal brief &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; 5 independent research runs</div>
+    <div class="meta">Signal brief &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; 3 primary corpora</div>
   </div>
 
   <!-- Left column -->
   <div class="col-left">
 
     <div class="hero-block">
-      <div class="eyebrow">Top finding — engaged users</div>
+      <div class="eyebrow">Top finding</div>
       <div class="big-number">5,000<sup>+</sup></div>
       <div class="hero-label">
         <strong>Memory &amp; continuity failure</strong>
@@ -498,11 +462,9 @@
     </div>
 
     <div class="trust-block">
-      <div>
-        <div class="trust-eyebrow">Finding 02 — gating constraint</div>
-        <h3>Trust blocks everything above it</h3>
-        <p>Users will share life context with an AI — if they can see it, edit it, and know it won't leak. Not a policy problem. A product design problem.</p>
-      </div>
+      <div class="trust-eyebrow">Gating constraint</div>
+      <h3>Trust blocks everything above it</h3>
+      <p>Users will share life context with an AI — if they can see it, edit it, and know it won't leak. Not a policy problem. A product design problem.</p>
       <div class="trust-stat">
         <div>
           <div class="t-num">16</div>
@@ -517,9 +479,9 @@
 
   </div>
 
-  <!-- Center column -->
+  <!-- Center column: bars -->
   <div class="col-center">
-    <div class="chart-title">Findings ranked by source count — all confirmed across 3 primary corpora</div>
+    <div class="chart-title">Findings ranked by source count — confirmed across 3 primary corpora</div>
 
     <div class="bars">
 
@@ -586,25 +548,24 @@
   <div class="col-right">
 
     <div class="divergence-block">
-      <div class="div-eyebrow">The framing that defines the product response</div>
-      <div class="fork">
+      <div class="div-eyebrow">Where the field is going wrong</div>
 
-        <div class="fork-stem">
-          <strong>Memory problem</strong>
-          How is the industry reading it?
+      <div class="fork-stem-box">
+        <strong>Memory failure</strong>
+        <span>How is the industry reading it?</span>
+      </div>
+
+      <div class="fork-arrow">↓</div>
+
+      <div class="fork-branches">
+        <div class="branch wrong">
+          <div class="b-label">Everyone else</div>
+          <p>Context window too small. Fix: more tokens.</p>
         </div>
-
-        <div class="fork-branches">
-          <div class="branch wrong">
-            <div class="b-label">Everyone else</div>
-            <p>Context window too small. Fix: more tokens.</p>
-          </div>
-          <div class="branch right">
-            <div class="b-label">What users say</div>
-            <p>Continuity of decisions, constraints, history. A relationship problem.</p>
-          </div>
+        <div class="branch right">
+          <div class="b-label">What users say</div>
+          <p>Continuity of decisions, constraints, history. A relationship problem.</p>
         </div>
-
       </div>
 
       <div class="punchline">Everyone else is solving tokens.<br>That's the wrong problem.</div>
