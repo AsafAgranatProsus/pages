@@ -223,6 +223,12 @@
     <span id="v-g">160</span>
   </div>
 
+  <div class="tune-row">
+    <label>Items (0=auto)</label>
+    <input type="range" id="t-n" min="0" max="80" step="1" value="0">
+    <span id="v-n">auto</span>
+  </div>
+
   <button id="tuner-copy">Copy values</button>
   <div id="tuner-vals"></div>
 </div>
@@ -272,6 +278,7 @@ let anchorXpct = 92;   // % of vw
 let anchorYpct = 115;  // % of vh
 let radiusPct  = 92;   // % of screen diagonal
 let gapPx      = 160;  // arc distance between button centres (px)
+let itemCount  = 0;    // 0 = auto (derived from gapPx)
 
 function getRadius() {
   const diag = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
@@ -295,8 +302,10 @@ let lastDragTime = null;
 function buildWheel() {
   ring.innerHTML = '';
   const R = getRadius();
-  // How many items fit around the full circle at the target arc gap?
-  const N = Math.max(ITEMS.length, Math.round((2 * Math.PI * R) / gapPx));
+  // Item count: explicit override or derived from arc gap
+  const N = itemCount > 0
+    ? itemCount
+    : Math.max(ITEMS.length, Math.round((2 * Math.PI * R) / gapPx));
   const angleStep = 360 / N;
 
   for (let i = 0; i < N; i++) {
@@ -395,7 +404,7 @@ function applyTuner() {
 
 function updateTunerDisplay() {
   document.getElementById('tuner-vals').textContent =
-    `X:${anchorXpct}vw  Y:${anchorYpct}vh  R:${radiusPct}%diag  G:${gapPx}px`;
+    `X:${anchorXpct}vw  Y:${anchorYpct}vh  R:${radiusPct}%diag  G:${gapPx}px  N:${itemCount || 'auto'}`;
 }
 
 function wire(sliderId, valId, setter) {
@@ -412,9 +421,20 @@ wire('t-x', 'v-x', v => anchorXpct = v);
 wire('t-y', 'v-y', v => anchorYpct = v);
 wire('t-r', 'v-r', v => radiusPct  = v);
 wire('t-g', 'v-g', v => gapPx      = v);
+// Items slider — custom display (0 → "auto")
+(function() {
+  const slider = document.getElementById('t-n');
+  const val    = document.getElementById('v-n');
+  slider.addEventListener('input', () => {
+    const v = Number(slider.value);
+    itemCount = v;
+    val.textContent = v === 0 ? 'auto' : v;
+    applyTuner();
+  });
+})();
 
 document.getElementById('tuner-copy').addEventListener('click', () => {
-  const txt = `anchorXpct=${anchorXpct}, anchorYpct=${anchorYpct}, radiusPct=${radiusPct}, gapPx=${gapPx}`;
+  const txt = `anchorXpct=${anchorXpct}, anchorYpct=${anchorYpct}, radiusPct=${radiusPct}, gapPx=${gapPx}, itemCount=${itemCount}`;
   navigator.clipboard.writeText(txt).catch(() => {});
   document.getElementById('tuner-vals').textContent = 'Copied: ' + txt;
 });
