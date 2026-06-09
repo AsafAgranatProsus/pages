@@ -24,22 +24,24 @@ html, body {
 }
 
 /* ── Green blob ─────────────────────────────────────────────── */
-/* Soft green glow at the bottom of the screen                   */
+/* Standalone element, single radial gradient, bottom-anchored.  */
+/* Kept as its own positioned node so it can be animated          */
+/* (translate / scale / pulse) independently later.               */
 #blob {
   position: absolute;
-  inset: 0;
+  left: 50%;
+  bottom: 0;
+  width: 130vw;
+  height: 55vh;
+  transform: translate(-50%, 35%);
   pointer-events: none;
   z-index: 0;
-  background:
-    radial-gradient(ellipse 85% 40% at 50% 102%,
-      rgba(120,185,150,0.75) 0%,
-      rgba(120,185,150,0.0)  100%),
-    radial-gradient(ellipse 55% 28% at 22% 100%,
-      rgba(150,195,150,0.45) 0%,
-      rgba(150,195,150,0.0)  100%),
-    radial-gradient(ellipse 50% 30% at 80% 104%,
-      rgba(100,170,140,0.50) 0%,
-      rgba(100,170,140,0.0)  100%);
+  will-change: transform;
+  background: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    rgba(120,185,150,0.85) 0%,
+    rgba(120,185,150,0.45) 38%,
+    rgba(120,185,150,0.0)  72%);
 }
 
 /* ── Top bar ────────────────────────────────────────────────── */
