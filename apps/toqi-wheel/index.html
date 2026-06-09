@@ -200,20 +200,20 @@
   <h3>Position tuner</h3>
 
   <div class="tune-row">
-    <label>X (vw%)</label>
-    <input type="range" id="t-x" min="-50" max="150" step="1" value="150">
-    <span id="v-x">150</span>
+    <label>X (%diag)</label>
+    <input type="range" id="t-x" min="-20" max="120" step="1" value="63">
+    <span id="v-x">63</span>
   </div>
 
   <div class="tune-row">
-    <label>Y (vh%)</label>
-    <input type="range" id="t-y" min="-50" max="150" step="1" value="59">
-    <span id="v-y">59</span>
+    <label>Y (%diag)</label>
+    <input type="range" id="t-y" min="-20" max="120" step="1" value="53">
+    <span id="v-y">53</span>
   </div>
 
   <div class="tune-row">
-    <label>Radius%</label>
-    <input type="range" id="t-r" min="40" max="160" step="1" value="40">
+    <label>Radius (%diag)</label>
+    <input type="range" id="t-r" min="5" max="100" step="1" value="40">
     <span id="v-r">40</span>
   </div>
 
@@ -274,20 +274,24 @@ const ITEMS = [
 const ring = document.getElementById('ring');
 
 // --- Tunable params ---
-let anchorXpct = 150;  // % of vw
-let anchorYpct = 59;   // % of vh
+let anchorXpct = 63;   // % of screen diagonal
+let anchorYpct = 53;   // % of screen diagonal
 let radiusPct  = 40;   // % of screen diagonal
 let gapPx      = 135;  // arc distance between button centres (px)
 let itemCount  = 32;   // 0 = auto (derived from gapPx)
 
 function getRadius() {
-  const diag = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
-  return diag * (radiusPct / 100);
+  return getDiag() * (radiusPct / 100);
+}
+
+function getDiag() {
+  return Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
 }
 
 function positionRing() {
-  const x = window.innerWidth  * (anchorXpct / 100);
-  const y = window.innerHeight * (anchorYpct / 100);
+  const diag = getDiag();
+  const x = diag * (anchorXpct / 100);
+  const y = diag * (anchorYpct / 100);
   ring.style.left = x + 'px';
   ring.style.top  = y + 'px';
 }
@@ -404,7 +408,7 @@ function applyTuner() {
 
 function updateTunerDisplay() {
   document.getElementById('tuner-vals').textContent =
-    `X:${anchorXpct}vw  Y:${anchorYpct}vh  R:${radiusPct}%diag  G:${gapPx}px  N:${itemCount || 'auto'}`;
+    `X:${anchorXpct}%d  Y:${anchorYpct}%d  R:${radiusPct}%d  G:${gapPx}px  N:${itemCount || 'auto'}`;
 }
 
 function wire(sliderId, valId, setter) {
