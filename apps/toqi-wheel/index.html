@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Toqi — What's on your mind?</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #f5f0e8;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    touch-action: none;
+  }
+
+  .header {
+    padding: 48px 24px 16px;
+    text-align: center;
+    z-index: 10;
+    position: relative;
+  }
+
+  .header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1a1a;
+    letter-spacing: -0.3px;
+  }
+
+  .header p {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  /* Wheel container — clips to screen */
+  .wheel-viewport {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* The actual rotating ring — center is off bottom-left */
+  .wheel-ring {
+    position: absolute;
+    /* Center of rotation is off-screen bottom-left */
+    bottom: -600px;
+    left: -600px;
+    width: 1px;
+    height: 1px;
+    pointer-events: all;
+    cursor: grab;
+    will-change: transform;
+  }
+
+  .wheel-ring:active { cursor: grabbing; }
+
+  .btn-wrapper {
+    position: absolute;
+    transform-origin: center center;
+    pointer-events: all;
+  }
+
+  .btn {
+    background: #1a1a1a;
+    color: #e8dcc8;
+    border-radius: 16px;
+    padding: 10px 14px;
+    width: 148px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+
+  .btn:active, .btn.active {
+    background: #3a3020;
+  }
+
+  .btn .title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn .subtitle {
+    font-size: 11px;
+    color: #a89878;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Tap hint */
+  .hint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: #aaa;
+    z-index: 10;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>What's on your mind?</h1>
+  <p>Spin to explore</p>
+</div>
+
+<div class="wheel-viewport">
+  <div class="wheel-ring" id="ring"></div>
+</div>
+
+<div class="hint">Drag to spin · Tap to start</div>
+
+<script>
+const ITEMS = [
+  { title: "Morning routine",   sub: "Start strong" },
+  { title: "Inbox triage",      sub: "Zero in minutes" },
+  { title: "Grocery run",       sub: "Fridge, restocked" },
+  { title: "Tonight's dinner",  sub: "Sorted in seconds" },
+  { title: "Weekend escape",    sub: "Somewhere new" },
+  { title: "Flight tickets",    sub: "Nail them first" },
+  { title: "Latest brief",      sub: "Your day in a nutshell" },
+  { title: "Tomorrow",          sub: "Set up tonight" },
+  { title: "Big decision",      sub: "Think it through" },
+  { title: "Save more",         sub: "Small wins add up" },
+  { title: "Mood check",        sub: "How are you, really" },
+  { title: "Deep clean",        sub: "One room at a time" },
+  { title: "Family plans",      sub: "Everyone in sync" },
+  { title: "Subscriptions",     sub: "Trim the waste" },
+  { title: "Local finds",       sub: "Hidden gems near you" },
+  { title: "New skill",         sub: "Ten minutes a day" },
+  { title: "Errand run",        sub: "Batch and done" },
+  { title: "Birthday watch",    sub: "Never miss one" },
+  { title: "Mindful move",      sub: "Reset the body" },
+  { title: "Travel hacks",      sub: "Skip the lines" },
+  { title: "Weekly review",     sub: "Close the loop" },
+  { title: "Meal prep",         sub: "Sunday, sorted" },
+  { title: "Workout plan",      sub: "Move today" },
+  { title: "Packing list",      sub: "Forget nothing" },
+  { title: "Date night",        sub: "Plan the spark" },
+  { title: "Meeting prep",      sub: "Walk in ready" },
+  { title: "Budget check",      sub: "Know your numbers" },
+  { title: "Reading list",      sub: "Saved for later" },
+  { title: "Water break",       sub: "Hydrate, repeat" },
+  { title: "Gift ideas",        sub: "They'll love it" },
+  { title: "Focus block",       sub: "Guard your deep work" },
+  { title: "Quick recipe",      sub: "Five ingredients, max" },
+  { title: "Trip planner",      sub: "Idea to itinerary" },
+  { title: "Bill reminders",    sub: "Never late again" },
+];
+
+const N = ITEMS.length;
+// Radius of the wheel — large so the arc feels gentle
+const RADIUS = 900;
+// Offset of ring center from bottom-left of viewport
+// We'll compute this dynamically
+const ring = document.getElementById('ring');
+
+let currentAngle = 0; // degrees, current rotation of the ring
+let velocity = 0;
+let lastY = null;
+let lastTime = null;
+let isDragging = false;
+let rafId = null;
+let lastDragY = null;
+let lastDragTime = null;
+
+function buildWheel() {
+  ring.innerHTML = '';
+  const angleStep = 360 / N;
+
+  for (let i = 0; i < N; i++) {
+    const item = ITEMS[i];
+    const angleDeg = i * angleStep;
+    const angleRad = (angleDeg * Math.PI) / 180;
+
+    // Position on circle
+    const x = RADIUS * Math.cos(angleRad);
+    const y = RADIUS * Math.sin(angleRad);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'btn-wrapper';
+    // Place at (x, y) from ring center, tangent rotation
+    wrapper.style.transform = `translate(${x - 74}px, ${y - 22}px) rotate(${angleDeg + 90}deg)`;
+
+    const btn = document.createElement('div');
+    btn.className = 'btn';
+    btn.innerHTML = `<div class="title">${item.title}</div><div class="subtitle">${item.sub}</div>`;
+
+    btn.addEventListener('click', (e) => {
+      if (Math.abs(velocity) > 0.5) return; // ignore taps during spin
+      document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // Could fire a callback here
+      console.log('Selected:', item.title);
+    });
+
+    wrapper.appendChild(btn);
+    ring.appendChild(wrapper);
+  }
+}
+
+function setRingAngle(deg) {
+  ring.style.transform = `rotate(${deg}deg)`;
+}
+
+// Drag handling — translate vertical drag to rotation
+// Moving finger up = wheel spins clockwise (positive angle)
+function onPointerDown(e) {
+  isDragging = true;
+  velocity = 0;
+  if (rafId) cancelAnimationFrame(rafId);
+  lastDragY = e.touches ? e.touches[0].clientY : e.clientY;
+  lastDragTime = performance.now();
+  e.preventDefault();
+}
+
+function onPointerMove(e) {
+  if (!isDragging) return;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const now = performance.now();
+  const dy = clientY - lastDragY;
+  const dt = now - lastDragTime;
+
+  // Convert pixel drag to degrees
+  // Circumference at RADIUS = 2πR; full circle = 360deg
+  // pixels per degree = 2πR / 360
+  const pixelsPerDeg = (2 * Math.PI * RADIUS) / 360;
+  const dAngle = dy / pixelsPerDeg * 57.3; // rough: dy/R in radians → degrees
+
+  currentAngle += dAngle;
+  setRingAngle(currentAngle);
+
+  // Track velocity (deg/ms)
+  if (dt > 0) velocity = dAngle / dt;
+
+  lastDragY = clientY;
+  lastDragTime = now;
+  e.preventDefault();
+}
+
+function onPointerUp(e) {
+  if (!isDragging) return;
+  isDragging = false;
+  // Convert velocity to deg/frame at 60fps
+  startInertia();
+}
+
+function startInertia() {
+  const FRICTION = 0.93;
+  const MIN_VEL = 0.01;
+
+  function frame() {
+    velocity *= FRICTION;
+    if (Math.abs(velocity) < MIN_VEL) {
+      velocity = 0;
+      return;
+    }
+    // velocity is deg/ms, frame is ~16ms
+    currentAngle += velocity * 16;
+    setRingAngle(currentAngle);
+    rafId = requestAnimationFrame(frame);
+  }
+
+  rafId = requestAnimationFrame(frame);
+}
+
+// Attach events
+ring.addEventListener('touchstart', onPointerDown, { passive: false });
+ring.addEventListener('touchmove', onPointerMove, { passive: false });
+ring.addEventListener('touchend', onPointerUp);
+ring.addEventListener('mousedown', onPointerDown);
+window.addEventListener('mousemove', onPointerMove);
+window.addEventListener('mouseup', onPointerUp);
+
+// Position the ring origin at bottom-left of viewport
+function positionRing() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  // Ring center: off bottom-left
+  // bottom: -600px, left: -600px in CSS already handles this
+  // But we want the arc to fill the right portion of screen
+  // Adjust RADIUS and offset based on screen size
+}
+
+buildWheel();
+setRingAngle(currentAngle);
+
+// Slow auto-spin on load to hint the interaction
+let autoSpin = true;
+let autoVel = 0.015; // deg/ms
+function autoSpinFrame() {
+  if (!autoSpin) return;
+  currentAngle += autoVel * 16;
+  setRingAngle(currentAngle);
+  requestAnimationFrame(autoSpinFrame);
+}
+requestAnimationFrame(autoSpinFrame);
+
+// Stop auto-spin on first touch
+ring.addEventListener('touchstart', () => { autoSpin = false; }, { once: true });
+ring.addEventListener('mousedown', () => { autoSpin = false; }, { once: true });
+</script>
+</body>
+</html>
