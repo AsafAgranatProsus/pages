@@ -51,9 +51,9 @@
   /* The actual rotating ring — center is off bottom-left */
   .wheel-ring {
     position: absolute;
-    /* Center of rotation is off-screen bottom-left */
-    bottom: -600px;
-    left: -600px;
+    /* Center of rotation sits just off the bottom-left corner */
+    bottom: -80px;
+    left: -80px;
     width: 1px;
     height: 1px;
     pointer-events: all;
@@ -168,8 +168,8 @@ const ITEMS = [
 ];
 
 const N = ITEMS.length;
-// Radius of the wheel — large so the arc feels gentle
-const RADIUS = 900;
+// Radius of the wheel — distance from off-screen anchor to buttons
+const RADIUS = 520;
 // Offset of ring center from bottom-left of viewport
 // We'll compute this dynamically
 const ring = document.getElementById('ring');
@@ -199,7 +199,8 @@ function buildWheel() {
     const wrapper = document.createElement('div');
     wrapper.className = 'btn-wrapper';
     // Place at (x, y) from ring center, tangent rotation
-    wrapper.style.transform = `translate(${x - 74}px, ${y - 22}px) rotate(${angleDeg + 90}deg)`;
+    // Buttons point radially outward from center (perpendicular to arc)
+    wrapper.style.transform = `translate(${x - 74}px, ${y - 22}px) rotate(${angleDeg}deg)`;
 
     const btn = document.createElement('div');
     btn.className = 'btn';
@@ -240,11 +241,8 @@ function onPointerMove(e) {
   const dy = clientY - lastDragY;
   const dt = now - lastDragTime;
 
-  // Convert pixel drag to degrees
-  // Circumference at RADIUS = 2πR; full circle = 360deg
-  // pixels per degree = 2πR / 360
-  const pixelsPerDeg = (2 * Math.PI * RADIUS) / 360;
-  const dAngle = dy / pixelsPerDeg * 57.3; // rough: dy/R in radians → degrees
+  // Convert pixel drag to degrees: dy / R (radians) → degrees
+  const dAngle = (dy / RADIUS) * (180 / Math.PI);
 
   currentAngle += dAngle;
   setRingAngle(currentAngle);
