@@ -95,17 +95,17 @@ html, body {
   flex-shrink: 0;
   position: relative;
   z-index: 20;
-  height: 72px;
-  background: rgba(252,247,239,0.92);
+  height: 88px;
+  background: rgba(250,244,235,0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 30px;
+  border-radius: 36px 36px 0 0;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 28px calc(env(safe-area-inset-bottom) * 0.5);
   gap: 8px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.05);
-  margin: 0 16px max(12px, env(safe-area-inset-bottom));
+  box-shadow: 0 -2px 24px rgba(0,0,0,0.04);
+  margin: 0;
 }
 
 .chat-side-btn {
