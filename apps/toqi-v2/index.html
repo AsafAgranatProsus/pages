@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Toqi</title>
+
+<!-- Lucide icons (CDN, tree-shakeable UMD) -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg:        #f5ede0;
+  --btn-bg:    #1c1917;
+  --btn-text:  #e8dcc8;
+  --btn-sub:   #a89070;
+  --chrome:    rgba(245,237,224,0.85);
+  --radius-btn: 18px;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  touch-action: none;
+}
+
+/* ── App shell ─────────────────────────────────────────────── */
+#app {
+  position: relative;
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Green blob ─────────────────────────────────────────────── */
+/*  Independent element, multiple radial gradients, sits behind
+    the chat input but above the bare background.               */
+#blob {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  /* Three overlapping radial gradients that together form the
+     teal-to-transparent organic shape seen in the screenshot.  */
+  background:
+    radial-gradient(ellipse 70% 55% at 38% 28%,
+      rgba(72,160,140,0.82) 0%,
+      rgba(72,160,140,0.0)  100%),
+    radial-gradient(ellipse 50% 40% at 20% 10%,
+      rgba(60,140,120,0.55) 0%,
+      rgba(60,140,120,0.0)  100%),
+    radial-gradient(ellipse 40% 30% at 55% 40%,
+      rgba(100,185,165,0.35) 0%,
+      rgba(100,185,165,0.0)  100%);
+}
+
+/* ── Top bar ────────────────────────────────────────────────── */
+#topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 64px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 20px 12px;
+  z-index: 20;
+}
+
+.topbar-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: #1c1917;
+}
+
+.topbar-btn.right {
+  background: rgba(232,220,200,0.7);
+  backdrop-filter: blur(6px);
+}
+
+/* ── Wheel layer ────────────────────────────────────────────── */
+#wheel-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+}
+
+.wheel-ring {
+  position: absolute;
+  width: 1px; height: 1px;
+  will-change: transform;
+  cursor: grab;
+}
+.wheel-ring:active { cursor: grabbing; }
+
+.btn-wrapper {
+  position: absolute;
+  transform-origin: center center;
+}
+
+.btn {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border-radius: var(--radius-btn);
+  padding: 10px 14px;
+  width: 200px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.22);
+  transition: background 0.12s;
+}
+
+.btn:active, .btn.active { background: #3a2e20; }
+
+.btn-icon {
+  flex-shrink: 0;
+  opacity: 0.75;
+  display: flex;
+  align-items: center;
+}
+
+.btn-text { min-width: 0; }
+
+.btn-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-sub {
+  font-size: 12px;
+  color: var(--btn-sub);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Chat input bar ─────────────────────────────────────────── */
+#chat-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 12px 16px max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(245,237,224,0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 30;
+}
+
+.chat-side-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: #1c1917;
+  flex-shrink: 0;
+}
+
+#chat-input-wrap {
+  flex: 1;
+  background: rgba(255,255,255,0.55);
+  border-radius: 22px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+}
+
+#chat-placeholder {
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: normal;
+  color: #b0a090;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Decorative dots ────────────────────────────────────────── */
+#dots {
+  position: absolute;
+  z-index: 6;
+  display: flex;
+  gap: 6px;
+  /* positioned to match screenshot — upper-left quadrant */
+  top: 38%;
+  left: 30%;
+  pointer-events: none;
+}
+
+.dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #1c1917;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Green blob -->
+  <div id="blob"></div>
+
+  <!-- Top bar -->
+  <div id="topbar">
+    <button class="topbar-btn left" id="btn-menu" aria-label="Menu">
+      <i data-lucide="menu" width="22" height="22"></i>
+    </button>
+    <button class="topbar-btn right" id="btn-new" aria-label="New chat">
+      <i data-lucide="message-circle-plus" width="20" height="20"></i>
+    </button>
+  </div>
+
+  <!-- Wheel -->
+  <div id="wheel-layer">
+    <div class="wheel-ring" id="ring"></div>
+  </div>
+
+  <!-- Decorative dots -->
+  <div id="dots">
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+  <!-- Chat input bar -->
+  <div id="chat-bar">
+    <button class="chat-side-btn" aria-label="Attach">
+      <i data-lucide="plus" width="22" height="22"></i>
+    </button>
+    <div id="chat-input-wrap">
+      <span id="chat-placeholder">Chat with toqi</span>
+    </div>
+    <button class="chat-side-btn" aria-label="Voice">
+      <i data-lucide="mic" width="22" height="22"></i>
+    </button>
+  </div>
+
+</div>
+
+<script>
+// ── Items ────────────────────────────────────────────────────
+// icon: Lucide icon name (null = no icon)
+const ITEMS = [
+  { title: "Morning routine",  sub: "Start strong",          icon: "sun" },
+  { title: "Inbox triage",     sub: "Zero in minutes",       icon: "mail" },
+  { title: "Grocery run",      sub: "Fridge, restocked",     icon: "shopping-cart" },
+  { title: "Tonight's dinner", sub: "Sorted in seconds",     icon: "utensils" },
+  { title: "Weekend escape",   sub: "Somewhere new",         icon: "map" },
+  { title: "Flight tickets",   sub: "Nail them first",       icon: "plane" },
+  { title: "Latest brief",     sub: "Your day in a nutshell",icon: "newspaper" },
+  { title: "Tomorrow",         sub: "Set up tonight",        icon: "calendar" },
+  { title: "Big decision",     sub: "Think it through",      icon: "binoculars" },
+  { title: "Save more",        sub: "Small wins add up",     icon: "piggy-bank" },
+  { title: "Mood check",       sub: "How are you, really",   icon: "heart" },
+  { title: "Deep clean",       sub: "One room at a time",    icon: "sparkles" },
+  { title: "Family plans",     sub: "Everyone in sync",      icon: "users" },
+  { title: "Subscriptions",    sub: "Trim the waste",        icon: "credit-card" },
+  { title: "Local finds",      sub: "Hidden gems near you",  icon: "map-pin" },
+  { title: "New skill",        sub: "Ten minutes a day",     icon: "book-open" },
+  { title: "Errand run",       sub: "Batch and done",        icon: "list-checks" },
+  { title: "Birthday watch",   sub: "Never miss one",        icon: "cake" },
+  { title: "Mindful move",     sub: "Reset the body",        icon: "activity" },
+  { title: "Travel hacks",     sub: "Skip the lines",        icon: "luggage" },
+  { title: "Weekly review",    sub: "Close the loop",        icon: "refresh-cw" },
+  { title: "Meal prep",        sub: "Sunday, sorted",        icon: "chef-hat" },
+  { title: "Workout plan",     sub: "Move today",            icon: "dumbbell" },
+  { title: "Packing list",     sub: "Forget nothing",        icon: "package" },
+  { title: "Date night",       sub: "Plan the spark",        icon: "star" },
+  { title: "Meeting prep",     sub: "Walk in ready",         icon: "presentation" },
+  { title: "Budget check",     sub: "Know your numbers",     icon: "bar-chart-2" },
+  { title: "Reading list",     sub: "Saved for later",       icon: "bookmark" },
+  { title: "Water break",      sub: "Hydrate, repeat",       icon: "droplets" },
+  { title: "Gift ideas",       sub: "They'll love it",       icon: "gift" },
+  { title: "Focus block",      sub: "Guard your deep work",  icon: "timer" },
+  { title: "Quick recipe",     sub: "Five ingredients, max", icon: "flame" },
+  { title: "Trip planner",     sub: "Idea to itinerary",     icon: "compass" },
+  { title: "Bill reminders",   sub: "Never late again",      icon: "bell" },
+];
+
+// ── Wheel params (tuned for portrait mobile) ─────────────────
+const ANCHOR_X_PCT = 63;   // % of diagonal
+const ANCHOR_Y_PCT = 53;   // % of diagonal
+const RADIUS_PCT   = 40;   // % of diagonal
+const ITEM_COUNT   = 32;
+
+const ring = document.getElementById('ring');
+
+function getDiag() {
+  return Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
+}
+
+function getRadius() { return getDiag() * (RADIUS_PCT / 100); }
+
+function positionRing() {
+  const d = getDiag();
+  ring.style.left = (d * ANCHOR_X_PCT / 100) + 'px';
+  ring.style.top  = (d * ANCHOR_Y_PCT / 100) + 'px';
+}
+
+// ── Build wheel buttons ──────────────────────────────────────
+function buildWheel() {
+  ring.innerHTML = '';
+  const R = getRadius();
+  const N = ITEM_COUNT;
+  const angleStep = 360 / N;
+
+  for (let i = 0; i < N; i++) {
+    const item = ITEMS[i % ITEMS.length];
+    const angleDeg = i * angleStep;
+    const angleRad = angleDeg * Math.PI / 180;
+
+    const x = R * Math.cos(angleRad);
+    const y = R * Math.sin(angleRad);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'btn-wrapper';
+    // Tangent orientation: +90° so text runs along the arc
+    // Flip buttons on the left half so text is always readable
+    const absAngle = (angleDeg + currentAngle % 360 + 360) % 360;
+    const flip = (absAngle > 90 && absAngle < 270) ? 180 : 0;
+    wrapper.style.transform =
+      `translate(${x - 100}px, ${y - 22}px) rotate(${angleDeg + 90 + flip}deg)`;
+    wrapper.dataset.index = i;
+
+    const btn = document.createElement('div');
+    btn.className = 'btn';
+
+    // Icon
+    if (item.icon) {
+      const iconWrap = document.createElement('div');
+      iconWrap.className = 'btn-icon';
+      iconWrap.innerHTML = `<i data-lucide="${item.icon}" width="16" height="16"></i>`;
+      btn.appendChild(iconWrap);
+    }
+
+    // Text
+    const textWrap = document.createElement('div');
+    textWrap.className = 'btn-text';
+    textWrap.innerHTML =
+      `<div class="btn-title">${item.title}</div>` +
+      `<div class="btn-sub">${item.sub}</div>`;
+    btn.appendChild(textWrap);
+
+    btn.addEventListener('click', () => {
+      if (Math.abs(velocity) > 0.5) return;
+      document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+
+    wrapper.appendChild(btn);
+    ring.appendChild(wrapper);
+  }
+
+  // Render Lucide icons inside the newly created buttons
+  lucide.createIcons({ nameAttr: 'data-lucide' });
+}
+
+// ── Per-frame render (flip recalculated each frame) ──────────
+let currentAngle = -90;
+let velocity = 0;
+let isDragging = false;
+let rafId = null;
+let lastDragY = null;
+let lastDragTime = null;
+
+function renderFrame() {
+  ring.style.transform = `rotate(${currentAngle}deg)`;
+
+  // Recalculate flip for each wrapper every frame
+  const wrappers = ring.querySelectorAll('.btn-wrapper');
+  wrappers.forEach(wrapper => {
+    const i = Number(wrapper.dataset.index);
+    const N = ITEM_COUNT;
+    const angleDeg = i * (360 / N);
+    const R = getRadius();
+    const angleRad = angleDeg * Math.PI / 180;
+    const x = R * Math.cos(angleRad);
+    const y = R * Math.sin(angleRad);
+
+    const absAngle = (angleDeg + currentAngle % 360 + 360) % 360;
+    const flip = (absAngle > 90 && absAngle < 270) ? 180 : 0;
+    wrapper.style.transform =
+      `translate(${x - 100}px, ${y - 22}px) rotate(${angleDeg + 90 + flip}deg)`;
+  });
+}
+
+// ── Drag ─────────────────────────────────────────────────────
+function onPointerDown(e) {
+  isDragging = true;
+  velocity = 0;
+  if (rafId) cancelAnimationFrame(rafId);
+  lastDragY = e.touches ? e.touches[0].clientY : e.clientY;
+  lastDragTime = performance.now();
+  e.preventDefault();
+}
+
+function onPointerMove(e) {
+  if (!isDragging) return;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const now = performance.now();
+  const dy = clientY - lastDragY;
+  const dt = now - lastDragTime;
+  const dAngle = -(dy / getRadius()) * (180 / Math.PI);
+
+  currentAngle += dAngle;
+  renderFrame();
+
+  if (dt > 0) velocity = dAngle / dt;
+  lastDragY = clientY;
+  lastDragTime = now;
+  e.preventDefault();
+}
+
+function onPointerUp() {
+  if (!isDragging) return;
+  isDragging = false;
+  startInertia();
+}
+
+function startInertia() {
+  const FRICTION = 0.96;
+  const MIN_VEL  = 0.001;
+  function frame() {
+    velocity *= FRICTION;
+    if (Math.abs(velocity) < MIN_VEL) { velocity = 0; return; }
+    currentAngle += velocity * 16;
+    renderFrame();
+    rafId = requestAnimationFrame(frame);
+  }
+  rafId = requestAnimationFrame(frame);
+}
+
+ring.addEventListener('touchstart', onPointerDown, { passive: false });
+ring.addEventListener('touchmove',  onPointerMove, { passive: false });
+ring.addEventListener('touchend',   onPointerUp);
+ring.addEventListener('mousedown',  onPointerDown);
+window.addEventListener('mousemove', onPointerMove);
+window.addEventListener('mouseup',   onPointerUp);
+
+window.addEventListener('resize', () => {
+  positionRing();
+  buildWheel();
+  renderFrame();
+});
+
+// ── Init ─────────────────────────────────────────────────────
+lucide.createIcons();
+positionRing();
+buildWheel();
+renderFrame();
+</script>
+</body>
+</html>
