@@ -99,13 +99,13 @@ html, body {
   background: rgba(250,244,235,0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 32px;
+  border-radius: 32px 32px 0 0;
   display: flex;
   align-items: center;
-  padding: 0 22px;
+  padding: 0 22px env(safe-area-inset-bottom);
   gap: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-  margin: 0 24px max(16px, env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+  margin: 0 24px 0;
 }
 
 .chat-side-btn {
