@@ -95,22 +95,21 @@ html, body {
   flex-shrink: 0;
   position: relative;
   z-index: 20;
-  height: 56px;
-  background: rgba(255,255,255,0.82);
+  height: 72px;
+  background: rgba(252,247,239,0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 28px;
+  border-radius: 30px;
   display: flex;
   align-items: center;
-  padding: 0 8px 0 16px;
+  padding: 0 20px;
   gap: 8px;
-  box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.05);
   margin: 0 16px max(12px, env(safe-area-inset-bottom));
 }
 
 .chat-side-btn {
-  width: 40px; height: 40px;
-  border-radius: 50%;
+  width: 28px; height: 28px;
   border: none;
   background: transparent;
   display: flex; align-items: center; justify-content: center;
@@ -121,9 +120,10 @@ html, body {
 
 #chat-placeholder {
   flex: 1;
-  font-size: 17px;
+  text-align: center;
+  font-size: 18px;
   font-weight: 400;
-  color: #9a8a7a;
+  color: #8a7d70;
   pointer-events: none;
   user-select: none;
 }
@@ -149,11 +149,11 @@ html, body {
 
   <div id="chat-bar">
     <button class="chat-side-btn" aria-label="Attach">
-      <i data-lucide="plus" width="22" height="22"></i>
+      <i data-lucide="plus" width="26" height="26"></i>
     </button>
     <span id="chat-placeholder">Chat with toqi</span>
     <button class="chat-side-btn" aria-label="Voice">
-      <i data-lucide="mic" width="22" height="22"></i>
+      <i data-lucide="mic" width="24" height="24"></i>
     </button>
   </div>
 
