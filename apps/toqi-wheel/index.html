@@ -48,11 +48,11 @@
     pointer-events: none;
   }
 
-  /* The actual rotating ring — center anchored at bottom-left corner */
+  /* The actual rotating ring — anchor tuned to match Toqi concept layout */
   .wheel-ring {
     position: absolute;
-    bottom: 0px;
-    left: 0px;
+    bottom: 163px;
+    left: 712px;
     width: 1px;
     height: 1px;
     pointer-events: all;
@@ -198,8 +198,8 @@ function buildWheel() {
     const wrapper = document.createElement('div');
     wrapper.className = 'btn-wrapper';
     // Place at (x, y) from ring center, tangent rotation
-    // Buttons point radially outward from center (perpendicular to arc)
-    wrapper.style.transform = `translate(${x - 68}px, ${y - 20}px) rotate(${angleDeg}deg)`;
+    // +180deg flips buttons to face outward (readable from outside the arc)
+    wrapper.style.transform = `translate(${x - 68}px, ${y - 20}px) rotate(${angleDeg + 180}deg)`;
 
     const btn = document.createElement('div');
     btn.className = 'btn';
