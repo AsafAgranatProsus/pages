@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mastering Rive — One-Page Guide</title>
+<style>
+  :root{
+    --bg:#f5f5f0; --surface:#fff; --dark:#1a1a1a;
+    --text:#1a1a1a; --body:#333; --sec:#444; --meta:#555;
+    --ondark:#fff; --bodydark:#ccc; --metadark:#999;
+    --accent:#e63329; --border:#eee; --muted:#ddd; --gap:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--body);
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  .meta{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--meta)}
+  .meta-dark{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--metadark)}
+
+  /* Masthead */
+  header{border-bottom:2px solid var(--dark);padding:48px 0 32px}
+  header .kicker{margin-bottom:20px}
+  header h1{font-size:54px;font-weight:700;line-height:1.02;letter-spacing:-.03em;color:var(--text);max-width:880px}
+  header .sub{margin-top:20px;font-size:18px;color:var(--sec);max-width:680px}
+  header .source-note{margin-top:24px}
+
+  /* Stat strip */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);background:var(--muted);margin:var(--gap) 0}
+  .stat{background:var(--surface);padding:28px 22px}
+  .stat .num{font-size:50px;font-weight:700;letter-spacing:-.03em;color:var(--accent);line-height:1}
+  .stat .lbl{margin-top:10px}
+
+  /* Section scaffolding */
+  section{padding:48px 0 8px}
+  .sec-head{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--muted);padding-bottom:14px;margin-bottom:28px}
+  .sec-head .idx{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.05em}
+  .sec-head h2{font-size:30px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+  .sec-head .obj{margin-left:auto;max-width:340px;font-size:13px;color:var(--meta);text-align:right}
+
+  /* Lesson grid */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap);background:var(--muted)}
+  .grid.three{grid-template-columns:repeat(3,1fr)}
+  .card{background:var(--surface);padding:26px 24px}
+  .card h3{font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .card .tag{margin-bottom:14px}
+  .card p{font-size:14.5px;color:var(--body);margin-bottom:10px}
+  .card ul{list-style:none;margin-top:6px}
+  .card li{font-size:14px;color:var(--body);padding-left:16px;position:relative;margin-bottom:6px}
+  .card li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;background:var(--accent)}
+  .card .kv{font-size:14px;color:var(--body);margin-bottom:5px}
+  .card .kv b{color:var(--text);font-weight:700}
+
+  /* Dark accent card */
+  .dark-card{background:var(--dark);color:var(--ondark);padding:32px 30px}
+  .dark-card h3{color:var(--ondark);font-size:20px;font-weight:700;margin-bottom:14px;letter-spacing:-.01em}
+  .dark-card p{color:var(--bodydark);font-size:15px;margin-bottom:12px}
+  .dark-card .num{font-size:56px;font-weight:700;color:var(--accent);letter-spacing:-.03em;line-height:1}
+
+  /* Pull quote */
+  blockquote{background:var(--surface);padding:30px 32px;margin:var(--gap) 0;border-left:4px solid var(--accent)}
+  blockquote p{font-size:20px;line-height:1.4;color:var(--text);font-weight:500;letter-spacing:-.01em}
+  blockquote cite{display:block;margin-top:14px;font-style:normal}
+
+  /* Comparison table */
+  .cmp{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:var(--gap);background:var(--muted);margin-top:var(--gap)}
+  .cmp>div{background:var(--surface);padding:14px 18px;font-size:14px;color:var(--body)}
+  .cmp .h{background:var(--dark);color:var(--ondark);font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+  .cmp .dim{font-weight:700;color:var(--text)}
+
+  footer{border-top:2px solid var(--dark);margin-top:48px;padding:28px 0 56px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+  @media(max-width:820px){
+    header h1{font-size:38px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .grid,.grid.three,.cmp{grid-template-columns:1fr}
+    .sec-head{flex-wrap:wrap}.sec-head .obj{margin-left:0;text-align:left;max-width:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kicker meta">Field Guide · Interactive Graphics</div>
+    <h1>Mastering Rive: Interactive Animation, State Machines &amp; Data Binding</h1>
+    <p class="sub">A zero-to-expert path through the design-driven graphics engine that lets you wire logic into motion — no developer handoff, one runtime, every platform.</p>
+    <div class="source-note meta">Built from the Rive notebook · 50 sources · synthesized 2026-06-09</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="stats">
+    <div class="stat"><div class="num">10–15×</div><div class="lbl meta">smaller files vs Lottie (binary .riv)</div></div>
+    <div class="stat"><div class="num">5</div><div class="lbl meta">chapters: beginner → technical lead</div></div>
+    <div class="stat"><div class="num">15×</div><div class="lbl meta">file-size cut Duolingo achieved</div></div>
+    <div class="stat"><div class="num">0</div><div class="lbl meta">lines of handoff code</div></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- CH 1 -->
+  <section id="ch1">
+    <div class="sec-head">
+      <span class="idx">CH 1</span>
+      <h2>Foundations &amp; the Core Paradigm</h2>
+      <span class="obj">Shift from a timeline-only, frame-by-frame mindset (After Effects / Lottie) to an interactive, state-driven one.</span>
+    </div>
+    <div class="grid three">
+      <div class="card">
+        <h3>What is Rive?</h3>
+        <div class="tag meta">Lesson 1.1</div>
+        <p>Rive is "a new general-purpose graphics format for all software and UI — animation is just part of the puzzle." A custom GPU renderer keeps files small and playback smooth.</p>
+        <ul>
+          <li>Binary <b>.riv</b> at runtime vs Lottie's text-parsed JSON</li>
+          <li>Interactive 2D runtime vs Spline's spatial 3D</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Your First 10 Minutes</h3>
+        <div class="tag meta">Lesson 1.2</div>
+        <p>Interface anatomy and the two modes you live in.</p>
+        <div class="kv"><b>Design Mode</b> — vector paths, anchor points (Y shortcut), hierarchy groups</div>
+        <div class="kv"><b>Animate Mode</b> — artboards, timelines, keyframes</div>
+      </div>
+      <div class="card">
+        <h3>Timelines → Buttons</h3>
+        <div class="tag meta">Lesson 1.3</div>
+        <p>Build a clean button group hierarchy. Isolate scaling vectors so keyframes don't conflict — e.g. nest a Button-Hover group inside a Button-Click group.</p>
+      </div>
+    </div>
+  </section>
+
+  <blockquote>
+    <p>"Designers, you already think in state machines. You do it whenever you design a hover effect, a pressed state, or an animated flow from one screen to another. And developers? You rebuild them."</p>
+    <cite class="meta">Valerie Veteto · A Beginner's Guide to the Rive State Machine</cite>
+  </blockquote>
+
+  <!-- CH 2 -->
+  <section id="ch2">
+    <div class="sec-head">
+      <span class="idx">CH 2</span>
+      <h2>The State Machine &amp; Event Listeners</h2>
+      <span class="obj">Eliminate the designer-to-developer handoff by wiring interactive logic visually.</span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>State Machine Overview</h3>
+        <div class="tag meta">Lesson 2.1</div>
+        <p>A state machine is "a decision-maker that chooses the right state (and animation) based on what's happening." A state is usually a timeline (Idle, Pressed), or a blend, or a placeholder like Exit.</p>
+        <ul>
+          <li>Entry, Any State, Exit nodes</li>
+          <li>Layers run concurrently — idle breathing + looping blink</li>
+          <li>Each artboard is self-contained: own artwork, animation, state machine</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Inputs &amp; Conditions</h3>
+        <div class="tag meta">Lesson 2.2</div>
+        <p>The three fundamental inputs that drive transitions:</p>
+        <div class="kv"><b>Boolean</b> — true/false toggles (e.g. hovering)</div>
+        <div class="kv"><b>Number</b> — math operators, numeric progression</div>
+        <div class="kv"><b>Trigger</b> — one-off action flashes</div>
+      </div>
+      <div class="card">
+        <h3>No-Code Listeners</h3>
+        <div class="tag meta">Lesson 2.3</div>
+        <p>Map pointer actions straight to vectors — no engineer intervention. Common early mistake: setting the user action but forgetting to set the Rive action (the value the listener writes).</p>
+        <ul>
+          <li>Pointer Enter / Exit / Move / Click</li>
+          <li>Listeners update bindings, set inputs, fire events</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Blend States (1D &amp; Additive)</h3>
+        <div class="tag meta">Lesson 2.4</div>
+        <p>The hardest part of transitions: the in-between. Smoothly drive a goal-meter vector when a bound numeric value sits unpredictably between 40% and 75%.</p>
+        <p class="kv">Tune duration (e.g. 350ms in, 200ms back) and interpolation (elastic / bounce / snappy ease) live, while the state machine plays.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CH 3 -->
+  <section id="ch3">
+    <div class="sec-head">
+      <span class="idx">CH 3</span>
+      <h2>Vector Rigging &amp; Mesh Deformations</h2>
+      <span class="obj">Turn static shapes into modular, living skeletons for character and UI motion.</span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>The Three Pillars of Rigging</h3>
+        <div class="tag meta">Lesson 3.1</div>
+        <div class="kv"><b>Bones</b> — skeletal structures driving vector paths</div>
+        <div class="kv"><b>Joysticks</b> — 2D controls syncing X/Y to facial expressions or cursor tracking</div>
+        <div class="kv"><b>Constraints</b> — automated bounds on Translation, Scale, Rotation</div>
+      </div>
+      <div class="card">
+        <h3>Inverse Kinematics</h3>
+        <div class="tag meta">Lesson 3.2</div>
+        <p><b>Forward (FK):</b> manual parent-child bone rotation.</p>
+        <p><b>Inverse (IK):</b> limbs auto-calculate joint angles to follow one strategic target group.</p>
+      </div>
+      <div class="card">
+        <h3>Raster Meshes &amp; PSD Imports</h3>
+        <div class="tag meta">Lesson 3.3</div>
+        <p>Import structured .psd files preserving layers. Apply vector vertex meshes over raster art to morph textures — ripple cloth, flow hair, flex skin.</p>
+      </div>
+      <div class="card">
+        <h3>Bone Weighting &amp; Vertex Binding</h3>
+        <div class="tag meta">Lesson 3.4</div>
+        <p>Paint influence maps onto individual mesh vertices so bends read as seamless, organic deformation rather than rigid pivots.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CH 4 -->
+  <section id="ch4">
+    <div class="sec-head">
+      <span class="idx">CH 4</span>
+      <h2>Data Binding &amp; Procedural Logic</h2>
+      <span class="obj">Make almost everything in a Rive graphic dynamically updatable at runtime.</span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>Data Binding Core Concepts</h3>
+        <div class="tag meta">Lesson 4.1</div>
+        <p>A <b>View Model</b> is "a box that contains all the data for this artboard." Create one, add typed fields (boolean, number, string, color, image, list), bind them to transition conditions.</p>
+        <p class="kv">Rive doesn't fetch data — it <i>reacts</i> to it. When a bound value updates, the right transition fires; the rest of the machine keeps humming, never blocking on an API.</p>
+      </div>
+      <div class="card">
+        <h3>View Models, Enums &amp; Solos</h3>
+        <div class="tag meta">Lesson 4.2</div>
+        <p>Build scalable architectures: nest View Models inside each other, map visual variants via <b>Enums</b>, switch component visibility instantly via <b>Solos</b>.</p>
+      </div>
+      <div class="card">
+        <h3>Functions &amp; Automation</h3>
+        <div class="tag meta">Lesson 4.3</div>
+        <p>Procedural workflows inside the editor — Formula Converters and Range Mappers to scale structural changes as repeatable, multi-step routines.</p>
+      </div>
+      <div class="card">
+        <h3>The Rive AI Coding Agent</h3>
+        <div class="tag meta">Lesson 4.4</div>
+        <p>Script complex physics or camera logic with prompt-driven assistance. The loop: <b>Prompt → Test → Refine.</b></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CH 5 -->
+  <section id="ch5">
+    <div class="sec-head">
+      <span class="idx">CH 5</span>
+      <h2>Cross-Platform Implementation</h2>
+      <span class="obj">Deploy production .riv files natively, the way Duolingo and Spotify do.</span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>Duolingo Lip-Sync Pipeline</h3>
+        <div class="tag meta">Lesson 5.1</div>
+        <p>Audio-engine timestamps map to phonetic shapes (visemes). Structural logic arrays let one character speak any script in real time across 40+ languages.</p>
+      </div>
+      <div class="card">
+        <h3>Engine Integration</h3>
+        <div class="tag meta">Lesson 5.2</div>
+        <p>A unified C++ runtime — "what you see in the Editor is what you get." Initialize runtimes, manage state params natively, handle responsive artboard layouts.</p>
+        <ul><li>Flutter · React / React Native · Unity &amp; Unreal · iOS · Android · Web</li></ul>
+      </div>
+      <div class="card">
+        <h3>Memory &amp; Performance</h3>
+        <div class="tag meta">Lesson 5.3</div>
+        <ul>
+          <li>Dispose of controllers when not in use</li>
+          <li>Lazy-load animations not immediately needed</li>
+          <li>Combine related animations into one state machine</li>
+          <li>Match frame rate to device capability</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>The Creative Technologist</h3>
+        <div class="tag meta">Lesson 5.4</div>
+        <p>Merge creative and logical: code-accessible view properties, a single source of truth from canvas to code. The role Duolingo created to bridge designers and devs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rive vs Lottie -->
+  <section id="vs">
+    <div class="sec-head">
+      <span class="idx">REF</span>
+      <h2>Rive vs Lottie — When to Choose Which</h2>
+    </div>
+    <div class="cmp">
+      <div class="h">Dimension</div><div class="h">Rive</div><div class="h">Lottie</div>
+
+      <div class="dim">Interactivity</div>
+      <div>State machines respond to input/data in real time — no guesswork for devs</div>
+      <div>Scroll &amp; basic triggers only; all interactivity coded by hand</div>
+
+      <div class="dim">Responsiveness</div>
+      <div>Built-in Layout &amp; Scrolling adapt to any screen</div>
+      <div>No responsive layout; resize means recreating</div>
+
+      <div class="dim">Dynamic data</div>
+      <div>Data binding: color, size, text, images, lists update at runtime</div>
+      <div>Static by nature; needs developer intervention</div>
+
+      <div class="dim">File size</div>
+      <div>Binary .riv, 10–15× smaller (240KB Lottie ≈ 16KB Rive)</div>
+      <div>JSON — versatile but bloated</div>
+
+      <div class="dim">Rendering</div>
+      <div>Purpose-built GPU renderer (Metal / Vulkan)</div>
+      <div>Vector libraries struggle on complex scenes</div>
+
+      <div class="dim">Pipeline</div>
+      <div>Design + animate + runtime in one tool</div>
+      <div>Illustrator/Figma → After Effects → Bodymovin export</div>
+
+      <div class="dim">Game engines</div>
+      <div>Native Unity &amp; Unreal support</div>
+      <div>Web &amp; mobile only</div>
+
+      <div class="dim">Where Lottie still wins</div>
+      <div>No alpha masking yet; scripting engine in progress</div>
+      <div>Alpha masking + JS expressions available today</div>
+    </div>
+  </section>
+
+  <!-- Closing dark card -->
+  <section id="why">
+    <div class="dark-card">
+      <div class="num">15×</div>
+      <h3>Why teams switch</h3>
+      <p>Duolingo adopted Rive for its interactive characters and achieved a 15× reduction in file size while improving performance and interactivity. The strategic payoff isn't smaller files — it's collapsing the design-to-dev handoff into a single source of truth from canvas to code.</p>
+      <p class="meta-dark">Case studies: Duolingo · Spotify · LinkedIn · Brilliant.org</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap" style="display:flex;justify-content:space-between;width:100%;flex-wrap:wrap;gap:12px">
+    <span class="meta">Mastering Rive · One-Page Guide</span>
+    <span class="meta">Source: Rive notebook (50 sources) · Curriculum blueprint, beginner state-machine guide, data-binding core concepts, Rive vs Lottie, optimization best practices</span>
+  </div>
+</footer>
+
+</body>
+</html>
