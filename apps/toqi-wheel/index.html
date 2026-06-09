@@ -201,32 +201,32 @@
 
   <div class="tune-row">
     <label>X (vw%)</label>
-    <input type="range" id="t-x" min="-50" max="150" step="1" value="92">
-    <span id="v-x">92</span>
+    <input type="range" id="t-x" min="-50" max="150" step="1" value="150">
+    <span id="v-x">150</span>
   </div>
 
   <div class="tune-row">
     <label>Y (vh%)</label>
-    <input type="range" id="t-y" min="-50" max="150" step="1" value="115">
-    <span id="v-y">115</span>
+    <input type="range" id="t-y" min="-50" max="150" step="1" value="59">
+    <span id="v-y">59</span>
   </div>
 
   <div class="tune-row">
     <label>Radius%</label>
-    <input type="range" id="t-r" min="40" max="160" step="1" value="92">
-    <span id="v-r">92</span>
+    <input type="range" id="t-r" min="40" max="160" step="1" value="40">
+    <span id="v-r">40</span>
   </div>
 
   <div class="tune-row">
     <label>Gap (px)</label>
-    <input type="range" id="t-g" min="100" max="300" step="5" value="160">
-    <span id="v-g">160</span>
+    <input type="range" id="t-g" min="100" max="300" step="5" value="135">
+    <span id="v-g">135</span>
   </div>
 
   <div class="tune-row">
     <label>Items (0=auto)</label>
-    <input type="range" id="t-n" min="0" max="80" step="1" value="0">
-    <span id="v-n">auto</span>
+    <input type="range" id="t-n" min="0" max="80" step="1" value="32">
+    <span id="v-n">32</span>
   </div>
 
   <button id="tuner-copy">Copy values</button>
@@ -274,11 +274,11 @@ const ITEMS = [
 const ring = document.getElementById('ring');
 
 // --- Tunable params ---
-let anchorXpct = 92;   // % of vw
-let anchorYpct = 115;  // % of vh
-let radiusPct  = 92;   // % of screen diagonal
-let gapPx      = 160;  // arc distance between button centres (px)
-let itemCount  = 0;    // 0 = auto (derived from gapPx)
+let anchorXpct = 150;  // % of vw
+let anchorYpct = 59;   // % of vh
+let radiusPct  = 40;   // % of screen diagonal
+let gapPx      = 135;  // arc distance between button centres (px)
+let itemCount  = 32;   // 0 = auto (derived from gapPx)
 
 function getRadius() {
   const diag = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
