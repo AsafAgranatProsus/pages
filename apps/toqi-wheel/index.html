@@ -40,7 +40,6 @@
     margin-top: 4px;
   }
 
-  /* Wheel container — clips to screen */
   .wheel-viewport {
     position: absolute;
     inset: 0;
@@ -48,11 +47,9 @@
     pointer-events: none;
   }
 
-  /* The actual rotating ring — anchor tuned to match Toqi concept layout */
+  /* Ring anchor — positioned via JS from vw/vh */
   .wheel-ring {
     position: absolute;
-    bottom: 163px;
-    left: 712px;
     width: 1px;
     height: 1px;
     pointer-events: all;
@@ -80,9 +77,7 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.18);
   }
 
-  .btn:active, .btn.active {
-    background: #3a3020;
-  }
+  .btn:active, .btn.active { background: #3a3020; }
 
   .btn .title {
     font-size: 13px;
@@ -102,7 +97,6 @@
     text-overflow: ellipsis;
   }
 
-  /* Tap hint */
   .hint {
     position: absolute;
     bottom: 32px;
@@ -112,6 +106,79 @@
     color: #aaa;
     z-index: 10;
     pointer-events: none;
+  }
+
+  /* --- Tuning panel --- */
+  #tuner {
+    position: fixed;
+    bottom: 60px;
+    right: 12px;
+    z-index: 100;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 11px;
+    color: #333;
+    width: 200px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  }
+
+  #tuner h3 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+
+  .tune-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    gap: 6px;
+  }
+
+  .tune-row label {
+    flex: 0 0 60px;
+    font-size: 11px;
+    color: #555;
+  }
+
+  .tune-row input[type=range] {
+    flex: 1;
+    accent-color: #1a1a1a;
+  }
+
+  .tune-row span {
+    flex: 0 0 36px;
+    text-align: right;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: #1a1a1a;
+  }
+
+  #tuner-copy {
+    margin-top: 8px;
+    width: 100%;
+    padding: 5px;
+    font-size: 11px;
+    background: #1a1a1a;
+    color: #e8dcc8;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  #tuner-vals {
+    margin-top: 6px;
+    font-size: 10px;
+    color: #888;
+    word-break: break-all;
+    line-height: 1.4;
   }
 </style>
 </head>
@@ -127,6 +194,32 @@
 </div>
 
 <div class="hint">Drag to spin · Tap to start</div>
+
+<!-- Tuning panel -->
+<div id="tuner">
+  <h3>Position tuner</h3>
+
+  <div class="tune-row">
+    <label>X (vw%)</label>
+    <input type="range" id="t-x" min="-50" max="150" step="1" value="92">
+    <span id="v-x">92</span>
+  </div>
+
+  <div class="tune-row">
+    <label>Y (vh%)</label>
+    <input type="range" id="t-y" min="-50" max="150" step="1" value="115">
+    <span id="v-y">115</span>
+  </div>
+
+  <div class="tune-row">
+    <label>Radius%</label>
+    <input type="range" id="t-r" min="40" max="160" step="1" value="92">
+    <span id="v-r">92</span>
+  </div>
+
+  <button id="tuner-copy">Copy values</button>
+  <div id="tuner-vals"></div>
+</div>
 
 <script>
 const ITEMS = [
@@ -166,14 +259,27 @@ const ITEMS = [
   { title: "Bill reminders",    sub: "Never late again" },
 ];
 
-const ITEMS_BASE = ITEMS;
-// Repeat items to fill the circle tightly — target ~5deg per item
-// With 34 items that's 10.6deg each; repeat 2x = 68 items = 5.3deg each
-const ITEMS_FULL = [...ITEMS_BASE, ...ITEMS_BASE];
+const ITEMS_FULL = [...ITEMS, ...ITEMS];
 const N = ITEMS_FULL.length;
-// Radius = screen diagonal
-const RADIUS = Math.round(Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 0.92);
+
 const ring = document.getElementById('ring');
+
+// --- Tunable params (as % of vw/vh/diagonal) ---
+let anchorXpct = 92;   // % of vw
+let anchorYpct = 115;  // % of vh (>100 = below screen = bottom-right anchor)
+let radiusPct  = 92;   // % of screen diagonal
+
+function getRadius() {
+  const diag = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
+  return diag * (radiusPct / 100);
+}
+
+function positionRing() {
+  const x = window.innerWidth  * (anchorXpct / 100);
+  const y = window.innerHeight * (anchorYpct / 100);
+  ring.style.left = x + 'px';
+  ring.style.top  = y + 'px';
+}
 
 let currentAngle = -90;
 let velocity = 0;
@@ -184,6 +290,7 @@ let lastDragTime = null;
 
 function buildWheel() {
   ring.innerHTML = '';
+  const R = getRadius();
   const angleStep = 360 / N;
 
   for (let i = 0; i < N; i++) {
@@ -191,25 +298,21 @@ function buildWheel() {
     const angleDeg = i * angleStep;
     const angleRad = (angleDeg * Math.PI) / 180;
 
-    // Position on circle
-    const x = RADIUS * Math.cos(angleRad);
-    const y = RADIUS * Math.sin(angleRad);
+    const x = R * Math.cos(angleRad);
+    const y = R * Math.sin(angleRad);
 
     const wrapper = document.createElement('div');
     wrapper.className = 'btn-wrapper';
-    // Place at (x, y) from ring center, tangent rotation
-    // +180deg flips buttons to face outward (readable from outside the arc)
     wrapper.style.transform = `translate(${x - 68}px, ${y - 20}px) rotate(${angleDeg + 180}deg)`;
 
     const btn = document.createElement('div');
     btn.className = 'btn';
     btn.innerHTML = `<div class="title">${item.title}</div><div class="subtitle">${item.sub}</div>`;
 
-    btn.addEventListener('click', (e) => {
-      if (Math.abs(velocity) > 0.5) return; // ignore taps during spin
+    btn.addEventListener('click', () => {
+      if (Math.abs(velocity) > 0.5) return;
       document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      // Could fire a callback here
       console.log('Selected:', item.title);
     });
 
@@ -222,8 +325,6 @@ function setRingAngle(deg) {
   ring.style.transform = `rotate(${deg}deg)`;
 }
 
-// Drag handling — translate vertical drag to rotation
-// Moving finger up = wheel spins clockwise (positive angle)
 function onPointerDown(e) {
   isDragging = true;
   velocity = 0;
@@ -239,38 +340,30 @@ function onPointerMove(e) {
   const now = performance.now();
   const dy = clientY - lastDragY;
   const dt = now - lastDragTime;
-
-  // Convert pixel drag to degrees — negate so drag direction matches wheel movement
-  const dAngle = -(dy / RADIUS) * (180 / Math.PI);
+  const dAngle = -(dy / getRadius()) * (180 / Math.PI);
 
   currentAngle += dAngle;
   setRingAngle(currentAngle);
 
-  // Track velocity (deg/ms)
   if (dt > 0) velocity = dAngle / dt;
-
   lastDragY = clientY;
   lastDragTime = now;
   e.preventDefault();
 }
 
-function onPointerUp(e) {
+function onPointerUp() {
   if (!isDragging) return;
   isDragging = false;
-  // Convert velocity to deg/frame at 60fps
   startInertia();
 }
 
 function startInertia() {
-  const FRICTION = 0.96;   // slower decay = longer, smoother coast
-  const MIN_VEL = 0.001;   // much lower threshold = no hard stop
+  const FRICTION = 0.96;
+  const MIN_VEL = 0.001;
 
   function frame() {
     velocity *= FRICTION;
-    if (Math.abs(velocity) < MIN_VEL) {
-      velocity = 0;
-      return;
-    }
+    if (Math.abs(velocity) < MIN_VEL) { velocity = 0; return; }
     currentAngle += velocity * 16;
     setRingAngle(currentAngle);
     rafId = requestAnimationFrame(frame);
@@ -279,18 +372,58 @@ function startInertia() {
   rafId = requestAnimationFrame(frame);
 }
 
-// Attach events
 ring.addEventListener('touchstart', onPointerDown, { passive: false });
-ring.addEventListener('touchmove', onPointerMove, { passive: false });
-ring.addEventListener('touchend', onPointerUp);
-ring.addEventListener('mousedown', onPointerDown);
+ring.addEventListener('touchmove',  onPointerMove, { passive: false });
+ring.addEventListener('touchend',   onPointerUp);
+ring.addEventListener('mousedown',  onPointerDown);
 window.addEventListener('mousemove', onPointerMove);
-window.addEventListener('mouseup', onPointerUp);
+window.addEventListener('mouseup',   onPointerUp);
 
+// --- Tuner wiring ---
+function applyTuner() {
+  positionRing();
+  buildWheel();
+  setRingAngle(currentAngle);
+  updateTunerDisplay();
+}
+
+function updateTunerDisplay() {
+  document.getElementById('tuner-vals').textContent =
+    `X:${anchorXpct}vw  Y:${anchorYpct}vh  R:${radiusPct}%diag`;
+}
+
+function wire(sliderId, valId, setter) {
+  const slider = document.getElementById(sliderId);
+  const val    = document.getElementById(valId);
+  slider.addEventListener('input', () => {
+    val.textContent = slider.value;
+    setter(Number(slider.value));
+    applyTuner();
+  });
+}
+
+wire('t-x', 'v-x', v => anchorXpct = v);
+wire('t-y', 'v-y', v => anchorYpct = v);
+wire('t-r', 'v-r', v => radiusPct  = v);
+
+document.getElementById('tuner-copy').addEventListener('click', () => {
+  const txt = `anchorXpct=${anchorXpct}, anchorYpct=${anchorYpct}, radiusPct=${radiusPct}`;
+  navigator.clipboard.writeText(txt).catch(() => {});
+  document.getElementById('tuner-vals').textContent = 'Copied: ' + txt;
+});
+
+// Rebuild on orientation/resize
+window.addEventListener('resize', () => {
+  positionRing();
+  buildWheel();
+  setRingAngle(currentAngle);
+});
+
+// Init
+positionRing();
 buildWheel();
 setRingAngle(currentAngle);
-
-window.addEventListener('resize', () => { location.reload(); });
+updateTunerDisplay();
 </script>
 </body>
 </html>
