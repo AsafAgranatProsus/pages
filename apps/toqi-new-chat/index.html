@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Toqi</title>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #f5ede0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Green blob ─────────────────────────────────────────────── */
+#blob {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 90% 65% at 55% 18%,
+      rgba(60,155,130,0.90) 0%,
+      rgba(60,155,130,0.0)  100%),
+    radial-gradient(ellipse 60% 45% at 20% 5%,
+      rgba(50,140,115,0.60) 0%,
+      rgba(50,140,115,0.0)  100%),
+    radial-gradient(ellipse 50% 35% at 75% 35%,
+      rgba(90,175,150,0.40) 0%,
+      rgba(90,175,150,0.0)  100%);
+}
+
+/* ── Top bar ────────────────────────────────────────────────── */
+#topbar {
+  position: relative;
+  z-index: 20;
+  flex-shrink: 0;
+  height: 72px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 20px 14px;
+}
+
+.topbar-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.30);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: #1c1917;
+}
+
+.topbar-btn.right {
+  background: rgba(232,218,200,0.75);
+}
+
+/* ── Main content area ──────────────────────────────────────── */
+#content {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 20px 16px;
+  gap: 12px;
+}
+
+/* ── Suggestion chips ───────────────────────────────────────── */
+#chips {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chip {
+  background: #1c1917;
+  color: #e8dcc8;
+  border-radius: 20px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.20);
+  transition: background 0.12s;
+  align-self: flex-start;
+}
+
+.chip:active { background: #3a2e20; }
+
+.chip-icon {
+  flex-shrink: 0;
+  opacity: 0.70;
+  display: flex; align-items: center;
+}
+
+.chip-text { min-width: 0; }
+
+.chip-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.chip-sub {
+  font-size: 12px;
+  color: #a89070;
+  margin-top: 2px;
+}
+
+/* ── Chat input pill ────────────────────────────────────────── */
+#chat-bar {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+  height: 56px;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px 0 16px;
+  gap: 8px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  margin: 0 0 max(8px, env(safe-area-inset-bottom));
+}
+
+.chat-side-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: #1c1917;
+  flex-shrink: 0;
+}
+
+#chat-placeholder {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 400;
+  color: #b8a898;
+  pointer-events: none;
+  user-select: none;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="blob"></div>
+
+  <div id="topbar">
+    <button class="topbar-btn left" aria-label="Menu">
+      <i data-lucide="menu" width="22" height="22"></i>
+    </button>
+    <button class="topbar-btn right" aria-label="New chat">
+      <i data-lucide="message-circle-plus" width="20" height="20"></i>
+    </button>
+  </div>
+
+  <div id="content">
+    <div id="chips">
+      <div class="chip">
+        <div class="chip-icon"><i data-lucide="sun" width="16" height="16"></i></div>
+        <div class="chip-text">
+          <div class="chip-title">Morning routine</div>
+          <div class="chip-sub">Start strong</div>
+        </div>
+      </div>
+      <div class="chip">
+        <div class="chip-icon"><i data-lucide="mail" width="16" height="16"></i></div>
+        <div class="chip-text">
+          <div class="chip-title">Inbox triage</div>
+          <div class="chip-sub">Zero in minutes</div>
+        </div>
+      </div>
+      <div class="chip">
+        <div class="chip-icon"><i data-lucide="utensils" width="16" height="16"></i></div>
+        <div class="chip-text">
+          <div class="chip-title">Tonight's dinner</div>
+          <div class="chip-sub">Sorted in seconds</div>
+        </div>
+      </div>
+      <div class="chip">
+        <div class="chip-icon"><i data-lucide="map" width="16" height="16"></i></div>
+        <div class="chip-text">
+          <div class="chip-title">Weekend escape</div>
+          <div class="chip-sub">Somewhere new</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chat-bar">
+    <button class="chat-side-btn" aria-label="Attach">
+      <i data-lucide="plus" width="22" height="22"></i>
+    </button>
+    <span id="chat-placeholder">Chat with toqi</span>
+    <button class="chat-side-btn" aria-label="Voice">
+      <i data-lucide="mic" width="22" height="22"></i>
+    </button>
+  </div>
+
+</div>
+<script>
+lucide.createIcons();
+</script>
+</body>
+</html>
