@@ -48,12 +48,11 @@
     pointer-events: none;
   }
 
-  /* The actual rotating ring — center is off bottom-left */
+  /* The actual rotating ring — center anchored at bottom-left corner */
   .wheel-ring {
     position: absolute;
-    /* Center of rotation sits just off the bottom-left corner */
-    bottom: -80px;
-    left: -80px;
+    bottom: 0px;
+    left: 0px;
     width: 1px;
     height: 1px;
     pointer-events: all;
@@ -72,9 +71,9 @@
   .btn {
     background: #1a1a1a;
     color: #e8dcc8;
-    border-radius: 16px;
-    padding: 10px 14px;
-    width: 148px;
+    border-radius: 14px;
+    padding: 8px 12px;
+    width: 136px;
     cursor: pointer;
     user-select: none;
     transition: background 0.15s;
@@ -168,13 +167,13 @@ const ITEMS = [
 ];
 
 const N = ITEMS.length;
-// Radius of the wheel — distance from off-screen anchor to buttons
-const RADIUS = 520;
-// Offset of ring center from bottom-left of viewport
-// We'll compute this dynamically
+// Radius = screen diagonal so arc sweeps nicely across the screen
+const RADIUS = Math.round(Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 0.92);
 const ring = document.getElementById('ring');
 
-let currentAngle = 0; // degrees, current rotation of the ring
+// Start angle: -90deg so arc opens upward-right from bottom-left anchor
+// Items at 0° point right, so starting at -90 puts first item at top
+let currentAngle = -90; // degrees, current rotation of the ring
 let velocity = 0;
 let lastY = null;
 let lastTime = null;
@@ -200,7 +199,7 @@ function buildWheel() {
     wrapper.className = 'btn-wrapper';
     // Place at (x, y) from ring center, tangent rotation
     // Buttons point radially outward from center (perpendicular to arc)
-    wrapper.style.transform = `translate(${x - 74}px, ${y - 22}px) rotate(${angleDeg}deg)`;
+    wrapper.style.transform = `translate(${x - 68}px, ${y - 20}px) rotate(${angleDeg}deg)`;
 
     const btn = document.createElement('div');
     btn.className = 'btn';
@@ -301,6 +300,11 @@ function positionRing() {
 
 buildWheel();
 setRingAngle(currentAngle);
+
+// Recompute RADIUS on resize
+window.addEventListener('resize', () => {
+  location.reload();
+});
 
 // Slow auto-spin on load to hint the interaction
 let autoSpin = true;
