@@ -217,6 +217,12 @@
     <span id="v-r">92</span>
   </div>
 
+  <div class="tune-row">
+    <label>Gap (px)</label>
+    <input type="range" id="t-g" min="100" max="300" step="5" value="160">
+    <span id="v-g">160</span>
+  </div>
+
   <button id="tuner-copy">Copy values</button>
   <div id="tuner-vals"></div>
 </div>
@@ -259,15 +265,13 @@ const ITEMS = [
   { title: "Bill reminders",    sub: "Never late again" },
 ];
 
-const ITEMS_FULL = [...ITEMS, ...ITEMS];
-const N = ITEMS_FULL.length;
-
 const ring = document.getElementById('ring');
 
-// --- Tunable params (as % of vw/vh/diagonal) ---
+// --- Tunable params ---
 let anchorXpct = 92;   // % of vw
-let anchorYpct = 115;  // % of vh (>100 = below screen = bottom-right anchor)
+let anchorYpct = 115;  // % of vh
 let radiusPct  = 92;   // % of screen diagonal
+let gapPx      = 160;  // arc distance between button centres (px)
 
 function getRadius() {
   const diag = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
@@ -291,10 +295,12 @@ let lastDragTime = null;
 function buildWheel() {
   ring.innerHTML = '';
   const R = getRadius();
+  // How many items fit around the full circle at the target arc gap?
+  const N = Math.max(ITEMS.length, Math.round((2 * Math.PI * R) / gapPx));
   const angleStep = 360 / N;
 
   for (let i = 0; i < N; i++) {
-    const item = ITEMS_FULL[i];
+    const item = ITEMS[i % ITEMS.length];
     const angleDeg = i * angleStep;
     const angleRad = (angleDeg * Math.PI) / 180;
 
@@ -389,7 +395,7 @@ function applyTuner() {
 
 function updateTunerDisplay() {
   document.getElementById('tuner-vals').textContent =
-    `X:${anchorXpct}vw  Y:${anchorYpct}vh  R:${radiusPct}%diag`;
+    `X:${anchorXpct}vw  Y:${anchorYpct}vh  R:${radiusPct}%diag  G:${gapPx}px`;
 }
 
 function wire(sliderId, valId, setter) {
@@ -405,9 +411,10 @@ function wire(sliderId, valId, setter) {
 wire('t-x', 'v-x', v => anchorXpct = v);
 wire('t-y', 'v-y', v => anchorYpct = v);
 wire('t-r', 'v-r', v => radiusPct  = v);
+wire('t-g', 'v-g', v => gapPx      = v);
 
 document.getElementById('tuner-copy').addEventListener('click', () => {
-  const txt = `anchorXpct=${anchorXpct}, anchorYpct=${anchorYpct}, radiusPct=${radiusPct}`;
+  const txt = `anchorXpct=${anchorXpct}, anchorYpct=${anchorYpct}, radiusPct=${radiusPct}, gapPx=${gapPx}`;
   navigator.clipboard.writeText(txt).catch(() => {});
   document.getElementById('tuner-vals').textContent = 'Copied: ' + txt;
 });
