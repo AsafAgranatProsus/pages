@@ -262,8 +262,8 @@ function onPointerUp(e) {
 }
 
 function startInertia() {
-  const FRICTION = 0.93;
-  const MIN_VEL = 0.01;
+  const FRICTION = 0.96;   // slower decay = longer, smoother coast
+  const MIN_VEL = 0.001;   // much lower threshold = no hard stop
 
   function frame() {
     velocity *= FRICTION;
@@ -271,7 +271,6 @@ function startInertia() {
       velocity = 0;
       return;
     }
-    // velocity is deg/ms, frame is ~16ms
     currentAngle += velocity * 16;
     setRingAngle(currentAngle);
     rafId = requestAnimationFrame(frame);
