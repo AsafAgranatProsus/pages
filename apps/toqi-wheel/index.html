@@ -166,17 +166,17 @@ const ITEMS = [
   { title: "Bill reminders",    sub: "Never late again" },
 ];
 
-const N = ITEMS.length;
-// Radius = screen diagonal so arc sweeps nicely across the screen
+const ITEMS_BASE = ITEMS;
+// Repeat items to fill the circle tightly — target ~5deg per item
+// With 34 items that's 10.6deg each; repeat 2x = 68 items = 5.3deg each
+const ITEMS_FULL = [...ITEMS_BASE, ...ITEMS_BASE];
+const N = ITEMS_FULL.length;
+// Radius = screen diagonal
 const RADIUS = Math.round(Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 0.92);
 const ring = document.getElementById('ring');
 
-// Start angle: -90deg so arc opens upward-right from bottom-left anchor
-// Items at 0° point right, so starting at -90 puts first item at top
-let currentAngle = -90; // degrees, current rotation of the ring
+let currentAngle = -90;
 let velocity = 0;
-let lastY = null;
-let lastTime = null;
 let isDragging = false;
 let rafId = null;
 let lastDragY = null;
@@ -187,7 +187,7 @@ function buildWheel() {
   const angleStep = 360 / N;
 
   for (let i = 0; i < N; i++) {
-    const item = ITEMS[i];
+    const item = ITEMS_FULL[i];
     const angleDeg = i * angleStep;
     const angleRad = (angleDeg * Math.PI) / 180;
 
@@ -240,8 +240,8 @@ function onPointerMove(e) {
   const dy = clientY - lastDragY;
   const dt = now - lastDragTime;
 
-  // Convert pixel drag to degrees: dy / R (radians) → degrees
-  const dAngle = (dy / RADIUS) * (180 / Math.PI);
+  // Convert pixel drag to degrees — negate so drag direction matches wheel movement
+  const dAngle = -(dy / RADIUS) * (180 / Math.PI);
 
   currentAngle += dAngle;
   setRingAngle(currentAngle);
@@ -288,38 +288,10 @@ ring.addEventListener('mousedown', onPointerDown);
 window.addEventListener('mousemove', onPointerMove);
 window.addEventListener('mouseup', onPointerUp);
 
-// Position the ring origin at bottom-left of viewport
-function positionRing() {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  // Ring center: off bottom-left
-  // bottom: -600px, left: -600px in CSS already handles this
-  // But we want the arc to fill the right portion of screen
-  // Adjust RADIUS and offset based on screen size
-}
-
 buildWheel();
 setRingAngle(currentAngle);
 
-// Recompute RADIUS on resize
-window.addEventListener('resize', () => {
-  location.reload();
-});
-
-// Slow auto-spin on load to hint the interaction
-let autoSpin = true;
-let autoVel = 0.015; // deg/ms
-function autoSpinFrame() {
-  if (!autoSpin) return;
-  currentAngle += autoVel * 16;
-  setRingAngle(currentAngle);
-  requestAnimationFrame(autoSpinFrame);
-}
-requestAnimationFrame(autoSpinFrame);
-
-// Stop auto-spin on first touch
-ring.addEventListener('touchstart', () => { autoSpin = false; }, { once: true });
-ring.addEventListener('mousedown', () => { autoSpin = false; }, { once: true });
+window.addEventListener('resize', () => { location.reload(); });
 </script>
 </body>
 </html>
