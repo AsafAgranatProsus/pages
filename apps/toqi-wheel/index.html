@@ -407,7 +407,8 @@ function onPointerMove(e) {
   const now = performance.now();
   const dy = clientY - lastDragY;
   const dt = now - lastDragTime;
-  const dAngle = -(dy / getRadius()) * (180 / Math.PI);
+  const dir = flipButtons ? 1 : -1;
+  const dAngle = dir * (dy / getRadius()) * (180 / Math.PI);
 
   currentAngle += dAngle;
   setRingAngle(currentAngle);
