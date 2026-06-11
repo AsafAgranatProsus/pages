@@ -187,6 +187,13 @@
     accent-color: #1a1a1a;
   }
 
+  .tune-row input[type=checkbox] {
+    flex: 1;
+    accent-color: #1a1a1a;
+    align-self: center;
+    margin: 0;
+  }
+
   .tune-row span {
     flex: 0 0 36px;
     text-align: right;
@@ -261,6 +268,12 @@
     <span id="v-n">32</span>
   </div>
 
+  <div class="tune-row">
+    <label>Flip buttons</label>
+    <input type="checkbox" id="t-flip">
+    <span id="v-flip">off</span>
+  </div>
+
   <button id="tuner-copy">Copy values</button>
   <div id="tuner-vals"></div>
   </div>
@@ -312,6 +325,7 @@ let anchorYpct = 53;   // % of screen diagonal
 let radiusPct  = 40;   // % of screen diagonal
 let gapPx      = 135;  // arc distance between button centres (px)
 let itemCount  = 32;   // 0 = auto (derived from gapPx)
+let flipButtons = false; // flip button text 180° (upright when viewing right side)
 
 function getRadius() {
   return getDiag() * (radiusPct / 100);
@@ -355,7 +369,8 @@ function buildWheel() {
 
     const wrapper = document.createElement('div');
     wrapper.className = 'btn-wrapper';
-    wrapper.style.transform = `translate(${x - 68}px, ${y - 20}px) rotate(${angleDeg + 180}deg)`;
+    const flipDeg = flipButtons ? 180 : 0;
+    wrapper.style.transform = `translate(${x - 68}px, ${y - 20}px) rotate(${angleDeg + 180 + flipDeg}deg)`;
 
     const btn = document.createElement('div');
     btn.className = 'btn';
@@ -441,7 +456,7 @@ function applyTuner() {
 
 function updateTunerDisplay() {
   document.getElementById('tuner-vals').textContent =
-    `X:${anchorXpct}%d  Y:${anchorYpct}%d  R:${radiusPct}%d  N:${itemCount || 'auto'}`;
+    `X:${anchorXpct}%d  Y:${anchorYpct}%d  R:${radiusPct}%d  N:${itemCount || 'auto'}  Flip:${flipButtons ? 'on' : 'off'}`;
 }
 
 function wire(sliderId, valId, setter) {
@@ -469,8 +484,19 @@ wire('t-r', 'v-r', v => radiusPct  = v);
   });
 })();
 
+// Flip buttons toggle
+(function() {
+  const cb  = document.getElementById('t-flip');
+  const val = document.getElementById('v-flip');
+  cb.addEventListener('change', () => {
+    flipButtons = cb.checked;
+    val.textContent = cb.checked ? 'on' : 'off';
+    applyTuner();
+  });
+})();
+
 document.getElementById('tuner-copy').addEventListener('click', () => {
-  const txt = `anchorXpct=${anchorXpct}, anchorYpct=${anchorYpct}, radiusPct=${radiusPct}, itemCount=${itemCount}`;
+  const txt = `anchorXpct=${anchorXpct}, anchorYpct=${anchorYpct}, radiusPct=${radiusPct}, itemCount=${itemCount}, flipButtons=${flipButtons}`;
   navigator.clipboard.writeText(txt).catch(() => {});
   document.getElementById('tuner-vals').textContent = 'Copied: ' + txt;
 });
