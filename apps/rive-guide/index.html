@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mastering Rive — One-Page Guide</title>
+<title>Mastering Rive — Interactive Guide</title>
 <style>
   :root{
     --bg:#f5f5f0; --surface:#fff; --dark:#1a1a1a;
     --text:#1a1a1a; --body:#333; --sec:#444; --meta:#555;
     --ondark:#fff; --bodydark:#ccc; --metadark:#999;
     --accent:#e63329; --border:#eee; --muted:#ddd; --gap:2px;
+    --nav-h:56px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -21,6 +22,18 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
   .meta{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--meta)}
   .meta-dark{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--metadark)}
+
+  /* Progress rail */
+  #progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--accent);z-index:60;transition:width .1s linear}
+
+  /* Sticky chapter nav */
+  nav.chapnav{position:sticky;top:0;z-index:50;background:var(--dark);height:var(--nav-h);display:flex;align-items:center}
+  nav.chapnav .wrap{display:flex;align-items:center;gap:8px;width:100%;overflow-x:auto;scrollbar-width:none}
+  nav.chapnav .wrap::-webkit-scrollbar{display:none}
+  nav.chapnav .brand{font-size:12px;font-weight:700;color:var(--ondark);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;margin-right:8px}
+  nav.chapnav a{font-size:12px;color:var(--bodydark);text-decoration:none;padding:6px 10px;white-space:nowrap;border-radius:2px;transition:color .15s,background .15s}
+  nav.chapnav a:hover{color:var(--ondark)}
+  nav.chapnav a.active{color:var(--ondark);background:var(--accent)}
 
   /* Masthead */
   header{border-bottom:2px solid var(--dark);padding:48px 0 32px}
@@ -36,7 +49,7 @@
   .stat .lbl{margin-top:10px}
 
   /* Section scaffolding */
-  section{padding:48px 0 8px}
+  section{padding:48px 0 8px;scroll-margin-top:calc(var(--nav-h) + 12px)}
   .sec-head{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--muted);padding-bottom:14px;margin-bottom:28px}
   .sec-head .idx{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.05em}
   .sec-head h2{font-size:30px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
@@ -55,6 +68,25 @@
   .card .kv{font-size:14px;color:var(--body);margin-bottom:5px}
   .card .kv b{color:var(--text);font-weight:700}
 
+  /* Collapsible card mechanics */
+  .card.collapsible .card-head{display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:12px}
+  .card.collapsible .card-head h3{margin-bottom:0}
+  .card.collapsible .toggle{flex:none;width:20px;height:20px;border:1px solid var(--muted);position:relative;transition:background .15s,border-color .15s}
+  .card.collapsible .toggle::before,
+  .card.collapsible .toggle::after{content:"";position:absolute;background:var(--accent);transition:transform .2s}
+  .card.collapsible .toggle::before{left:4px;right:4px;top:9px;height:2px}
+  .card.collapsible .toggle::after{top:4px;bottom:4px;left:9px;width:2px}
+  .card.collapsible.open .toggle::after{transform:scaleY(0)}
+  .card.collapsible .card-body{max-height:0;overflow:hidden;transition:max-height .28s ease;margin-top:0}
+  .card.collapsible.open .card-body{max-height:600px;margin-top:14px}
+  .card.collapsible .tag{margin-bottom:0}
+  .card.collapsible.open .tag{margin-bottom:0}
+
+  /* Riv embed placeholder slot */
+  .riv-slot{margin-top:14px;background:var(--bg);border:1px dashed var(--muted);min-height:120px;display:flex;align-items:center;justify-content:center;position:relative}
+  .riv-slot canvas{width:100%;height:100%;display:block}
+  .riv-slot .riv-ph{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--metadark);text-align:center;padding:18px}
+
   /* Dark accent card */
   .dark-card{background:var(--dark);color:var(--ondark);padding:32px 30px}
   .dark-card h3{color:var(--ondark);font-size:20px;font-weight:700;margin-bottom:14px;letter-spacing:-.01em}
@@ -66,11 +98,18 @@
   blockquote p{font-size:20px;line-height:1.4;color:var(--text);font-weight:500;letter-spacing:-.01em}
   blockquote cite{display:block;margin-top:14px;font-style:normal}
 
-  /* Comparison table */
+  /* Comparison table + filter */
+  .cmp-tools{display:flex;align-items:center;gap:8px;margin-top:var(--gap);flex-wrap:wrap}
+  .cmp-tools .flbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--meta)}
+  .cmp-tools button{font-family:inherit;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--body);background:var(--surface);border:1px solid var(--muted);padding:7px 12px;cursor:pointer;transition:all .15s}
+  .cmp-tools button.active{background:var(--dark);color:var(--ondark);border-color:var(--dark)}
   .cmp{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:var(--gap);background:var(--muted);margin-top:var(--gap)}
   .cmp>div{background:var(--surface);padding:14px 18px;font-size:14px;color:var(--body)}
   .cmp .h{background:var(--dark);color:var(--ondark);font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
   .cmp .dim{font-weight:700;color:var(--text)}
+  .cmp .row{display:contents}
+  .cmp .row.hide>div{display:none}
+  .cmp-col-rive .h:nth-child(2){outline:2px solid var(--accent);outline-offset:-2px}
 
   footer{border-top:2px solid var(--dark);margin-top:48px;padding:28px 0 56px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 
@@ -83,6 +122,20 @@
 </style>
 </head>
 <body>
+
+<div id="progress"></div>
+
+<nav class="chapnav">
+  <div class="wrap">
+    <span class="brand">Rive</span>
+    <a href="#ch1" data-nav="ch1">1 · Foundations</a>
+    <a href="#ch2" data-nav="ch2">2 · State Machine</a>
+    <a href="#ch3" data-nav="ch3">3 · Rigging</a>
+    <a href="#ch4" data-nav="ch4">4 · Data Binding</a>
+    <a href="#ch5" data-nav="ch5">5 · Cross-Platform</a>
+    <a href="#vs" data-nav="vs">Rive vs Lottie</a>
+  </div>
+</nav>
 
 <header>
   <div class="wrap">
@@ -112,26 +165,32 @@
       <span class="obj">Shift from a timeline-only, frame-by-frame mindset (After Effects / Lottie) to an interactive, state-driven one.</span>
     </div>
     <div class="grid three">
-      <div class="card">
-        <h3>What is Rive?</h3>
+      <div class="card collapsible open">
+        <div class="card-head"><h3>What is Rive?</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 1.1</div>
-        <p>Rive is "a new general-purpose graphics format for all software and UI — animation is just part of the puzzle." A custom GPU renderer keeps files small and playback smooth.</p>
-        <ul>
-          <li>Binary <b>.riv</b> at runtime vs Lottie's text-parsed JSON</li>
-          <li>Interactive 2D runtime vs Spline's spatial 3D</li>
-        </ul>
+        <div class="card-body">
+          <p>Rive is "a new general-purpose graphics format for all software and UI — animation is just part of the puzzle." A custom GPU renderer keeps files small and playback smooth.</p>
+          <ul>
+            <li>Binary <b>.riv</b> at runtime vs Lottie's text-parsed JSON</li>
+            <li>Interactive 2D runtime vs Spline's spatial 3D</li>
+          </ul>
+        </div>
       </div>
-      <div class="card">
-        <h3>Your First 10 Minutes</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Your First 10 Minutes</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 1.2</div>
-        <p>Interface anatomy and the two modes you live in.</p>
-        <div class="kv"><b>Design Mode</b> — vector paths, anchor points (Y shortcut), hierarchy groups</div>
-        <div class="kv"><b>Animate Mode</b> — artboards, timelines, keyframes</div>
+        <div class="card-body">
+          <p>Interface anatomy and the two modes you live in.</p>
+          <div class="kv"><b>Design Mode</b> — vector paths, anchor points (Y shortcut), hierarchy groups</div>
+          <div class="kv"><b>Animate Mode</b> — artboards, timelines, keyframes</div>
+        </div>
       </div>
-      <div class="card">
-        <h3>Timelines → Buttons</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Timelines → Buttons</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 1.3</div>
-        <p>Build a clean button group hierarchy. Isolate scaling vectors so keyframes don't conflict — e.g. nest a Button-Hover group inside a Button-Click group.</p>
+        <div class="card-body">
+          <p>Build a clean button group hierarchy. Isolate scaling vectors so keyframes don't conflict — e.g. nest a Button-Hover group inside a Button-Click group.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -149,38 +208,47 @@
       <span class="obj">Eliminate the designer-to-developer handoff by wiring interactive logic visually.</span>
     </div>
     <div class="grid">
-      <div class="card">
-        <h3>State Machine Overview</h3>
+      <div class="card collapsible open">
+        <div class="card-head"><h3>State Machine Overview</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 2.1</div>
-        <p>A state machine is "a decision-maker that chooses the right state (and animation) based on what's happening." A state is usually a timeline (Idle, Pressed), or a blend, or a placeholder like Exit.</p>
-        <ul>
-          <li>Entry, Any State, Exit nodes</li>
-          <li>Layers run concurrently — idle breathing + looping blink</li>
-          <li>Each artboard is self-contained: own artwork, animation, state machine</li>
-        </ul>
+        <div class="card-body">
+          <p>A state machine is "a decision-maker that chooses the right state (and animation) based on what's happening." A state is usually a timeline (Idle, Pressed), or a blend, or a placeholder like Exit.</p>
+          <ul>
+            <li>Entry, Any State, Exit nodes</li>
+            <li>Layers run concurrently — idle breathing + looping blink</li>
+            <li>Each artboard is self-contained: own artwork, animation, state machine</li>
+          </ul>
+          <div class="riv-slot" data-riv="state-machine-demo"><span class="riv-ph">Live state-machine demo slot — drop a .riv here</span></div>
+        </div>
       </div>
-      <div class="card">
-        <h3>Inputs &amp; Conditions</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Inputs &amp; Conditions</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 2.2</div>
-        <p>The three fundamental inputs that drive transitions:</p>
-        <div class="kv"><b>Boolean</b> — true/false toggles (e.g. hovering)</div>
-        <div class="kv"><b>Number</b> — math operators, numeric progression</div>
-        <div class="kv"><b>Trigger</b> — one-off action flashes</div>
+        <div class="card-body">
+          <p>The three fundamental inputs that drive transitions:</p>
+          <div class="kv"><b>Boolean</b> — true/false toggles (e.g. hovering)</div>
+          <div class="kv"><b>Number</b> — math operators, numeric progression</div>
+          <div class="kv"><b>Trigger</b> — one-off action flashes</div>
+        </div>
       </div>
-      <div class="card">
-        <h3>No-Code Listeners</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>No-Code Listeners</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 2.3</div>
-        <p>Map pointer actions straight to vectors — no engineer intervention. Common early mistake: setting the user action but forgetting to set the Rive action (the value the listener writes).</p>
-        <ul>
-          <li>Pointer Enter / Exit / Move / Click</li>
-          <li>Listeners update bindings, set inputs, fire events</li>
-        </ul>
+        <div class="card-body">
+          <p>Map pointer actions straight to vectors — no engineer intervention. Common early mistake: setting the user action but forgetting to set the Rive action (the value the listener writes).</p>
+          <ul>
+            <li>Pointer Enter / Exit / Move / Click</li>
+            <li>Listeners update bindings, set inputs, fire events</li>
+          </ul>
+        </div>
       </div>
-      <div class="card">
-        <h3>Blend States (1D &amp; Additive)</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Blend States (1D &amp; Additive)</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 2.4</div>
-        <p>The hardest part of transitions: the in-between. Smoothly drive a goal-meter vector when a bound numeric value sits unpredictably between 40% and 75%.</p>
-        <p class="kv">Tune duration (e.g. 350ms in, 200ms back) and interpolation (elastic / bounce / snappy ease) live, while the state machine plays.</p>
+        <div class="card-body">
+          <p>The hardest part of transitions: the in-between. Smoothly drive a goal-meter vector when a bound numeric value sits unpredictably between 40% and 75%.</p>
+          <p class="kv">Tune duration (e.g. 350ms in, 200ms back) and interpolation (elastic / bounce / snappy ease) live, while the state machine plays.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -193,28 +261,36 @@
       <span class="obj">Turn static shapes into modular, living skeletons for character and UI motion.</span>
     </div>
     <div class="grid">
-      <div class="card">
-        <h3>The Three Pillars of Rigging</h3>
+      <div class="card collapsible open">
+        <div class="card-head"><h3>The Three Pillars of Rigging</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 3.1</div>
-        <div class="kv"><b>Bones</b> — skeletal structures driving vector paths</div>
-        <div class="kv"><b>Joysticks</b> — 2D controls syncing X/Y to facial expressions or cursor tracking</div>
-        <div class="kv"><b>Constraints</b> — automated bounds on Translation, Scale, Rotation</div>
+        <div class="card-body">
+          <div class="kv"><b>Bones</b> — skeletal structures driving vector paths</div>
+          <div class="kv"><b>Joysticks</b> — 2D controls syncing X/Y to facial expressions or cursor tracking</div>
+          <div class="kv"><b>Constraints</b> — automated bounds on Translation, Scale, Rotation</div>
+        </div>
       </div>
-      <div class="card">
-        <h3>Inverse Kinematics</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Inverse Kinematics</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 3.2</div>
-        <p><b>Forward (FK):</b> manual parent-child bone rotation.</p>
-        <p><b>Inverse (IK):</b> limbs auto-calculate joint angles to follow one strategic target group.</p>
+        <div class="card-body">
+          <p><b>Forward (FK):</b> manual parent-child bone rotation.</p>
+          <p><b>Inverse (IK):</b> limbs auto-calculate joint angles to follow one strategic target group.</p>
+        </div>
       </div>
-      <div class="card">
-        <h3>Raster Meshes &amp; PSD Imports</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Raster Meshes &amp; PSD Imports</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 3.3</div>
-        <p>Import structured .psd files preserving layers. Apply vector vertex meshes over raster art to morph textures — ripple cloth, flow hair, flex skin.</p>
+        <div class="card-body">
+          <p>Import structured .psd files preserving layers. Apply vector vertex meshes over raster art to morph textures — ripple cloth, flow hair, flex skin.</p>
+        </div>
       </div>
-      <div class="card">
-        <h3>Bone Weighting &amp; Vertex Binding</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Bone Weighting &amp; Vertex Binding</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 3.4</div>
-        <p>Paint influence maps onto individual mesh vertices so bends read as seamless, organic deformation rather than rigid pivots.</p>
+        <div class="card-body">
+          <p>Paint influence maps onto individual mesh vertices so bends read as seamless, organic deformation rather than rigid pivots.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -227,26 +303,35 @@
       <span class="obj">Make almost everything in a Rive graphic dynamically updatable at runtime.</span>
     </div>
     <div class="grid">
-      <div class="card">
-        <h3>Data Binding Core Concepts</h3>
+      <div class="card collapsible open">
+        <div class="card-head"><h3>Data Binding Core Concepts</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 4.1</div>
-        <p>A <b>View Model</b> is "a box that contains all the data for this artboard." Create one, add typed fields (boolean, number, string, color, image, list), bind them to transition conditions.</p>
-        <p class="kv">Rive doesn't fetch data — it <i>reacts</i> to it. When a bound value updates, the right transition fires; the rest of the machine keeps humming, never blocking on an API.</p>
+        <div class="card-body">
+          <p>A <b>View Model</b> is "a box that contains all the data for this artboard." Create one, add typed fields (boolean, number, string, color, image, list), bind them to transition conditions.</p>
+          <p class="kv">Rive doesn't fetch data — it <i>reacts</i> to it. When a bound value updates, the right transition fires; the rest of the machine keeps humming, never blocking on an API.</p>
+          <div class="riv-slot" data-riv="data-binding-demo"><span class="riv-ph">Live data-bound meter slot — drop a .riv here</span></div>
+        </div>
       </div>
-      <div class="card">
-        <h3>View Models, Enums &amp; Solos</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>View Models, Enums &amp; Solos</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 4.2</div>
-        <p>Build scalable architectures: nest View Models inside each other, map visual variants via <b>Enums</b>, switch component visibility instantly via <b>Solos</b>.</p>
+        <div class="card-body">
+          <p>Build scalable architectures: nest View Models inside each other, map visual variants via <b>Enums</b>, switch component visibility instantly via <b>Solos</b>.</p>
+        </div>
       </div>
-      <div class="card">
-        <h3>Functions &amp; Automation</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Functions &amp; Automation</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 4.3</div>
-        <p>Procedural workflows inside the editor — Formula Converters and Range Mappers to scale structural changes as repeatable, multi-step routines.</p>
+        <div class="card-body">
+          <p>Procedural workflows inside the editor — Formula Converters and Range Mappers to scale structural changes as repeatable, multi-step routines.</p>
+        </div>
       </div>
-      <div class="card">
-        <h3>The Rive AI Coding Agent</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>The Rive AI Coding Agent</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 4.4</div>
-        <p>Script complex physics or camera logic with prompt-driven assistance. The loop: <b>Prompt → Test → Refine.</b></p>
+        <div class="card-body">
+          <p>Script complex physics or camera logic with prompt-driven assistance. The loop: <b>Prompt → Test → Refine.</b></p>
+        </div>
       </div>
     </div>
   </section>
@@ -259,31 +344,39 @@
       <span class="obj">Deploy production .riv files natively, the way Duolingo and Spotify do.</span>
     </div>
     <div class="grid">
-      <div class="card">
-        <h3>Duolingo Lip-Sync Pipeline</h3>
+      <div class="card collapsible open">
+        <div class="card-head"><h3>Duolingo Lip-Sync Pipeline</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 5.1</div>
-        <p>Audio-engine timestamps map to phonetic shapes (visemes). Structural logic arrays let one character speak any script in real time across 40+ languages.</p>
+        <div class="card-body">
+          <p>Audio-engine timestamps map to phonetic shapes (visemes). Structural logic arrays let one character speak any script in real time across 40+ languages.</p>
+        </div>
       </div>
-      <div class="card">
-        <h3>Engine Integration</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Engine Integration</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 5.2</div>
-        <p>A unified C++ runtime — "what you see in the Editor is what you get." Initialize runtimes, manage state params natively, handle responsive artboard layouts.</p>
-        <ul><li>Flutter · React / React Native · Unity &amp; Unreal · iOS · Android · Web</li></ul>
+        <div class="card-body">
+          <p>A unified C++ runtime — "what you see in the Editor is what you get." Initialize runtimes, manage state params natively, handle responsive artboard layouts.</p>
+          <ul><li>Flutter · React / React Native · Unity &amp; Unreal · iOS · Android · Web</li></ul>
+        </div>
       </div>
-      <div class="card">
-        <h3>Memory &amp; Performance</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Memory &amp; Performance</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 5.3</div>
-        <ul>
-          <li>Dispose of controllers when not in use</li>
-          <li>Lazy-load animations not immediately needed</li>
-          <li>Combine related animations into one state machine</li>
-          <li>Match frame rate to device capability</li>
-        </ul>
+        <div class="card-body">
+          <ul>
+            <li>Dispose of controllers when not in use</li>
+            <li>Lazy-load animations not immediately needed</li>
+            <li>Combine related animations into one state machine</li>
+            <li>Match frame rate to device capability</li>
+          </ul>
+        </div>
       </div>
-      <div class="card">
-        <h3>The Creative Technologist</h3>
+      <div class="card collapsible">
+        <div class="card-head"><h3>The Creative Technologist</h3><span class="toggle"></span></div>
         <div class="tag meta">Lesson 5.4</div>
-        <p>Merge creative and logical: code-accessible view properties, a single source of truth from canvas to code. The role Duolingo created to bridge designers and devs.</p>
+        <div class="card-body">
+          <p>Merge creative and logical: code-accessible view properties, a single source of truth from canvas to code. The role Duolingo created to bridge designers and devs.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -294,40 +387,55 @@
       <span class="idx">REF</span>
       <h2>Rive vs Lottie — When to Choose Which</h2>
     </div>
-    <div class="cmp">
+    <div class="cmp-tools">
+      <span class="flbl">Highlight:</span>
+      <button data-filter="all" class="active">All dimensions</button>
+      <button data-filter="rive">Where Rive wins</button>
+      <button data-filter="lottie">Where Lottie wins</button>
+    </div>
+    <div class="cmp" id="cmp">
       <div class="h">Dimension</div><div class="h">Rive</div><div class="h">Lottie</div>
 
-      <div class="dim">Interactivity</div>
-      <div>State machines respond to input/data in real time — no guesswork for devs</div>
-      <div>Scroll &amp; basic triggers only; all interactivity coded by hand</div>
-
-      <div class="dim">Responsiveness</div>
-      <div>Built-in Layout &amp; Scrolling adapt to any screen</div>
-      <div>No responsive layout; resize means recreating</div>
-
-      <div class="dim">Dynamic data</div>
-      <div>Data binding: color, size, text, images, lists update at runtime</div>
-      <div>Static by nature; needs developer intervention</div>
-
-      <div class="dim">File size</div>
-      <div>Binary .riv, 10–15× smaller (240KB Lottie ≈ 16KB Rive)</div>
-      <div>JSON — versatile but bloated</div>
-
-      <div class="dim">Rendering</div>
-      <div>Purpose-built GPU renderer (Metal / Vulkan)</div>
-      <div>Vector libraries struggle on complex scenes</div>
-
-      <div class="dim">Pipeline</div>
-      <div>Design + animate + runtime in one tool</div>
-      <div>Illustrator/Figma → After Effects → Bodymovin export</div>
-
-      <div class="dim">Game engines</div>
-      <div>Native Unity &amp; Unreal support</div>
-      <div>Web &amp; mobile only</div>
-
-      <div class="dim">Where Lottie still wins</div>
-      <div>No alpha masking yet; scripting engine in progress</div>
-      <div>Alpha masking + JS expressions available today</div>
+      <div class="row" data-win="rive">
+        <div class="dim">Interactivity</div>
+        <div>State machines respond to input/data in real time — no guesswork for devs</div>
+        <div>Scroll &amp; basic triggers only; all interactivity coded by hand</div>
+      </div>
+      <div class="row" data-win="rive">
+        <div class="dim">Responsiveness</div>
+        <div>Built-in Layout &amp; Scrolling adapt to any screen</div>
+        <div>No responsive layout; resize means recreating</div>
+      </div>
+      <div class="row" data-win="rive">
+        <div class="dim">Dynamic data</div>
+        <div>Data binding: color, size, text, images, lists update at runtime</div>
+        <div>Static by nature; needs developer intervention</div>
+      </div>
+      <div class="row" data-win="rive">
+        <div class="dim">File size</div>
+        <div>Binary .riv, 10–15× smaller (240KB Lottie ≈ 16KB Rive)</div>
+        <div>JSON — versatile but bloated</div>
+      </div>
+      <div class="row" data-win="rive">
+        <div class="dim">Rendering</div>
+        <div>Purpose-built GPU renderer (Metal / Vulkan)</div>
+        <div>Vector libraries struggle on complex scenes</div>
+      </div>
+      <div class="row" data-win="rive">
+        <div class="dim">Pipeline</div>
+        <div>Design + animate + runtime in one tool</div>
+        <div>Illustrator/Figma → After Effects → Bodymovin export</div>
+      </div>
+      <div class="row" data-win="rive">
+        <div class="dim">Game engines</div>
+        <div>Native Unity &amp; Unreal support</div>
+        <div>Web &amp; mobile only</div>
+      </div>
+      <div class="row" data-win="lottie">
+        <div class="dim">Where Lottie still wins</div>
+        <div>No alpha masking yet; scripting engine in progress</div>
+        <div>Alpha masking + JS expressions available today</div>
+      </div>
     </div>
   </section>
 
@@ -345,10 +453,66 @@
 
 <footer>
   <div class="wrap" style="display:flex;justify-content:space-between;width:100%;flex-wrap:wrap;gap:12px">
-    <span class="meta">Mastering Rive · One-Page Guide</span>
+    <span class="meta">Mastering Rive · Interactive Guide</span>
     <span class="meta">Source: Rive notebook (50 sources) · Curriculum blueprint, beginner state-machine guide, data-binding core concepts, Rive vs Lottie, optimization best practices</span>
   </div>
 </footer>
+
+<script>
+(function(){
+  // Progress rail
+  var rail=document.getElementById('progress');
+  function onScroll(){
+    var h=document.documentElement;
+    var max=h.scrollHeight-h.clientHeight;
+    rail.style.width=(max>0?(h.scrollTop/max*100):0)+'%';
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+
+  // Collapsible cards
+  document.querySelectorAll('.card.collapsible .card-head').forEach(function(head){
+    head.addEventListener('click',function(){
+      head.parentElement.classList.toggle('open');
+    });
+  });
+
+  // Scroll-spy nav
+  var navLinks=Array.prototype.slice.call(document.querySelectorAll('nav.chapnav a'));
+  var sections=navLinks.map(function(a){return document.getElementById(a.getAttribute('data-nav'));});
+  function spy(){
+    var pos=window.scrollY+ (document.querySelector('nav.chapnav').offsetHeight)+40;
+    var idx=0;
+    for(var i=0;i<sections.length;i++){
+      if(sections[i] && sections[i].offsetTop<=pos) idx=i;
+    }
+    navLinks.forEach(function(a,i){a.classList.toggle('active',i===idx);});
+  }
+  window.addEventListener('scroll',spy,{passive:true});
+  spy();
+
+  // Comparison table filter
+  var cmp=document.getElementById('cmp');
+  document.querySelectorAll('.cmp-tools button').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.cmp-tools button').forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');
+      var f=btn.getAttribute('data-filter');
+      cmp.querySelectorAll('.row').forEach(function(row){
+        var win=row.getAttribute('data-win');
+        row.classList.toggle('hide', f!=='all' && win!==f);
+      });
+    });
+  });
+
+  // Rive embed mount point — slots are marked with [data-riv].
+  // To go live: load @rive-app/canvas, then for each slot replace the
+  // placeholder with a <canvas> and new rive.Rive({src, stateMachines, ...}).
+  // Left as no-op until .riv assets are provided.
+  window.__rivSlots = Array.prototype.slice.call(document.querySelectorAll('.riv-slot[data-riv]'))
+    .map(function(s){return s.getAttribute('data-riv');});
+})();
+</script>
 
 </body>
 </html>
