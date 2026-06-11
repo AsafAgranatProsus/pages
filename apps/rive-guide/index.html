@@ -61,6 +61,11 @@
   .card{background:var(--surface);padding:26px 24px}
   .card h3{font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
   .card .tag{margin-bottom:14px}
+  .tag.opt{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:2px 8px;border-radius:0;font-weight:700;letter-spacing:.04em}
+  .card.optional{border-left:4px solid var(--accent)}
+  .card.optional .agent-steps{margin-top:14px;font-size:14px}
+  .card.optional .agent-steps li{margin-bottom:6px}
+  .card.optional code{background:var(--surface);padding:1px 5px;font-size:13px}
   .card p{font-size:14.5px;color:var(--body);margin-bottom:10px}
   .card ul{list-style:none;margin-top:6px}
   .card li{font-size:14px;color:var(--body);padding-left:16px;position:relative;margin-bottom:6px}
@@ -191,6 +196,21 @@
         <div class="card-body">
           <p>Build a clean button group hierarchy. Isolate scaling vectors so keyframes don't conflict — e.g. nest a Button-Hover group inside a Button-Click group.</p>
         </div>
+      </div>
+    </div>
+
+    <div class="card optional collapsible" style="margin-top:var(--gap)">
+      <div class="card-head"><h3>Optional · Let the AI Agent stamp out the tedium</h3><span class="toggle"></span></div>
+      <div class="tag opt">Lesson 1.4 — optional, do the manual steps first</div>
+      <div class="card-body">
+        <p>Build your button and state machine <b>by hand</b> first — that is the lesson, and there is no shortcut to the intuition it gives you. Once you have done it once, Rive's built-in <b>AI Agent</b> can remove the grind on anything repetitive: a state machine with 40 near-identical states, dozens of View Model properties, a wall of transitions.</p>
+        <ul class="agent-steps">
+          <li>Lives <b>inside the Rive Editor</b> (Early Access build) — not Cursor, not an external tool. No API keys, no setup.</li>
+          <li>Free for everyone as of Apr 2026, including the Free plan.</li>
+          <li>Open a file, have an artboard, then prompt it: <code>Create a State Machine about birds with 20 states and 2 layers</code>. Type <code>End Prompt</code> to let it apply changes.</li>
+          <li>It builds structure: State Machines, Layers, States, Transitions, Conditions, View Models, Properties, Instances, Layouts, Shapes. It does <b>not</b> design your art or your motion feel — that stays yours.</li>
+        </ul>
+        <p class="kv">Note: the older Rive <b>MCP</b> integration (localhost + Cursor) is deprecated — the in-editor AI Agent replaced it. Don't follow MCP setup guides. Separately, a paid <b>AI Coding Agent</b> writes Luau scripting code; that's Chapter 4 territory, skip it for now.</p>
       </div>
     </div>
   </section>
