@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Tokia — onboarding flow</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --bg: #0e0f10;
+    --ink: #f3f4f1;
+    --ink-dim: rgba(243, 244, 241, 0.55);
+    --ink-faint: rgba(243, 244, 241, 0.32);
+    --green-1: #7ee787;
+    --green-2: #2ea043;
+    --green-3: #0b3d1a;
+    --pill: rgba(255, 255, 255, 0.07);
+    --pill-border: rgba(255, 255, 255, 0.12);
+    --chip: rgba(255, 255, 255, 0.05);
+    --chip-border: rgba(255, 255, 255, 0.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    background: #000;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  /* Phone frame */
+  .frame-wrap {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+  }
+  .phone {
+    position: relative;
+    width: 390px;
+    height: 800px;
+    max-height: calc(100vh - 70px);
+    background: var(--bg);
+    border-radius: 44px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 0 0 1.5px rgba(255,255,255,0.06);
+  }
+  @media (max-width: 430px) {
+    .frame-wrap { padding: 0; gap: 0; }
+    .phone { width: 100vw; height: 100vh; max-height: 100vh; border-radius: 0; }
+  }
+
+  /* Blob */
+  .blob {
+    position: absolute;
+    left: 50%;
+    top: 150px;
+    width: 230px;
+    height: 230px;
+    margin-left: -115px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 32%, var(--green-1) 0%, var(--green-2) 42%, var(--green-3) 100%);
+    filter: blur(2px);
+    box-shadow: 0 0 80px rgba(46,160,67,0.45), 0 0 140px rgba(46,160,67,0.25);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Screen content */
+  .screen {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    padding: 0 26px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .screen.active { opacity: 1; pointer-events: auto; }
+
+  .topbar {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .topbar .dots { display: flex; gap: 6px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-faint); transition: all .3s; }
+  .dot.on { background: var(--green-1); width: 18px; border-radius: 3px; }
+  .topbar .skip { font-size: 14px; color: var(--ink-faint); background: none; border: none; }
+
+  .body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 18px;
+  }
+
+  .agent-line {
+    font-size: 23px;
+    line-height: 1.42;
+    font-weight: 450;
+    letter-spacing: -0.2px;
+    color: var(--ink);
+    margin-bottom: 26px;
+  }
+  .agent-line .dim { color: var(--ink-dim); }
+  .agent-sub {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink-dim);
+    margin-top: -14px;
+    margin-bottom: 26px;
+  }
+
+  /* Chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+  .chip {
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--chip);
+    border: 1px solid var(--chip-border);
+    border-radius: 999px;
+    padding: 11px 18px;
+    transition: all .18s;
+  }
+  .chip:active { transform: scale(0.96); background: rgba(126,231,135,0.14); border-color: rgba(126,231,135,0.4); }
+
+  /* Buttons */
+  .btn-row { display: flex; flex-direction: column; gap: 11px; }
+  .btn-row.horiz { flex-direction: row; }
+  .btn {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--bg);
+    background: var(--green-1);
+    border: none;
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    transition: transform .15s, opacity .15s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn.ghost {
+    background: var(--pill);
+    border: 1px solid var(--pill-border);
+    color: var(--ink);
+  }
+  .btn.half { flex: 1; }
+  .btn i { width: 18px; height: 18px; }
+
+  /* Frosted chat pill (Screen 0 tap target) */
+  .pill {
+    margin-top: 6px;
+    background: var(--pill);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--pill-border);
+    border-radius: 18px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--ink-dim);
+    font-size: 15px;
+  }
+  .pill .send {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--green-1); display: flex; align-items: center; justify-content: center;
+  }
+  .pill .send i { width: 17px; height: 17px; color: var(--bg); }
+
+  /* "live pull" result card */
+  .card {
+    background: var(--pill);
+    border: 1px solid var(--pill-border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+  }
+  .card .ic {
+    width: 38px; height: 38px; flex-shrink: 0;
+    border-radius: 11px;
+    background: rgba(126,231,135,0.16);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card .ic i { width: 19px; height: 19px; color: var(--green-1); }
+  .card .meta { font-size: 12px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .card .title { font-size: 16px; color: var(--ink); font-weight: 500; }
+
+  /* Home / earned buttons */
+  .home-greet { font-size: 26px; font-weight: 500; letter-spacing: -0.4px; color: var(--ink); margin-bottom: 6px; }
+  .home-sub { font-size: 15px; color: var(--ink-dim); margin-bottom: 26px; }
+  .qa { display: flex; flex-direction: column; gap: 11px; margin-bottom: 22px; }
+  .qa-btn {
+    background: var(--pill);
+    border: 1px solid var(--pill-border);
+    border-radius: 15px;
+    padding: 15px 17px;
+    display: flex; align-items: center; gap: 13px;
+    color: var(--ink); font-size: 16px;
+    transition: transform .15s;
+  }
+  .qa-btn:active { transform: scale(0.98); }
+  .qa-btn .qic { width: 34px; height: 34px; border-radius: 10px; background: rgba(126,231,135,0.14); display: flex; align-items: center; justify-content: center; }
+  .qa-btn .qic i { width: 17px; height: 17px; color: var(--green-1); }
+  .qa-note { font-size: 13px; color: var(--ink-faint); line-height: 1.5; }
+
+  /* annotation tag — the "why this screen exists" note for the room */
+  .anno {
+    position: absolute;
+    bottom: 14px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; color: var(--ink-faint);
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 999px; padding: 6px 14px; max-width: 320px; text-align: center;
+    z-index: 3; pointer-events: none; line-height: 1.4;
+  }
+
+  /* External controls */
+  .controls { display: flex; gap: 10px; align-items: center; }
+  .controls button {
+    background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 10px; padding: 9px 16px; font-size: 13px; font-family: inherit;
+  }
+  .controls button:active { transform: scale(0.96); }
+  .controls .label { color: rgba(255,255,255,0.4); font-size: 12px; min-width: 130px; text-align: center; }
+  .anno-toggle.off { opacity: 0.4; }
+
+  .reset { position: absolute; top: 14px; right: 18px; z-index: 4; background: none; border: none; color: var(--ink-faint); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="frame-wrap">
+  <div class="phone" id="phone">
+    <div class="blob" id="blob"></div>
+
+    <!-- SCREEN 0 — cold open -->
+    <div class="screen" data-screen="0">
+      <div class="topbar"><div class="dots"></div></div>
+      <div class="body">
+        <div class="agent-line">before I can be useful, I need to understand <span class="dim">one thing about your day.</span></div>
+        <div class="agent-sub">mind if I ask?</div>
+        <div class="btn-row">
+          <button class="btn" data-go="1">go ahead</button>
+        </div>
+      </div>
+      <div class="anno">no menu. no buttons. one question. we earn the skip by being fast.</div>
+    </div>
+
+    <!-- SCREEN 1 — awareness question -->
+    <div class="screen" data-screen="1">
+      <div class="topbar"><div class="dots"></div></div>
+      <div class="body">
+        <div class="agent-line">what's the part of your week that always slips — the thing you keep meaning to handle and don't?</div>
+        <div class="chips">
+          <button class="chip" data-go="2">replying to people</button>
+          <button class="chip" data-go="2">staying on top of plans</button>
+          <button class="chip" data-go="2">just… everything</button>
+        </div>
+        <div class="pill">
+          <span>or type it…</span>
+          <span class="send"><i data-lucide="arrow-up"></i></span>
+        </div>
+      </div>
+      <div class="anno">a question about THEIR life — not "what do you want from an app."</div>
+    </div>
+
+    <!-- SCREEN 2 — reflect back -->
+    <div class="screen" data-screen="2">
+      <div class="topbar"><div class="dots"></div></div>
+      <div class="body">
+        <div class="agent-line">yeah. the stuff in your calendar and inbox moves faster than your attention does.</div>
+        <div class="agent-sub">most apps make you re-type all of it. I don't want to do that to you.</div>
+        <div class="btn-row">
+          <button class="btn" data-go="3">go on</button>
+        </div>
+      </div>
+      <div class="anno">names the pain precisely + pre-frames connect as "I'm saving you work."</div>
+    </div>
+
+    <!-- SCREEN 3 — the connect as consequence -->
+    <div class="screen" data-screen="3">
+      <div class="topbar"><div class="dots"></div></div>
+      <div class="body">
+        <div class="agent-line">if I can see what's already on your plate, I can tell you the one thing worth doing next — <span class="dim">every morning, before you ask.</span></div>
+        <div class="agent-sub">want me to take a look?</div>
+        <div class="btn-row">
+          <button class="btn" data-go="4a"><i data-lucide="calendar"></i> connect calendar</button>
+          <button class="btn ghost" data-go="4a"><i data-lucide="mail"></i> connect email</button>
+          <button class="btn ghost" data-go="4b">not yet</button>
+        </div>
+      </div>
+      <div class="anno">the connect is the ANSWER to a problem they just told us they have.</div>
+    </div>
+
+    <!-- SCREEN 4a — connected, first value -->
+    <div class="screen" data-screen="4a">
+      <div class="topbar"><div class="dots"></div></div>
+      <div class="body">
+        <div class="agent-line">ok. looking…</div>
+        <div class="card">
+          <div class="ic"><i data-lucide="alert-circle"></i></div>
+          <div>
+            <div class="meta">tomorrow · no time blocked</div>
+            <div class="title">dentist — call back</div>
+          </div>
+        </div>
+        <div class="agent-sub">want me to find you a slot?</div>
+        <div class="btn-row horiz">
+          <button class="btn half" data-go="home">yes, find one</button>
+          <button class="btn ghost half" data-go="home">later</button>
+        </div>
+      </div>
+      <div class="anno">first real value in under 5 seconds. the moment that makes it sticky.</div>
+    </div>
+
+    <!-- SCREEN 4b — not yet, smaller value -->
+    <div class="screen" data-screen="4b">
+      <div class="topbar"><div class="dots"></div></div>
+      <div class="body">
+        <div class="agent-line">fair. start me with one thing then —</div>
+        <div class="agent-sub">tell me what's on your mind right now and I'll hold it.</div>
+        <div class="pill">
+          <span>type a thought…</span>
+          <span class="send"><i data-lucide="arrow-up"></i></span>
+        </div>
+        <div style="height:14px"></div>
+        <div class="btn-row">
+          <button class="btn ghost" data-go="home">skip for now</button>
+        </div>
+      </div>
+      <div class="anno">don't punish the "no." deliver a smaller version. connect re-appears when it obviously helps.</div>
+    </div>
+
+    <!-- HOME — earned quick actions -->
+    <div class="screen" data-screen="home">
+      <button class="reset" data-go="0">↺ restart</button>
+      <div class="topbar"><div class="dots" style="visibility:hidden"></div></div>
+      <div class="body" style="justify-content:flex-end">
+        <div class="home-greet">morning, Asaf.</div>
+        <div class="home-sub">here's where I'd start today.</div>
+        <div class="qa">
+          <button class="qa-btn"><span class="qic"><i data-lucide="clock"></i></span> find me a slot</button>
+          <button class="qa-btn"><span class="qic"><i data-lucide="sun"></i></span> what's my day</button>
+          <button class="qa-btn"><span class="qic"><i data-lucide="bookmark"></i></span> hold a thought</button>
+        </div>
+        <div class="qa-note">same buttons Pierre wants — but they arrive AFTER the conversation, populated from what the user just told us. the user already knows what they're for.</div>
+        <div class="pill" style="margin-top:20px">
+          <span>ask me anything…</span>
+          <span class="send"><i data-lucide="arrow-up"></i></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button id="prev">‹ back</button>
+    <span class="label" id="poslabel">cold open</span>
+    <button id="next">next ›</button>
+    <button id="annoToggle" class="anno-toggle">notes: on</button>
+  </div>
+</div>
+
+<script>
+  const order = ["0","1","2","3","4a","4b","home"];
+  const labels = {
+    "0":"cold open","1":"awareness question","2":"reflect back","3":"the connect",
+    "4a":"connected · first value","4b":"not yet · smaller value","home":"earned quick actions"
+  };
+  // blob target position per screen (top px). home = lower-key, smaller.
+  const blobState = {
+    "0":   {top:150, scale:1.0,  op:1},
+    "1":   {top:90,  scale:0.62, op:0.9},
+    "2":   {top:90,  scale:0.62, op:0.9},
+    "3":   {top:90,  scale:0.58, op:0.9},
+    "4a":  {top:80,  scale:0.5,  op:0.85},
+    "4b":  {top:80,  scale:0.5,  op:0.85},
+    "home":{top:60,  scale:0.42, op:0.8}
+  };
+
+  let idx = 0;
+  let annoOn = true;
+  const blob = document.getElementById("blob");
+
+  function renderDots(screen) {
+    const stepMap = {"0":0,"1":1,"2":2,"3":3,"4a":4,"4b":4,"home":4};
+    document.querySelectorAll(".screen").forEach(s => {
+      const sc = s.dataset.screen;
+      const dotsEl = s.querySelector(".dots");
+      if (!dotsEl) return;
+      dotsEl.innerHTML = "";
+      for (let i=0;i<5;i++){
+        const d=document.createElement("div");
+        d.className="dot"+(i===stepMap[sc]?" on":"");
+        dotsEl.appendChild(d);
+      }
+    });
+  }
+
+  function moveBlob(screen){
+    const st = blobState[screen] || blobState["0"];
+    gsap.to(blob, {top: st.top, scale: st.scale, opacity: st.op, duration: 0.7, ease: "power3.inOut"});
+  }
+
+  function show(screen){
+    const target = document.querySelector(`.screen[data-screen="${screen}"]`);
+    if(!target) return;
+    document.querySelectorAll(".screen").forEach(s=>{
+      s.classList.remove("active");
+    });
+    target.classList.add("active");
+    // fade content up
+    gsap.fromTo(target.querySelectorAll(".body > *"),
+      {y:14, opacity:0},
+      {y:0, opacity:1, duration:0.5, stagger:0.06, ease:"power2.out", delay:0.1});
+    moveBlob(screen);
+    renderDots(screen);
+    idx = Math.max(0, order.indexOf(screen));
+    document.getElementById("poslabel").textContent = labels[screen] || screen;
+    applyAnno();
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function applyAnno(){
+    document.querySelectorAll(".anno").forEach(a=>{ a.style.display = annoOn ? "block" : "none"; });
+  }
+
+  // tap targets inside the prototype
+  document.addEventListener("click", e=>{
+    const go = e.target.closest("[data-go]");
+    if(go){ show(go.dataset.go); }
+  });
+
+  // external controls — linear walk for presenting
+  document.getElementById("next").onclick = ()=>{ idx=Math.min(order.length-1, idx+1); show(order[idx]); };
+  document.getElementById("prev").onclick = ()=>{ idx=Math.max(0, idx-1); show(order[idx]); };
+  document.getElementById("annoToggle").onclick = (e)=>{
+    annoOn=!annoOn; applyAnno();
+    e.target.textContent = "notes: "+(annoOn?"on":"off");
+    e.target.classList.toggle("off", !annoOn);
+  };
+
+  // blob idle breathe
+  gsap.to(blob, {scale:"+=0.04", duration:3.2, repeat:-1, yoyo:true, ease:"sine.inOut"});
+
+  // init
+  if (window.lucide) lucide.createIcons();
+  show("0");
+</script>
+</body>
+</html>
