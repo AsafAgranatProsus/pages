@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Psychology — Learn / Practice / Apply</title>
+<style>
+  :root{
+    --bg:#f5f5f0; --surface:#fff; --dark:#1a1a1a;
+    --text:#1a1a1a; --body:#333; --sec:#444; --meta:#555;
+    --ondark:#fff; --bodydark:#ccc; --metadark:#999;
+    --accent:#e63329; --border:#eee; --muted:#ddd; --gap:2px;
+    --nav-h:56px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--body);
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  .meta{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--meta)}
+  .meta-dark{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--metadark)}
+
+  #progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--accent);z-index:60;transition:width .1s linear}
+
+  nav.chapnav{position:sticky;top:0;z-index:50;background:var(--dark);height:var(--nav-h);display:flex;align-items:center}
+  nav.chapnav .wrap{display:flex;align-items:center;gap:8px;width:100%;overflow-x:auto;scrollbar-width:none}
+  nav.chapnav .wrap::-webkit-scrollbar{display:none}
+  nav.chapnav .brand{font-size:12px;font-weight:700;color:var(--ondark);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;margin-right:8px}
+  nav.chapnav a{font-size:12px;color:var(--bodydark);text-decoration:none;padding:6px 10px;white-space:nowrap;border-radius:2px;transition:color .15s,background .15s;position:relative}
+  nav.chapnav a:hover{color:var(--ondark)}
+  nav.chapnav a.active{color:var(--ondark);background:var(--accent)}
+  nav.chapnav a .chk{display:none;margin-left:4px}
+  nav.chapnav a.done .chk{display:inline}
+
+  header{border-bottom:2px solid var(--dark);padding:48px 0 32px}
+  header .kicker{margin-bottom:20px}
+  header h1{font-size:52px;font-weight:700;line-height:1.05;letter-spacing:-.03em;color:var(--text);max-width:880px}
+  header .sub{margin-top:20px;font-size:18px;color:var(--sec);max-width:680px}
+  header .source-note{margin-top:24px}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);background:var(--muted);margin:var(--gap) 0}
+  .stat{background:var(--surface);padding:28px 22px}
+  .stat .num{font-size:44px;font-weight:700;letter-spacing:-.03em;color:var(--accent);line-height:1}
+  .stat .lbl{margin-top:10px}
+
+  section{padding:48px 0 8px;scroll-margin-top:calc(var(--nav-h) + 12px)}
+  .sec-head{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--muted);padding-bottom:14px;margin-bottom:28px;flex-wrap:wrap}
+  .sec-head .idx{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.05em}
+  .sec-head h2{font-size:28px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+  .sec-head .obj{margin-left:auto;max-width:340px;font-size:13px;color:var(--meta);text-align:right}
+  .stage-label{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:28px 0 12px}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap);background:var(--muted)}
+  .grid.three{grid-template-columns:repeat(3,1fr)}
+  .card{background:var(--surface);padding:26px 24px}
+  .card h3{font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .card .tag{margin-bottom:14px}
+  .card p{font-size:14.5px;color:var(--body);margin-bottom:10px}
+  .card ul{list-style:none;margin-top:6px}
+  .card li{font-size:14px;color:var(--body);padding-left:16px;position:relative;margin-bottom:6px}
+  .card li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;background:var(--accent)}
+  .card .kv{font-size:14px;color:var(--body);margin-bottom:5px}
+  .card .kv b{color:var(--text);font-weight:700}
+
+  .card.collapsible .card-head{display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:12px}
+  .card.collapsible .card-head h3{margin-bottom:0}
+  .card.collapsible .toggle{flex:none;width:20px;height:20px;border:1px solid var(--muted);position:relative;transition:background .15s,border-color .15s}
+  .card.collapsible .toggle::before,
+  .card.collapsible .toggle::after{content:"";position:absolute;background:var(--accent);transition:transform .2s}
+  .card.collapsible .toggle::before{left:4px;right:4px;top:9px;height:2px}
+  .card.collapsible .toggle::after{top:4px;bottom:4px;left:9px;width:2px}
+  .card.collapsible.open .toggle::after{transform:scaleY(0)}
+  .card.collapsible .card-body{max-height:0;overflow:hidden;transition:max-height .3s ease;margin-top:0}
+  .card.collapsible.open .card-body{max-height:2000px;margin-top:14px}
+
+  blockquote{background:var(--surface);padding:30px 32px;margin:var(--gap) 0;border-left:4px solid var(--accent)}
+  blockquote p{font-size:19px;line-height:1.4;color:var(--text);font-weight:500;letter-spacing:-.01em}
+  blockquote cite{display:block;margin-top:14px;font-style:normal}
+
+  /* Practice / quiz cards */
+  .quiz-card{background:var(--surface);padding:26px 24px;margin-bottom:var(--gap)}
+  .quiz-card .q{font-size:16px;font-weight:600;color:var(--text);margin-bottom:14px}
+  .quiz-card .opts{display:flex;flex-direction:column;gap:8px}
+  .quiz-card button.opt-btn{text-align:left;font-family:inherit;font-size:14.5px;color:var(--body);background:var(--bg);border:1px solid var(--muted);padding:12px 16px;cursor:pointer;transition:all .15s}
+  .quiz-card button.opt-btn:hover{border-color:var(--accent)}
+  .quiz-card button.opt-btn.correct{background:#e8f5e9;border-color:#2e7d32;color:#1b5e20;font-weight:600}
+  .quiz-card button.opt-btn.wrong{background:#fdecea;border-color:var(--accent);color:#8a1c14}
+  .quiz-card .explain{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-size:14px;color:var(--sec);display:none}
+  .quiz-card .explain.show{display:block}
+
+  /* Apply exercise card */
+  .apply-card{background:var(--dark);color:var(--ondark);padding:30px 28px;margin-bottom:var(--gap)}
+  .apply-card h3{color:var(--ondark);font-size:19px;font-weight:700;margin-bottom:12px}
+  .apply-card p{color:var(--bodydark);font-size:15px;margin-bottom:10px;line-height:1.6}
+  .apply-card ol{margin:10px 0 0 18px;color:var(--bodydark);font-size:14.5px;line-height:1.8}
+  .apply-card textarea{width:100%;margin-top:14px;background:#2a2a2a;border:1px solid #444;color:#fff;padding:14px;font-family:inherit;font-size:14px;min-height:100px;resize:vertical}
+  .apply-card .save-note{font-size:12px;color:#999;margin-top:8px}
+  .apply-card .save-note.saved{color:#8bc98f}
+
+  /* Module complete button */
+  .complete-row{display:flex;justify-content:flex-end;margin:20px 0 8px}
+  .complete-btn{font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ondark);background:var(--dark);border:none;padding:12px 22px;cursor:pointer;transition:background .15s}
+  .complete-btn:hover{background:var(--accent)}
+  .complete-btn.done{background:#2e7d32}
+
+  /* Cheat sheet / checklist */
+  .checklist{background:var(--surface);padding:26px 24px}
+  .checklist label{display:flex;align-items:flex-start;gap:10px;font-size:14.5px;color:var(--body);margin-bottom:10px;cursor:pointer}
+  .checklist input[type=checkbox]{margin-top:3px}
+
+  footer{border-top:2px solid var(--dark);margin-top:48px;padding:28px 0 56px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+  @media(max-width:820px){
+    header h1{font-size:34px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .grid,.grid.three{grid-template-columns:1fr}
+    .sec-head{flex-wrap:wrap}.sec-head .obj{margin-left:0;text-align:left;max-width:none}
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<nav class="chapnav">
+  <div class="wrap">
+    <span class="brand">Behavioral</span>
+    <a href="#m1" data-nav="m1">1 · Understand Users <span class="chk">✓</span></a>
+    <a href="#m2" data-nav="m2">2 · Find The Gaps <span class="chk">✓</span></a>
+    <a href="#m3" data-nav="m3">3 · Delightful Journeys <span class="chk">✓</span></a>
+    <a href="#m4" data-nav="m4">4 · Communicate Decisions <span class="chk">✓</span></a>
+    <a href="#m5" data-nav="m5">5 · Ethical Design <span class="chk">✓</span></a>
+    <a href="#cheatsheet" data-nav="cheatsheet">Cheat Sheet</a>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <div class="kicker meta">Learn · Practice · Apply — Product Behavioral Science</div>
+    <h1>Product Psychology: Why Users Actually Do What They Do</h1>
+    <p class="sub">A 5-module, self-paced course built from the behavioral-science canon (Kahneman, Fogg, Cialdini, Eyal, Nielsen Norman, Brignull) — structured on the Growth.Design Product Psychology Masterclass curriculum, taught with real mental models instead of course marketing.</p>
+    <div class="source-note meta">Curriculum reference: growth.design/courses/product-psychology · saved to product-behaviorals notebook · built 2026-08-01</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="stats">
+    <div class="stat"><div class="num">5</div><div class="lbl meta">modules, ~2-3 hrs/week each</div></div>
+    <div class="stat"><div class="num">3</div><div class="lbl meta">stages per module: learn / practice / apply</div></div>
+    <div class="stat" id="stat-progress"><div class="num">0%</div><div class="lbl meta">your progress (saved locally)</div></div>
+    <div class="stat"><div class="num">0</div><div class="lbl meta">frameworks memorized so far</div></div>
+  </div>
+</div>
+
+<div class="wrap" id="modules-root">
+
+  <!-- MODULE 1 -->
+  <section id="m1">
+    <div class="sec-head">
+      <span class="idx">MODULE 1 · WEEK 1</span>
+      <h2>Understand User Behaviors</h2>
+      <span class="obj">Three mental models that explain almost every "why did the user do that?" moment.</span>
+    </div>
+
+    <span class="stage-label">Learn</span>
+    <div class="grid three">
+      <div class="card collapsible open">
+        <div class="card-head"><h3>System 1 vs System 2</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 1.1 · Kahneman</div>
+        <div class="card-body">
+          <p>Kahneman's <i>Thinking, Fast and Slow</i> splits cognition into two systems. <b>System 1</b> is fast, automatic, emotional, pattern-matching — it runs almost all of your product's moment-to-moment decisions (which button to tap, whether to trust a screen). <b>System 2</b> is slow, effortful, deliberate — it only engages when System 1 flags something as unusual, risky, or worth real thought.</p>
+          <ul>
+            <li>Most UI decisions are made by System 1 in under a second</li>
+            <li>System 2 is lazy — it defers to System 1 whenever it can</li>
+            <li>Friction, ambiguity, or a broken pattern is what wakes System 2 up</li>
+          </ul>
+          <p class="kv"><b>Product implication:</b> if a screen requires System 2 thinking to complete a routine task, you've made a design error, not a user-education problem.</p>
+        </div>
+      </div>
+      <div class="card collapsible">
+        <div class="card-head"><h3>The Fogg Behavior Model</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 1.2 · BJ Fogg</div>
+        <div class="card-body">
+          <p>Behavior happens when three things converge at the same moment: <b>B = MAP</b></p>
+          <div class="kv"><b>Motivation</b> — how much the person wants the outcome right now</div>
+          <div class="kv"><b>Ability</b> — how easy the action is (time, money, effort, brain cycles, social deviance, routine)</div>
+          <div class="kv"><b>Prompt</b> — the trigger that asks for the behavior at that moment</div>
+          <p class="kv">If a user doesn't act, one of the three is missing — and the highest-leverage fix is almost always <b>Ability</b> (make it easier), not motivation (nagging harder).</p>
+        </div>
+      </div>
+      <div class="card collapsible">
+        <div class="card-head"><h3>The Hook Model</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 1.3 · Nir Eyal</div>
+        <div class="card-body">
+          <p>Eyal's <i>Hooked</i> describes how habit-forming products close a loop: <b>Trigger → Action → Variable Reward → Investment.</b></p>
+          <ul>
+            <li>External trigger (notification) fades as an internal trigger (boredom, anxiety, FOMO) takes over</li>
+            <li>Variable reward — unpredictable payoff (like/comment count, feed content) keeps dopamine engaged</li>
+            <li>Investment — the user puts in effort (data, content, followers) that increases the odds they return</li>
+          </ul>
+          <p class="kv"><b>Ethical flag:</b> this same loop underlies both genuinely useful habits (language learning) and manipulative engagement traps (infinite scroll). Module 5 gives you the test to tell them apart.</p>
+        </div>
+      </div>
+    </div>
+
+    <span class="stage-label">Practice</span>
+    <div class="quiz-card">
+      <div class="q">A user abandons a signup form at the "upload ID document" step. Using B=MAP, what's most likely missing?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="0">Motivation — they didn't want the account badly enough</button>
+        <button class="opt-btn" data-correct="1">Ability — the action is high-effort (find the document, photograph it, upload it)</button>
+        <button class="opt-btn" data-correct="0">Prompt — they forgot the app existed</button>
+      </div>
+      <div class="explain">Ability is almost always the answer for a mid-onboarding drop-off after the user has already invested steps — motivation was clearly present, and the prompt is right in front of them. The fix is reducing effort (allow "finish later," auto-crop the photo, explain why it's needed right at that step) — not motivational copy.</div>
+    </div>
+    <div class="quiz-card">
+      <div class="q">Which System is responsible for a user hesitating and re-reading a confirmation dialog twice before clicking "Delete"?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="0">System 1 — it's an automatic reaction</button>
+        <button class="opt-btn" data-correct="1">System 2 — the action is flagged as risky/irreversible, forcing deliberate thought</button>
+        <button class="opt-btn" data-correct="0">Neither — this is a UI bug</button>
+      </div>
+      <div class="explain">Irreversibility and risk are exactly the triggers that escalate a decision from System 1 to System 2. This is by design in good product work — you *want* System 2 engaged before a destructive, unrecoverable action.</div>
+    </div>
+
+    <span class="stage-label">Apply</span>
+    <div class="apply-card">
+      <h3>Exercise 1 — Run B=MAP on your own product</h3>
+      <p>Pick one screen or flow in something you're actually working on (Toqi, the karate site, anything real) where users drop off or hesitate.</p>
+      <ol>
+        <li>Name the specific behavior you want (the action, precisely)</li>
+        <li>Rate Motivation at that moment (low/med/high) and why</li>
+        <li>Rate Ability — what's the single hardest sub-step?</li>
+        <li>Check the Prompt — is it present, and does it arrive at the right moment?</li>
+        <li>Write the one change you'd make first</li>
+      </ol>
+      <textarea data-id="m1-ex1" placeholder="Write your B=MAP breakdown here — it autosaves locally in your browser..."></textarea>
+      <div class="save-note">Not saved yet.</div>
+    </div>
+
+    <div class="complete-row"><button class="complete-btn" data-module="m1">Mark module complete</button></div>
+  </section>
+
+  <blockquote>
+    <p>"Nothing in life is as important as you think it is while you are thinking about it."</p>
+    <cite class="meta">Daniel Kahneman — on why System 2 overweights whatever is currently in focus</cite>
+  </blockquote>
+
+<!-- MODULE 2 -->
+  <section id="m2">
+    <div class="sec-head">
+      <span class="idx">MODULE 2 · WEEK 2-3</span>
+      <h2>Find The Gaps &amp; Improve Any Experience</h2>
+      <span class="obj">Know which psychology principle explains a friction point, and which one fixes it.</span>
+    </div>
+
+    <span class="stage-label">Learn</span>
+    <div class="grid three">
+      <div class="card collapsible open">
+        <div class="card-head"><h3>Heuristic Evaluation</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 2.1 · Nielsen Norman</div>
+        <div class="card-body">
+          <p>Jakob Nielsen's 10 usability heuristics are the fastest way to grade any screen without user testing. The five that catch the most real-world gaps:</p>
+          <ul>
+            <li><b>Visibility of system status</b> — does the user always know what's happening?</li>
+            <li><b>Match with the real world</b> — does it speak the user's language, not the system's?</li>
+            <li><b>User control &amp; freedom</b> — is there an obvious "undo" / exit?</li>
+            <li><b>Recognition over recall</b> — is the needed info visible, not memorized?</li>
+            <li><b>Error prevention</b> — does the design stop mistakes before they happen?</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Cognitive Load &amp; Friction</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 2.2</div>
+        <div class="card-body">
+          <p>Every extra decision, field, or unfamiliar pattern taxes a limited pool of mental effort (working memory). Friction isn't always bad — sometimes it's a deliberate System-2 speed bump (Module 1). The skill is telling <b>accidental friction</b> (a gap to close) from <b>intentional friction</b> (a safeguard to keep).</p>
+          <p class="kv"><b>Diagnostic question:</b> does this step protect the user or the business from a real risk? If no — it's a gap.</p>
+        </div>
+      </div>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Cialdini's Influence Principles</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 2.3 · Robert Cialdini</div>
+        <div class="card-body">
+          <p>Six principles that predict what moves people to say yes — useful both for spotting why an experience under-converts and for designing an ethical fix:</p>
+          <div class="kv"><b>Reciprocity</b> — give first (value, information) before asking</div>
+          <div class="kv"><b>Commitment &amp; Consistency</b> — small yeses make bigger yeses easier</div>
+          <div class="kv"><b>Social Proof</b> — "people like me are doing this"</div>
+          <div class="kv"><b>Authority</b> — credible signals reduce decision anxiety</div>
+          <div class="kv"><b>Liking</b> — familiarity and similarity lower resistance</div>
+          <div class="kv"><b>Scarcity</b> — perceived limits raise perceived value</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card collapsible" style="margin-top:var(--gap)">
+      <div class="card-head"><h3>The Gap-Finding Framework (this course's B.I.A.S.-style tool)</h3><span class="toggle"></span></div>
+      <div class="tag meta">Lesson 2.4 — worked method</div>
+      <div class="card-body">
+        <p>For any screen or flow, run this 4-step grading pass:</p>
+        <ol style="margin-left:18px;line-height:1.8">
+          <li><b>Behavior</b> — what does the user actually do here (not what you intended)?</li>
+          <li><b>Interruption</b> — where do they hesitate, re-read, back out, or abandon?</li>
+          <li><b>Assumption</b> — what did the design assume the user already knows or wants?</li>
+          <li><b>Signal</b> — which heuristic or influence principle is violated at that exact point?</li>
+        </ol>
+        <p class="kv">This is the reusable diagnostic — Module 3 uses it at the journey level, Module 4 uses it to justify a fix to stakeholders.</p>
+      </div>
+    </div>
+
+    <span class="stage-label">Practice</span>
+    <div class="quiz-card">
+      <div class="q">A checkout page shows "Only 2 left in stock!" — which Cialdini principle is this, and is it always manipulative?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="1">Scarcity — legitimate if true, manipulative if fabricated</button>
+        <button class="opt-btn" data-correct="0">Social Proof — always fine to use</button>
+        <button class="opt-btn" data-correct="0">Authority — always manipulative</button>
+      </div>
+      <div class="explain">Scarcity is ethically neutral in itself — the test is truthfulness (Module 5's manipulation matrix). A real low-stock count helps a genuine decision; a fake countdown timer that resets on refresh is a dark pattern.</div>
+    </div>
+    <div class="quiz-card">
+      <div class="q">Users keep tapping a greyed-out button expecting it to work. Which heuristic is violated?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="0">Match with the real world</button>
+        <button class="opt-btn" data-correct="1">Visibility of system status — the disabled state doesn't explain why or what's needed</button>
+        <button class="opt-btn" data-correct="0">Scarcity</button>
+      </div>
+      <div class="explain">A disabled button with no explanation leaves the user guessing at system state. The fix isn't just "enable it" — it's telling the user exactly what condition unlocks it.</div>
+    </div>
+
+    <span class="stage-label">Apply</span>
+    <div class="apply-card">
+      <h3>Exercise 2 — Run the Gap-Finding Framework</h3>
+      <p>Take the same screen from Exercise 1, or a new one.</p>
+      <ol>
+        <li>Write down the Behavior you actually observe or expect</li>
+        <li>Name the Interruption point precisely</li>
+        <li>State the Assumption the design is making</li>
+        <li>Name the Signal — which heuristic or Cialdini principle is being violated</li>
+      </ol>
+      <textarea data-id="m2-ex1" placeholder="Run B-I-A-S on a real screen here..."></textarea>
+      <div class="save-note">Not saved yet.</div>
+    </div>
+
+    <div class="complete-row"><button class="complete-btn" data-module="m2">Mark module complete</button></div>
+  </section>
+
+  <!-- MODULE 3 -->
+  <section id="m3">
+    <div class="sec-head">
+      <span class="idx">MODULE 3 · WEEK 4</span>
+      <h2>Create Delightful Journeys</h2>
+      <span class="obj">Find the moments worth the most ROI, then reorder the journey around them.</span>
+    </div>
+
+    <span class="stage-label">Learn</span>
+    <div class="grid three">
+      <div class="card collapsible open">
+        <div class="card-head"><h3>The Peak-End Rule</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 3.1 · Kahneman</div>
+        <div class="card-body">
+          <p>People don't remember an experience as an average of every moment — they remember (and judge) it almost entirely by its <b>most intense point (peak)</b> and its <b>final moment (end)</b>. Everything in between is compressed or forgotten.</p>
+          <p class="kv"><b>Product implication:</b> you get outsized ROI from investing in one great peak moment and a strong closing moment — polishing the entire middle of a journey evenly is often wasted effort.</p>
+        </div>
+      </div>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Four Types of Journey Moments</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 3.2</div>
+        <div class="card-body">
+          <div class="kv"><b>First impressions</b> — sets the trust baseline (halo effect: a good first moment biases perception of everything after)</div>
+          <div class="kv"><b>Friction points</b> — where drop-off/frustration concentrates</div>
+          <div class="kv"><b>Peaks</b> — the highest-emotion moment, positive or negative</div>
+          <div class="kv"><b>Endings</b> — the last thing felt before leaving (recency-weighted, per peak-end)</div>
+        </div>
+      </div>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Journey Mapping Pitfalls</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 3.3</div>
+        <div class="card-body">
+          <p>Common failure modes when mapping a journey:</p>
+          <ul>
+            <li>Mapping the <i>intended</i> flow instead of the <i>actual</i> one users take</li>
+            <li>Treating every step as equally important (peak-end says they aren't)</li>
+            <li>Building the map once and never updating it as the product changes</li>
+            <li>Mapping in isolation without cross-functional input (support tickets are journey data too)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <span class="stage-label">Practice</span>
+    <div class="quiz-card">
+      <div class="q">Per peak-end rule, where should you invest disproportionate design effort in a 6-step onboarding flow?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="0">Equally across all 6 steps</button>
+        <button class="opt-btn" data-correct="1">The single most emotionally intense step, and the final step</button>
+        <button class="opt-btn" data-correct="0">Only the very first step</button>
+      </div>
+      <div class="explain">Peak-end predicts users will judge and remember the whole flow based on its peak and its end — even if 4 of 6 steps were mediocre, a strong peak + strong ending can carry the overall impression.</div>
+    </div>
+
+    <span class="stage-label">Apply</span>
+    <div class="apply-card">
+      <h3>Exercise 3 — Map one real journey</h3>
+      <p>Pick a journey you know well (onboarding, first purchase, first week of use).</p>
+      <ol>
+        <li>List 5-8 real steps (not idealized ones)</li>
+        <li>Mark the first-impression moment, the peak, and the ending</li>
+        <li>Identify which one is currently weakest</li>
+        <li>Write one change that would strengthen it</li>
+      </ol>
+      <textarea data-id="m3-ex1" placeholder="Map your journey and peak-end analysis here..."></textarea>
+      <div class="save-note">Not saved yet.</div>
+    </div>
+
+    <div class="complete-row"><button class="complete-btn" data-module="m3">Mark module complete</button></div>
+  </section>
+
+<!-- MODULE 4 -->
+  <section id="m4">
+    <div class="sec-head">
+      <span class="idx">MODULE 4 · WEEK 5</span>
+      <h2>Communicate Product Decisions</h2>
+      <span class="obj">Rally your team and stakeholders around the psychology-backed call, not just your taste.</span>
+    </div>
+
+    <span class="stage-label">Learn</span>
+    <div class="grid three">
+      <div class="card collapsible open">
+        <div class="card-head"><h3>Evidence Beats Opinion</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 4.1</div>
+        <div class="card-body">
+          <p>"I think this looks better" loses to "users hesitate here because of X heuristic, and here's how competitor Y solved it." Naming the specific mechanism (loss aversion, recognition over recall, peak-end) converts a taste argument into a falsifiable claim — which is exactly what a skeptical stakeholder can actually engage with.</p>
+        </div>
+      </div>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Framing &amp; Loss Aversion in Pitches</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 4.2 · Kahneman &amp; Tversky</div>
+        <div class="card-body">
+          <p>People weigh losses roughly 2x more heavily than equivalent gains (Prospect Theory). "This change adds 3% conversion" lands weaker than "this friction point is currently losing you 3% of every cohort." Same fact, framed as a loss — more persuasive, and also more honest about the status quo cost of inaction.</p>
+        </div>
+      </div>
+      <div class="card collapsible">
+        <div class="card-head"><h3>The 3-Step Response Framework</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 4.3 — worked method</div>
+        <div class="card-body">
+          <p>For answering any pushback on a design decision:</p>
+          <ol style="margin-left:16px;line-height:1.8">
+            <li><b>Acknowledge</b> the concern specifically — restate it so they know you heard it</li>
+            <li><b>Name the mechanism</b> — the psychology principle or user data behind your call</li>
+            <li><b>Offer the test</b> — "here's how we'd know if I'm wrong" (a metric, a user test)</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <span class="stage-label">Practice</span>
+    <div class="quiz-card">
+      <div class="q">A stakeholder says "just add more fields to capture more data, users won't mind." What's the strongest psychology-backed pushback?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="1">Each added field raises Ability cost (Fogg B=MAP) and risks a completion drop — cite a specific step where this already happens</button>
+        <button class="opt-btn" data-correct="0">"I don't like it"</button>
+        <button class="opt-btn" data-correct="0">Agree, since more data is always useful</button>
+      </div>
+      <div class="explain">Naming the exact mechanism (Ability in B=MAP) and grounding it in an observed pattern turns a taste disagreement into a testable claim — much harder to wave away than a personal preference.</div>
+    </div>
+
+    <span class="stage-label">Apply</span>
+    <div class="apply-card">
+      <h3>Exercise 4 — Draft a stakeholder response</h3>
+      <p>Think of a real pushback you've gotten (or expect to get) on a design decision.</p>
+      <ol>
+        <li>Write the pushback verbatim</li>
+        <li>Acknowledge it in one sentence</li>
+        <li>Name the specific mechanism/principle backing your call</li>
+        <li>Propose the test that would prove you right or wrong</li>
+      </ol>
+      <textarea data-id="m4-ex1" placeholder="Draft your 3-step response here..."></textarea>
+      <div class="save-note">Not saved yet.</div>
+    </div>
+
+    <div class="complete-row"><button class="complete-btn" data-module="m4">Mark module complete</button></div>
+  </section>
+
+<!-- MODULE 5 -->
+  <section id="m5">
+    <div class="sec-head">
+      <span class="idx">MODULE 5 · WEEK 5</span>
+      <h2>Create Ethical &amp; Humane Products</h2>
+      <span class="obj">The same psychology principles that delight can manipulate. Here's the test that tells them apart.</span>
+    </div>
+
+    <span class="stage-label">Learn</span>
+    <div class="grid three">
+      <div class="card collapsible open">
+        <div class="card-head"><h3>The Manipulation Matrix</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 5.1</div>
+        <div class="card-body">
+          <p>Two axes decide whether a persuasive technique is ethical: does it serve the <b>user's genuine interest</b>, and is it <b>transparent</b> (would the user be upset to learn how it works)?</p>
+          <div class="kv"><b>Serves user + transparent</b> → good persuasion (a real progress bar, honest social proof)</div>
+          <div class="kv"><b>Serves user + hidden</b> → paternalistic but usually low-harm (a default set to the statistically best option)</div>
+          <div class="kv"><b>Serves business only + transparent</b> → aggressive but disclosed (a visible ad, an upsell you can decline)</div>
+          <div class="kv"><b>Serves business only + hidden</b> → manipulation (fake urgency, confirmshaming, hidden costs) — this is the zone to design out of your product</div>
+        </div>
+      </div>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Dark Patterns / Deceptive Patterns</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 5.2 · Harry Brignull</div>
+        <div class="card-body">
+          <p>Named, catalogued manipulation techniques — knowing the names makes them instantly spottable:</p>
+          <ul>
+            <li><b>Confirmshaming</b> — "No thanks, I don't want to save money"</li>
+            <li><b>Roach motel</b> — easy to get in, deliberately hard to get out (cancel subscription flows)</li>
+            <li><b>Sneak into basket</b> — pre-checked add-ons at checkout</li>
+            <li><b>Fake urgency</b> — countdown timers that reset or aren't real</li>
+            <li><b>Privacy Zuckering</b> — confusing settings that trick you into sharing more than intended</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card collapsible">
+        <div class="card-head"><h3>Three Humane Design Principles</h3><span class="toggle"></span></div>
+        <div class="tag meta">Lesson 5.3 · Center for Humane Technology</div>
+        <div class="card-body">
+          <div class="kv"><b>Respect attention</b> — design for the user's stated goal, not maximum time-on-app</div>
+          <div class="kv"><b>Respect autonomy</b> — make the "no" or "not now" path as easy to find as the "yes"</div>
+          <div class="kv"><b>Design for long-term wellbeing</b> — optimize for a metric that would still make you proud in 5 years, not just this quarter's engagement number</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="checklist" style="margin-top:var(--gap)">
+      <h3 style="margin-bottom:14px">Ethical Design Checklist — run before shipping any persuasive pattern</h3>
+      <label><input type="checkbox" data-id="eth1"> Would I be comfortable explaining exactly how this works to the user, out loud?</label>
+      <label><input type="checkbox" data-id="eth2"> Does declining/exiting take the same number of steps as accepting?</label>
+      <label><input type="checkbox" data-id="eth3"> Is every claim of urgency, scarcity, or social proof factually true right now?</label>
+      <label><input type="checkbox" data-id="eth4"> Does this pattern serve the user's actual goal, or only a business metric?</label>
+      <label><input type="checkbox" data-id="eth5"> Would I want a family member to experience this exact flow?</label>
+    </div>
+
+    <span class="stage-label">Practice</span>
+    <div class="quiz-card">
+      <div class="q">A cancel-subscription flow requires calling a phone number during business hours, while signup takes one click. What's this called, and which matrix quadrant is it?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="1">Roach motel — serves business only, and it's not really hidden, just aggressively inconvenient</button>
+        <button class="opt-btn" data-correct="0">Social proof — serves the user</button>
+        <button class="opt-btn" data-correct="0">Scarcity — always ethical</button>
+      </div>
+      <div class="explain">This is the textbook "roach motel" dark pattern — asymmetric friction between entering and exiting a commitment. It fails the exit-parity test in the ethical checklist above.</div>
+    </div>
+    <div class="quiz-card">
+      <div class="q">Which of these is an example of ethical persuasion, not manipulation?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="0">A countdown timer that silently resets when the page reloads</button>
+        <button class="opt-btn" data-correct="1">A real-time inventory count showing 2 units genuinely left in stock</button>
+        <button class="opt-btn" data-correct="0">A pre-checked "add extended warranty" box at checkout</button>
+      </div>
+      <div class="explain">The genuine, real-time inventory count is truthful and serves the user's actual decision — it passes both the transparency and user-interest tests. The other two are classic dark patterns (fake urgency, sneak-into-basket).</div>
+    </div>
+
+    <span class="stage-label">Apply</span>
+    <div class="apply-card">
+      <h3>Exercise 5 — Audit one of your own patterns</h3>
+      <p>Pick one persuasive technique already in a product you work on (a default, an urgency message, a nudge).</p>
+      <ol>
+        <li>Name the technique</li>
+        <li>Run it through the Manipulation Matrix — which quadrant?</li>
+        <li>Run the 5-point ethical checklist above against it</li>
+        <li>If it fails any check, write the fix</li>
+      </ol>
+      <textarea data-id="m5-ex1" placeholder="Audit a real pattern here..."></textarea>
+      <div class="save-note">Not saved yet.</div>
+    </div>
+
+    <div class="complete-row"><button class="complete-btn" data-module="m5">Mark module complete</button></div>
+  </section>
+
+  <blockquote>
+    <p>"AI output is only as good as the direction you give it, and your direction is only as good as your judgment." The tool changed. The judgment is still yours to build.</p>
+    <cite class="meta">Growth.Design — reframing why psychology literacy still matters in the AI era</cite>
+  </blockquote>
+
+<!-- CHEAT SHEET -->
+  <section id="cheatsheet">
+    <div class="sec-head">
+      <span class="idx">ONE-PAGER</span>
+      <h2>Cheat Sheet — All 5 Modules</h2>
+      <span class="obj">The whole course on one screen — for a quick review before applying it live.</span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>1 · Understand Users</h3>
+        <div class="tag meta">Mental models</div>
+        <ul>
+          <li>System 1 (fast/automatic) vs System 2 (slow/deliberate)</li>
+          <li>B = MAP — Behavior needs Motivation + Ability + Prompt together</li>
+          <li>Hook Model — Trigger → Action → Variable Reward → Investment</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>2 · Find The Gaps</h3>
+        <div class="tag meta">Diagnostic tools</div>
+        <ul>
+          <li>Nielsen's heuristics: status visibility, real-world match, user control, recognition, error prevention</li>
+          <li>Cialdini's 6: reciprocity, commitment, social proof, authority, liking, scarcity</li>
+          <li>B-I-A-S pass: Behavior → Interruption → Assumption → Signal</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>3 · Delightful Journeys</h3>
+        <div class="tag meta">Journey design</div>
+        <ul>
+          <li>Peak-end rule — people judge by the peak + the ending, not the average</li>
+          <li>Four moment types: first impressions, friction points, peaks, endings</li>
+          <li>Map the real journey, not the intended one</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>4 · Communicate Decisions</h3>
+        <div class="tag meta">Stakeholder framing</div>
+        <ul>
+          <li>Name the mechanism, not just your opinion</li>
+          <li>Loss framing outweighs gain framing ~2x (loss aversion)</li>
+          <li>3-step response: Acknowledge → Name the mechanism → Offer the test</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>5 · Ethical Design</h3>
+        <div class="tag meta">The line not to cross</div>
+        <ul>
+          <li>Manipulation Matrix: user-interest × transparency</li>
+          <li>Dark patterns: confirmshaming, roach motel, sneak into basket, fake urgency, privacy Zuckering</li>
+          <li>5-point checklist: explainability, exit parity, factual claims, user vs business goal, "would I show my family"</li>
+        </ul>
+      </div>
+      <div class="card" style="background:var(--dark);color:var(--ondark)">
+        <h3 style="color:var(--ondark)">Your saved work</h3>
+        <p style="color:var(--bodydark);font-size:14px">All 5 apply-exercise answers and checklist state are saved in this browser's local storage — nothing leaves your device. Revisit any module to edit.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap" style="display:flex;justify-content:space-between;width:100%;flex-wrap:wrap;gap:12px">
+    <span class="meta">Product Psychology · Learn / Practice / Apply</span>
+    <span class="meta">Sources: Kahneman (Thinking Fast and Slow) · Fogg Behavior Model · Cialdini (Influence) · Nir Eyal (Hooked) · Nielsen Norman Group · Harry Brignull (Deceptive Patterns) · growth.design curriculum reference</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var rail=document.getElementById('progress');
+  function onScroll(){
+    var h=document.documentElement;
+    var max=h.scrollHeight-h.clientHeight;
+    rail.style.width=(max>0?(h.scrollTop/max*100):0)+'%';
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+
+  document.addEventListener('click',function(e){
+    var head=e.target.closest('.card.collapsible .card-head');
+    if(head){ head.parentElement.classList.toggle('open'); }
+  });
+
+  var navLinks=Array.prototype.slice.call(document.querySelectorAll('nav.chapnav a'));
+  var sections=navLinks.map(function(a){return document.getElementById(a.getAttribute('data-nav'));});
+  function spy(){
+    var pos=window.scrollY+(document.querySelector('nav.chapnav').offsetHeight)+40;
+    var idx=0;
+    for(var i=0;i<sections.length;i++){
+      if(sections[i] && sections[i].offsetTop<=pos) idx=i;
+    }
+    navLinks.forEach(function(a,i){a.classList.toggle('active',i===idx);});
+  }
+  window.addEventListener('scroll',spy,{passive:true});
+  spy();
+
+  // Quiz interaction
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('.quiz-card button.opt-btn');
+    if(!btn) return;
+    var card=btn.closest('.quiz-card');
+    if(card.dataset.answered==='1') return;
+    card.dataset.answered='1';
+    var correct=btn.dataset.correct==='1';
+    card.querySelectorAll('.opt-btn').forEach(function(b){
+      if(b.dataset.correct==='1') b.classList.add('correct');
+      else if(b===btn) b.classList.add('wrong');
+      b.disabled=true;
+    });
+    var ex=card.querySelector('.explain');
+    if(ex) ex.classList.add('show');
+  });
+
+  // Apply textarea autosave
+  document.querySelectorAll('.apply-card textarea').forEach(function(ta){
+    var key='pp-apply-'+ta.dataset.id;
+    var saved=localStorage.getItem(key);
+    if(saved) ta.value=saved;
+    var note=ta.parentElement.querySelector('.save-note');
+    var t;
+    ta.addEventListener('input',function(){
+      clearTimeout(t);
+      t=setTimeout(function(){
+        localStorage.setItem(key,ta.value);
+        if(note){note.textContent='Saved locally.';note.classList.add('saved');}
+      },500);
+    });
+  });
+
+  // Module completion tracking
+  var MODULES=['m1','m2','m3','m4','m5'];
+  function loadDone(){
+    try{return JSON.parse(localStorage.getItem('pp-done')||'{}');}catch(e){return {};}
+  }
+  function saveDone(d){ localStorage.setItem('pp-done', JSON.stringify(d)); }
+  function refreshUI(){
+    var d=loadDone();
+    var doneCount=0;
+    MODULES.forEach(function(id){
+      var isDone=!!d[id];
+      if(isDone) doneCount++;
+      var navA=document.querySelector('nav.chapnav a[data-nav="'+id+'"]');
+      if(navA) navA.classList.toggle('done', isDone);
+      var btn=document.querySelector('.complete-btn[data-module="'+id+'"]');
+      if(btn){
+        btn.classList.toggle('done', isDone);
+        btn.textContent = isDone ? 'Module complete ✓' : 'Mark module complete';
+      }
+    });
+    var pct=Math.round(doneCount/MODULES.length*100);
+    var statEl=document.querySelector('#stat-progress .num');
+    if(statEl) statEl.textContent=pct+'%';
+  }
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('.complete-btn');
+    if(!btn) return;
+    var d=loadDone();
+    var id=btn.dataset.module;
+    d[id]=!d[id];
+    saveDone(d);
+    refreshUI();
+  });
+  refreshUI();
+
+  // Checklist persistence
+  document.querySelectorAll('.checklist input[type=checkbox]').forEach(function(cb){
+    var key='pp-check-'+cb.dataset.id;
+    cb.checked = localStorage.getItem(key)==='1';
+    cb.addEventListener('change',function(){
+      localStorage.setItem(key, cb.checked?'1':'0');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
