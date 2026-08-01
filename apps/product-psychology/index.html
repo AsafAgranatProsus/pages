@@ -113,6 +113,53 @@
 
   footer{border-top:2px solid var(--dark);margin-top:48px;padding:28px 0 56px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 
+  /* Hero + module images */
+  .hero-img{width:100%;display:block;margin-top:32px;border:1px solid var(--muted)}
+  .module-img{width:100%;display:block;margin-bottom:var(--gap)}
+  .module-img-wrap{background:var(--surface);padding:0;overflow:hidden}
+  figcaption{padding:14px 20px;font-size:12px;color:var(--meta)}
+
+  /* Case study block */
+  .case-study{background:var(--surface);padding:0;margin:var(--gap) 0}
+  .case-study .cs-head{padding:24px 24px 0}
+  .case-study .cs-head .tag{margin-bottom:8px}
+  .case-study .cs-head h3{font-size:19px;font-weight:700;color:var(--text);margin-bottom:10px}
+  .case-study .cs-body{padding:0 24px 24px}
+  .case-study .cs-body p{font-size:14.5px;color:var(--body);margin-bottom:12px}
+  .cs-steps{background:var(--bg);padding:20px 22px;margin:16px 0}
+  .cs-steps .step{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start}
+  .cs-steps .step:last-child{margin-bottom:0}
+  .cs-steps .step .step-n{flex:none;width:24px;height:24px;background:var(--dark);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:50%}
+  .cs-steps .step .step-txt{font-size:14px;color:var(--body)}
+  .cs-steps .step .step-txt b{color:var(--text)}
+  .cs-result{border-left:3px solid var(--accent);padding:12px 16px;background:var(--bg);font-size:14px;color:var(--sec);margin-top:14px}
+  .cs-result b{color:var(--text)}
+
+  /* Resource links */
+  .resources{background:var(--surface);padding:22px 24px;margin-top:var(--gap)}
+  .resources h4{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--meta);margin-bottom:12px}
+  .resources ul{list-style:none}
+  .resources li{font-size:14px;margin-bottom:9px;padding-left:16px;position:relative}
+  .resources li::before{content:"→";position:absolute;left:0;color:var(--accent);font-weight:700}
+  .resources a{color:var(--text);font-weight:600;text-decoration:none;border-bottom:1px solid var(--accent)}
+  .resources a:hover{color:var(--accent)}
+  .resources .res-meta{color:var(--meta);font-size:12.5px;display:block;margin-top:2px}
+
+  /* Difficulty tags on quiz cards */
+  .diff{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;margin-bottom:10px;border:1px solid var(--muted);color:var(--meta)}
+  .diff.easy{border-color:#2e7d32;color:#2e7d32}
+  .diff.medium{border-color:#e08a00;color:#e08a00}
+  .diff.hard{border-color:var(--accent);color:var(--accent)}
+
+  /* Model answer reveal */
+  .reveal-wrap{margin-top:14px}
+  .reveal-btn{font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);background:none;border:1px solid var(--accent);padding:9px 16px;cursor:pointer;transition:all .15s}
+  .reveal-btn:hover{background:var(--accent);color:#fff}
+  .model-answer{max-height:0;overflow:hidden;transition:max-height .3s ease;margin-top:0}
+  .model-answer.show{max-height:600px;margin-top:14px}
+  .model-answer .inner{background:#2a2a2a;border:1px solid #444;padding:16px;font-size:13.5px;color:#ddd;line-height:1.7}
+  .model-answer .inner b{color:#fff}
+
   @media(max-width:820px){
     header h1{font-size:34px}
     .stats{grid-template-columns:repeat(2,1fr)}
@@ -155,6 +202,10 @@
   </div>
 </div>
 
+<div class="wrap">
+  <img class="hero-img" src="img/hero.png" alt="Abstract illustration of an eye observing interface elements, symbolizing understanding how people perceive digital products">
+</div>
+
 <div class="wrap" id="modules-root">
 
   <!-- MODULE 1 -->
@@ -164,6 +215,11 @@
       <h2>Understand User Behaviors</h2>
       <span class="obj">Three mental models that explain almost every "why did the user do that?" moment.</span>
     </div>
+
+    <figure class="module-img-wrap">
+      <img class="module-img" src="img/m1-systems.png" alt="Abstract illustration of a head split between sharp fast-thinking shapes and soft slow-thinking circles">
+      <figcaption>System 1 (angular, automatic) and System 2 (rounded, deliberate) — the two-system model that governs every product decision.</figcaption>
+    </figure>
 
     <span class="stage-label">Learn</span>
     <div class="grid three">
@@ -206,8 +262,34 @@
       </div>
     </div>
 
+    <div class="case-study">
+      <div class="cs-head">
+        <div class="tag meta">Worked case study</div>
+        <h3>Duolingo's streak — reading it through all three models at once</h3>
+      </div>
+      <div class="cs-body">
+        <p>Duolingo's daily streak counter is one of the most analyzed patterns in consumer product design. Here's how the three Module 1 models stack on top of each other to explain why it works so well — and where it edges into manipulation.</p>
+        <div class="cs-steps">
+          <div class="step"><span class="step-n">1</span><span class="step-txt"><b>System 1 read:</b> the flame icon and streak number are processed in under a second — no deliberation needed to feel a pang of "don't break it." That's a System 1 emotional reaction, not a reasoned decision.</span></div>
+          <div class="step"><span class="step-n">2</span><span class="step-txt"><b>B=MAP read:</b> Motivation is manufactured by loss aversion (you're not gaining a day, you're protecting an existing streak — see Module 4 for why losses hit harder than gains). Ability is kept deliberately low — a lesson takes under 2 minutes. Prompt is a push notification timed to when your streak is about to expire.</span></div>
+          <div class="step"><span class="step-n">3</span><span class="step-txt"><b>Hook Model read:</b> Trigger (notification) → Action (complete one lesson) → Variable reward (XP, random bonus rewards, leaderboard shifts) → Investment (the streak count itself, which grows more valuable to protect the longer it runs).</span></div>
+        </div>
+        <div class="cs-result"><b>Where it crosses into Module 5 territory:</b> Duolingo sells "streak freezes" — a monetized fix for the anxiety the product itself created. That's the tell to watch for: when a feature manufactures a negative emotional state and then charges you to relieve it, ethical persuasion has tipped into engineered anxiety. Hold that thought — Module 5's manipulation matrix gives you the formal test.</div>
+      </div>
+    </div>
+
+    <div class="resources">
+      <h4>Go deeper</h4>
+      <ul>
+        <li><a href="https://www.penguinrandomhouse.com/books/89308/thinking-fast-and-slow-by-daniel-kahneman/" target="_blank" rel="noopener">Thinking, Fast and Slow</a> — Daniel Kahneman<span class="res-meta">Read Part 1 (Ch. 1-9) for the full System 1/2 foundation — the rest of the course leans on this repeatedly.</span></li>
+        <li><a href="https://behaviormodel.org/" target="_blank" rel="noopener">behaviormodel.org</a> — BJ Fogg's own reference site for B=MAP<span class="res-meta">Interactive breakdown with the original Stanford research behind it.</span></li>
+        <li><a href="https://www.nirandfar.com/how-to-manufacture-desire/" target="_blank" rel="noopener">"How to Manufacture Desire"</a> — Nir Eyal<span class="res-meta">Eyal's own condensed version of the Hook Model, plus his later (post-<i>Hooked</i>) writing on ethical limits.</span></li>
+      </ul>
+    </div>
+
     <span class="stage-label">Practice</span>
     <div class="quiz-card">
+      <div class="diff easy">Easy</div>
       <div class="q">A user abandons a signup form at the "upload ID document" step. Using B=MAP, what's most likely missing?</div>
       <div class="opts">
         <button class="opt-btn" data-correct="0">Motivation — they didn't want the account badly enough</button>
@@ -217,6 +299,7 @@
       <div class="explain">Ability is almost always the answer for a mid-onboarding drop-off after the user has already invested steps — motivation was clearly present, and the prompt is right in front of them. The fix is reducing effort (allow "finish later," auto-crop the photo, explain why it's needed right at that step) — not motivational copy.</div>
     </div>
     <div class="quiz-card">
+      <div class="diff easy">Easy</div>
       <div class="q">Which System is responsible for a user hesitating and re-reading a confirmation dialog twice before clicking "Delete"?</div>
       <div class="opts">
         <button class="opt-btn" data-correct="0">System 1 — it's an automatic reaction</button>
@@ -224,6 +307,16 @@
         <button class="opt-btn" data-correct="0">Neither — this is a UI bug</button>
       </div>
       <div class="explain">Irreversibility and risk are exactly the triggers that escalate a decision from System 1 to System 2. This is by design in good product work — you *want* System 2 engaged before a destructive, unrecoverable action.</div>
+    </div>
+    <div class="quiz-card">
+      <div class="diff medium">Medium</div>
+      <div class="q">A fitness app has low Day-7 retention despite high Day-1 signups. Motivation is clearly present (people chose to install a fitness app) and the daily reminder (Prompt) fires reliably. Where should you look first?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="0">Add a bigger discount to increase motivation</button>
+        <button class="opt-btn" data-correct="0">Send more notifications so the prompt lands more often</button>
+        <button class="opt-btn" data-correct="1">Audit Ability at the exact moment the prompt fires — is starting a workout at that moment actually easy?</button>
+      </div>
+      <div class="explain">With M and P confirmed present, the model says look at A. Ask specifically: at the moment the notification fires, does starting a workout require finding equipment, changing clothes, or 10+ minutes — or can they do something in under 60 seconds? Retention problems that survive a working prompt are almost always an Ability problem in disguise.</div>
     </div>
 
     <span class="stage-label">Apply</span>
@@ -239,6 +332,16 @@
       </ol>
       <textarea data-id="m1-ex1" placeholder="Write your B=MAP breakdown here — it autosaves locally in your browser..."></textarea>
       <div class="save-note">Not saved yet.</div>
+      <div class="reveal-wrap">
+        <button class="reveal-btn">Reveal model answer</button>
+        <div class="model-answer"><div class="inner">
+          <b>Example: Toqi's ramble-capture feature, "save an open item to review later."</b><br><br>
+          <b>Motivation:</b> Medium — the user just said something worth keeping, but the urge fades within seconds if not captured instantly.<br>
+          <b>Ability:</b> The hardest sub-step is deciding whether the capture actually "landed" — no visible confirmation currently exists, so users aren't sure if it worked and often repeat themselves.<br>
+          <b>Prompt:</b> Present and well-timed (it's a passive background listener, not a request) — so Prompt isn't the gap.<br>
+          <b>First fix:</b> a lightweight, non-intrusive confirmation (a small chip animation) the instant an item is captured — closes the Ability gap without adding any extra user effort.
+        </div></div>
+      </div>
     </div>
 
     <div class="complete-row"><button class="complete-btn" data-module="m1">Mark module complete</button></div>
@@ -256,6 +359,11 @@
       <h2>Find The Gaps &amp; Improve Any Experience</h2>
       <span class="obj">Know which psychology principle explains a friction point, and which one fixes it.</span>
     </div>
+
+    <figure class="module-img-wrap">
+      <img class="module-img" src="img/m2-gaps.png" alt="Abstract illustration of a magnifying glass finding a crack in a grid of interface screens">
+      <figcaption>Diagnosing gaps means finding the exact crack — not "the onboarding feels off," but "step 3 violates recognition-over-recall."</figcaption>
+    </figure>
 
     <span class="stage-label">Learn</span>
     <div class="grid three">
@@ -311,8 +419,34 @@
       </div>
     </div>
 
+    <div class="case-study">
+      <div class="cs-head">
+        <div class="tag meta">Worked case study</div>
+        <h3>Grading Airbnb's original "Request to Book" flow with B-I-A-S</h3>
+      </div>
+      <div class="cs-body">
+        <p>Before Airbnb added Instant Book, every reservation required the host to manually approve a request — often taking 24 hours. Here's how a B-I-A-S pass would have flagged the exact gap, years before the fix shipped.</p>
+        <div class="cs-steps">
+          <div class="step"><span class="step-n">B</span><span class="step-txt">Guest finds a listing, fills in dates and guest count, clicks "Request to Book" believing this reserves the room.</span></div>
+          <div class="step"><span class="step-n">I</span><span class="step-txt">Guest gets a "request sent" screen with no reservation — some hosts didn't respond for a full day. Guests abandoned to book a competing (confirmable) hotel instead.</span></div>
+          <div class="step"><span class="step-n">A</span><span class="step-txt">The design assumed guests understood the listing was a <i>request</i>, not a booking — but the emotional and mental model of "I just booked a place to stay" was already set the moment they clicked.</span></div>
+          <div class="step"><span class="step-n">S</span><span class="step-txt"><b>Match with the real world</b> (Nielsen) is violated — hotel booking, the mental model guests already carry, is instant. <b>Visibility of system status</b> is also violated — no clear "pending" state communicated the real waiting cost upfront.</span></div>
+        </div>
+        <div class="cs-result"><b>The actual fix Airbnb shipped:</b> "Instant Book" — hosts could pre-approve criteria (reviews, verified ID) so most bookings became truly instant, matching the real-world mental model guests already had. It didn't fix the messaging — it removed the gap entirely.</div>
+      </div>
+    </div>
+
+    <div class="resources">
+      <h4>Go deeper</h4>
+      <ul>
+        <li><a href="https://www.nngroup.com/articles/ten-usability-heuristics/" target="_blank" rel="noopener">Ten Usability Heuristics for User Interface Design</a> — Nielsen Norman Group<span class="res-meta">The original 1994 list, still the industry reference — read the full 10, not just the 5 covered here.</span></li>
+        <li><a href="https://www.influenceatwork.com/principles-of-persuasion/" target="_blank" rel="noopener">The 7 Principles of Persuasion</a> — Robert Cialdini's own site<span class="res-meta">Cialdini added a 7th principle (Unity) in later editions of <i>Influence</i> — worth knowing it exists even though this module covers the original 6.</span></li>
+      </ul>
+    </div>
+
     <span class="stage-label">Practice</span>
     <div class="quiz-card">
+      <div class="diff easy">Easy</div>
       <div class="q">A checkout page shows "Only 2 left in stock!" — which Cialdini principle is this, and is it always manipulative?</div>
       <div class="opts">
         <button class="opt-btn" data-correct="1">Scarcity — legitimate if true, manipulative if fabricated</button>
@@ -322,6 +456,7 @@
       <div class="explain">Scarcity is ethically neutral in itself — the test is truthfulness (Module 5's manipulation matrix). A real low-stock count helps a genuine decision; a fake countdown timer that resets on refresh is a dark pattern.</div>
     </div>
     <div class="quiz-card">
+      <div class="diff easy">Easy</div>
       <div class="q">Users keep tapping a greyed-out button expecting it to work. Which heuristic is violated?</div>
       <div class="opts">
         <button class="opt-btn" data-correct="0">Match with the real world</button>
@@ -329,6 +464,16 @@
         <button class="opt-btn" data-correct="0">Scarcity</button>
       </div>
       <div class="explain">A disabled button with no explanation leaves the user guessing at system state. The fix isn't just "enable it" — it's telling the user exactly what condition unlocks it.</div>
+    </div>
+    <div class="quiz-card">
+      <div class="diff hard">Hard</div>
+      <div class="q">A B2B dashboard shows a "94% of teams like yours use this feature" banner next to a paid upgrade button — but the 94% figure is from a 3-person internal beta test, not real customer data. Which single change would move this from manipulation back into ethical persuasion, without removing the banner?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="0">Make the banner bigger so it's more persuasive</button>
+        <button class="opt-btn" data-correct="0">Remove the percentage and just say "Popular feature"</button>
+        <button class="opt-btn" data-correct="1">Only show the stat once it reflects a real, sufficiently large sample of actual customers — and cite the true sample</button>
+      </div>
+      <div class="explain">This is Social Proof (Cialdini) failing the truthfulness test, not a wording or emphasis problem. The mechanism only works ethically when the claim is real — vague softening ("Popular feature") dodges the lie without fixing it. The fix is structural: wait until you have a real number, and disclose the sample honestly.</div>
     </div>
 
     <span class="stage-label">Apply</span>
@@ -343,6 +488,16 @@
       </ol>
       <textarea data-id="m2-ex1" placeholder="Run B-I-A-S on a real screen here..."></textarea>
       <div class="save-note">Not saved yet.</div>
+      <div class="reveal-wrap">
+        <button class="reveal-btn">Reveal model answer</button>
+        <div class="model-answer"><div class="inner">
+          <b>Example: karateisrael.co.il's current WooCommerce checkout (per the 2026-07-27 investigation).</b><br><br>
+          <b>Behavior:</b> a member tries to pay a membership fee or event fee online.<br>
+          <b>Interruption:</b> payment "glitches" reported by the org — unclear if failures happen at gateway redirect or card entry.<br>
+          <b>Assumption:</b> the current WooCommerce+plugin stack assumes a generic e-commerce flow works for Israeli payment culture (installments, Bit, standing orders) — it doesn't.<br>
+          <b>Signal:</b> Match with the real world (Nielsen) — Israeli users expect תשלומים and Bit as payment options; their absence breaks the expected mental model of "how I pay for things here," independent of any actual bug.
+        </div></div>
+      </div>
     </div>
 
     <div class="complete-row"><button class="complete-btn" data-module="m2">Mark module complete</button></div>
@@ -355,6 +510,11 @@
       <h2>Create Delightful Journeys</h2>
       <span class="obj">Find the moments worth the most ROI, then reorder the journey around them.</span>
     </div>
+
+    <figure class="module-img-wrap">
+      <img class="module-img" src="img/m3-journey.png" alt="Abstract illustration of a winding journey path with one tall peak and a marked ending point">
+      <figcaption>Users remember the peak and the ending — everything else in the journey compresses in memory.</figcaption>
+    </figure>
 
     <span class="stage-label">Learn</span>
     <div class="grid three">
@@ -391,8 +551,33 @@
       </div>
     </div>
 
+    <div class="case-study">
+      <div class="cs-head">
+        <div class="tag meta">Worked case study</div>
+        <h3>Mailchimp's "high five" — engineering a peak on purpose</h3>
+      </div>
+      <div class="cs-body">
+        <p>Mailchimp famously plays a small animation of its mascot Freddie giving a high five right after a user successfully sends their first campaign. On paper it's a trivial moment — the email already sent, nothing functional depends on it. Here's why it's a deliberate peak-end investment, not decoration.</p>
+        <div class="cs-steps">
+          <div class="step"><span class="step-n">1</span><span class="step-txt"><b>Journey audit:</b> the actual "send a campaign" flow has ~6-8 real steps (design, audience, subject line, preview, schedule, confirm, send). Most are necessary friction — checking recipient lists is a safeguard, not a gap (Module 2's intentional-vs-accidental friction test).</span></div>
+          <div class="step"><span class="step-n">2</span><span class="step-txt"><b>Where's the peak?</b> Before the redesign, the highest-emotion moment was actually anxiety — "did this just email 10,000 people something wrong?" A negative peak, per peak-end, would have dominated the memory of the entire flow regardless of how smooth steps 1-7 were.</span></div>
+          <div class="step"><span class="step-n">3</span><span class="step-txt"><b>The fix:</b> insert a designed positive peak exactly at the anxiety point — the high-five animation reframes "it's done and irreversible" (anxious) into "you did it" (celebratory) at the precise moment peak-end weighting is captured.</span></div>
+        </div>
+        <div class="cs-result"><b>The lesson generalizes:</b> you don't need to fix every step in a journey — find the single moment currently carrying the most emotional weight (often a natural anxiety point right before an irreversible action) and design that one moment on purpose.</div>
+      </div>
+    </div>
+
+    <div class="resources">
+      <h4>Go deeper</h4>
+      <ul>
+        <li><a href="https://www.nngroup.com/articles/peak-end-rule/" target="_blank" rel="noopener">The Peak-End Rule: How to Optimize Experiences</a> — Nielsen Norman Group<span class="res-meta">Practical UX-specific breakdown with more product examples.</span></li>
+        <li><a href="https://www.nngroup.com/articles/journey-mapping-101/" target="_blank" rel="noopener">Journey Mapping 101</a> — Nielsen Norman Group<span class="res-meta">Covers exactly the pitfalls in Lesson 3.3 in more depth, plus a real mapping template.</span></li>
+      </ul>
+    </div>
+
     <span class="stage-label">Practice</span>
     <div class="quiz-card">
+      <div class="diff easy">Easy</div>
       <div class="q">Per peak-end rule, where should you invest disproportionate design effort in a 6-step onboarding flow?</div>
       <div class="opts">
         <button class="opt-btn" data-correct="0">Equally across all 6 steps</button>
@@ -400,6 +585,16 @@
         <button class="opt-btn" data-correct="0">Only the very first step</button>
       </div>
       <div class="explain">Peak-end predicts users will judge and remember the whole flow based on its peak and its end — even if 4 of 6 steps were mediocre, a strong peak + strong ending can carry the overall impression.</div>
+    </div>
+    <div class="quiz-card">
+      <div class="diff medium">Medium</div>
+      <div class="q">A support ticket flow has 8 tedious steps but ends with a single tap "Was this helpful? 👍/👎" and immediate visible resolution. A different product has a smoother 4-step flow but ends abruptly with no confirmation the issue is resolved. Which is more likely to be remembered positively?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="1">The 8-step flow — its clear, resolved ending outweighs a mediocre middle</button>
+        <button class="opt-btn" data-correct="0">The 4-step flow — fewer steps always wins</button>
+        <button class="opt-btn" data-correct="0">They'll be remembered identically since one has fewer steps</button>
+      </div>
+      <div class="explain">Peak-end says the ending carries disproportionate memory weight. An abrupt, unresolved ending (even after a "smoother" journey) leaves ambiguity as the last felt emotion — which tends to read as negative. The longer flow with a clean, confirmed resolution ends on a felt "peak" of relief.</div>
     </div>
 
     <span class="stage-label">Apply</span>
@@ -414,6 +609,18 @@
       </ol>
       <textarea data-id="m3-ex1" placeholder="Map your journey and peak-end analysis here..."></textarea>
       <div class="save-note">Not saved yet.</div>
+      <div class="reveal-wrap">
+        <button class="reveal-btn">Reveal model answer</button>
+        <div class="model-answer"><div class="inner">
+          <b>Example: Toqi's first-week journey (per the 2026-06-17 planning meeting notes).</b><br><br>
+          <b>Steps:</b> install → onboarding screen → first chat message → first quick-button use → first Calendar/Gmail connection prompt → first proactive resurfacing (V2) → day-7 return.<br>
+          <b>First impression:</b> the newly simplified onboarding screen (replacing the confusing in-chat flow) — currently the strongest moment.<br>
+          <b>Peak:</b> currently weak/undesigned — no single moment stands out as delightful yet.<br>
+          <b>Ending (of week 1):</b> whatever happens on day-7 return — also undesigned.<br>
+          <b>Weakest link:</b> no deliberate peak exists yet in the first week.<br>
+          <b>Fix:</b> the "Open items" list surfacing a correctly-captured ramble note back to the user unprompted could be engineered as the peak moment — "it actually remembered" is a strong, designable positive spike.
+        </div></div>
+      </div>
     </div>
 
     <div class="complete-row"><button class="complete-btn" data-module="m3">Mark module complete</button></div>
@@ -426,6 +633,11 @@
       <h2>Communicate Product Decisions</h2>
       <span class="obj">Rally your team and stakeholders around the psychology-backed call, not just your taste.</span>
     </div>
+
+    <figure class="module-img-wrap">
+      <img class="module-img" src="img/m4-stakeholders.png" alt="Abstract illustration of two figures at a table, one presenting a bar chart to convince the other">
+      <figcaption>The pitch that survives scrutiny names the mechanism — it doesn't lean on taste.</figcaption>
+    </figure>
 
     <span class="stage-label">Learn</span>
     <div class="grid three">
@@ -457,8 +669,33 @@
       </div>
     </div>
 
+    <div class="case-study">
+      <div class="cs-head">
+        <div class="tag meta">Worked case study</div>
+        <h3>Answering "just make the button bigger" with the 3-Step Framework</h3>
+      </div>
+      <div class="cs-body">
+        <p>A common real pitch scenario: a stakeholder watches a usability session where a user misses a CTA, and concludes "make the button bigger." That's a plausible-sounding but often wrong diagnosis. Here's the 3-step response in practice.</p>
+        <div class="cs-steps">
+          <div class="step"><span class="step-n">1</span><span class="step-txt"><b>Acknowledge:</b> "You're right that the user missed it — that's a real problem worth fixing."</span></div>
+          <div class="step"><span class="step-n">2</span><span class="step-txt"><b>Name the mechanism:</b> "But the session shows their eyes tracked past it twice — that's a visual hierarchy issue (the button doesn't violate any size heuristic, it's competing with 3 other high-contrast elements for attention), not a size issue. Making it bigger without reducing competing visual weight risks banner blindness."</span></div>
+          <div class="step"><span class="step-n">3</span><span class="step-txt"><b>Offer the test:</b> "Let's A/B two versions — one just bigger, one with reduced surrounding visual noise — and measure which actually moves click-through. I'd bet on the second, but let's not guess."</span></div>
+        </div>
+        <div class="cs-result"><b>Why this wins the room:</b> it doesn't just disagree — it re-diagnoses using a named mechanism (visual hierarchy / competing salience) and proposes a test that would prove the stakeholder right if they actually are. That combination is what makes pushback land as rigor, not ego.</div>
+      </div>
+    </div>
+
+    <div class="resources">
+      <h4>Go deeper</h4>
+      <ul>
+        <li><a href="https://www.jstor.org/stable/1914185" target="_blank" rel="noopener">Prospect Theory: An Analysis of Decision under Risk</a> — Kahneman &amp; Tversky, 1979<span class="res-meta">The original paper behind loss aversion — dense, but Ch. 26-27 of <i>Thinking, Fast and Slow</i> is the readable version of the same material.</span></li>
+        <li><a href="https://hbr.org/2013/01/how-to-argue-for-a-design-decision" target="_blank" rel="noopener">How to Sell Your Design Decisions</a> — search term for HBR/UX-writing pieces on evidence-based design pitches<span class="res-meta">Search this exact phrase — multiple solid pieces exist under similar titles; pick the one matching your stakeholder type (exec vs. PM vs. engineer).</span></li>
+      </ul>
+    </div>
+
     <span class="stage-label">Practice</span>
     <div class="quiz-card">
+      <div class="diff easy">Easy</div>
       <div class="q">A stakeholder says "just add more fields to capture more data, users won't mind." What's the strongest psychology-backed pushback?</div>
       <div class="opts">
         <button class="opt-btn" data-correct="1">Each added field raises Ability cost (Fogg B=MAP) and risks a completion drop — cite a specific step where this already happens</button>
@@ -466,6 +703,16 @@
         <button class="opt-btn" data-correct="0">Agree, since more data is always useful</button>
       </div>
       <div class="explain">Naming the exact mechanism (Ability in B=MAP) and grounding it in an observed pattern turns a taste disagreement into a testable claim — much harder to wave away than a personal preference.</div>
+    </div>
+    <div class="quiz-card">
+      <div class="diff medium">Medium</div>
+      <div class="q">Which framing is more persuasive to a stakeholder, per loss aversion — and why?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="0">"This redesign could increase signups by 5%"</button>
+        <button class="opt-btn" data-correct="1">"This friction point is currently costing us 5% of every cohort that starts signup"</button>
+        <button class="opt-btn" data-correct="0">Both are equally persuasive — the number is the same</button>
+      </div>
+      <div class="explain">Same underlying number, but framing it as an existing loss (money already being lost to a broken flow) engages loss aversion more strongly than framing it as a hypothetical future gain — losses are weighted roughly 2x more heavily than equivalent gains.</div>
     </div>
 
     <span class="stage-label">Apply</span>
@@ -480,6 +727,16 @@
       </ol>
       <textarea data-id="m4-ex1" placeholder="Draft your 3-step response here..."></textarea>
       <div class="save-note">Not saved yet.</div>
+      <div class="reveal-wrap">
+        <button class="reveal-btn">Reveal model answer</button>
+        <div class="model-answer"><div class="inner">
+          <b>Example: Maggie's "attitude problem, pushes to prod without PM approval" review point (per the 2026-06-25 non-renewal context).</b><br><br>
+          <b>Acknowledge:</b> "You're right that shipping without sign-off broke the team's process, and that's a legitimate process concern."<br>
+          <b>Name the mechanism:</b> "The underlying design calls themselves — onboarding cards, the landing animation — were validated as strong (Nishi's own praise). The friction was procedural, not a quality-of-judgment issue."<br>
+          <b>Offer the test:</b> "Separate the two: agree on a review-gate process going forward, and let the shipped work's actual outcomes (user response, Nishi's feedback) be the test of the underlying design judgment."<br>
+          <i>Note: per MEMORY.md, this situation is resolved and non-renewal already happened — this is a retrospective drill, not a live negotiation.</i>
+        </div></div>
+      </div>
     </div>
 
     <div class="complete-row"><button class="complete-btn" data-module="m4">Mark module complete</button></div>
@@ -492,6 +749,11 @@
       <h2>Create Ethical &amp; Humane Products</h2>
       <span class="obj">The same psychology principles that delight can manipulate. Here's the test that tells them apart.</span>
     </div>
+
+    <figure class="module-img-wrap">
+      <img class="module-img" src="img/m5-ethics.png" alt="Abstract illustration of a balance scale weighing a heart shape against a gear or coin shape">
+      <figcaption>Every persuasive pattern trades off user wellbeing against a business metric — the question is whether it's honest about the trade.</figcaption>
+    </figure>
 
     <span class="stage-label">Learn</span>
     <div class="grid three">
@@ -540,8 +802,36 @@
       <label><input type="checkbox" data-id="eth5"> Would I want a family member to experience this exact flow?</label>
     </div>
 
+    <div class="case-study">
+      <div class="cs-head">
+        <div class="tag meta">Worked case study</div>
+        <h3>LinkedIn's "your network is growing" emails — running the full audit</h3>
+      </div>
+      <div class="cs-body">
+        <p>LinkedIn was sued (and settled) over emails sent to a user's contacts that implied the user themselves had invited them, driven by an opt-in flow that imported and used a user's entire address book without clear disclosure. Full 5-point audit:</p>
+        <div class="cs-steps">
+          <div class="step"><span class="step-n">1</span><span class="step-txt"><b>Explainability:</b> fails — most users didn't realize granting contact access would trigger repeated automated invitations sent under their name.</span></div>
+          <div class="step"><span class="step-n">2</span><span class="step-txt"><b>Exit parity:</b> fails — opting in (one click, low friction) was far easier than opting out or stopping the invitation cadence once started.</span></div>
+          <div class="step"><span class="step-n">3</span><span class="step-txt"><b>Factual claims:</b> arguably fails — the emails were framed as personal invitations from the user, not automated system emails, which misrepresented their origin.</span></div>
+          <div class="step"><span class="step-n">4</span><span class="step-txt"><b>User goal vs business metric:</b> fails — this served LinkedIn's growth metric (viral invitations) rather than any goal the user had actually expressed.</span></div>
+          <div class="step"><span class="step-n">5</span><span class="step-txt"><b>Family test:</b> fails — very few users, on reflection, would want their contact list mined this way on their behalf.</span></div>
+        </div>
+        <div class="cs-result"><b>Matrix placement:</b> Serves business only + hidden — the exact manipulation quadrant. Growth loops built on unclear consent are the most common way well-intentioned "viral growth" mechanics drift into this quadrant without anyone deciding to be unethical on purpose — the incremental optimization (more imports = more invites = more growth) never stopped to ask the 5 questions above.</div>
+      </div>
+    </div>
+
+    <div class="resources">
+      <h4>Go deeper</h4>
+      <ul>
+        <li><a href="https://www.deceptive.design/" target="_blank" rel="noopener">deceptive.design</a> — Harry Brignull's full pattern catalogue (formerly darkpatterns.org)<span class="res-meta">The canonical reference — includes a "Hall of Shame" of real, named examples per pattern.</span></li>
+        <li><a href="https://www.humanetech.com/" target="_blank" rel="noopener">Center for Humane Technology</a><span class="res-meta">Tristan Harris's organization — their "Ledger of Harms" catalogues real downstream effects of attention-optimized design.</span></li>
+        <li><a href="https://www.nirandfar.com/manipulation/" target="_blank" rel="noopener">"Was Facebook Designed to Be Addictive?"</a> and related pieces — Nir Eyal<span class="res-meta">Eyal's own post-<i>Hooked</i> writing directly engages the ethics question raised by his own framework — useful to read against Module 1's Hook Model.</span></li>
+      </ul>
+    </div>
+
     <span class="stage-label">Practice</span>
     <div class="quiz-card">
+      <div class="diff easy">Easy</div>
       <div class="q">A cancel-subscription flow requires calling a phone number during business hours, while signup takes one click. What's this called, and which matrix quadrant is it?</div>
       <div class="opts">
         <button class="opt-btn" data-correct="1">Roach motel — serves business only, and it's not really hidden, just aggressively inconvenient</button>
@@ -551,6 +841,7 @@
       <div class="explain">This is the textbook "roach motel" dark pattern — asymmetric friction between entering and exiting a commitment. It fails the exit-parity test in the ethical checklist above.</div>
     </div>
     <div class="quiz-card">
+      <div class="diff easy">Easy</div>
       <div class="q">Which of these is an example of ethical persuasion, not manipulation?</div>
       <div class="opts">
         <button class="opt-btn" data-correct="0">A countdown timer that silently resets when the page reloads</button>
@@ -558,6 +849,16 @@
         <button class="opt-btn" data-correct="0">A pre-checked "add extended warranty" box at checkout</button>
       </div>
       <div class="explain">The genuine, real-time inventory count is truthful and serves the user's actual decision — it passes both the transparency and user-interest tests. The other two are classic dark patterns (fake urgency, sneak-into-basket).</div>
+    </div>
+    <div class="quiz-card">
+      <div class="diff hard">Hard</div>
+      <div class="q">A meditation app defaults new users into a 12-month auto-renewing plan (cheaper per-month) instead of monthly, with the difference disclosed only in fine print. It genuinely believes the yearly plan serves users better (they're more likely to stick with meditation long-term per the company's own retention data). Where does this land, and what single change fixes it without abandoning the yearly default?</div>
+      <div class="opts">
+        <button class="opt-btn" data-correct="0">It's already ethical because the yearly plan genuinely helps retention</button>
+        <button class="opt-btn" data-correct="0">Switch the default to monthly to be safe</button>
+        <button class="opt-btn" data-correct="1">Keep the yearly default, but disclose the price and commitment as prominently as the monthly option — genuine benefit + hidden terms is still manipulation</button>
+      </div>
+      <div class="explain">Good intent doesn't move a pattern out of the "hidden" axis — the matrix asks about transparency independent of whether the underlying default is actually good for the user. A default genuinely in the user's interest is fine (paternalistic-but-low-harm quadrant) ONLY if it's disclosed with equal prominence, not buried in fine print. Hiding genuinely good terms is still a trust violation — and it's also just unnecessary, since honest framing of a real benefit tends to convert fine on its own.</div>
     </div>
 
     <span class="stage-label">Apply</span>
@@ -572,6 +873,16 @@
       </ol>
       <textarea data-id="m5-ex1" placeholder="Audit a real pattern here..."></textarea>
       <div class="save-note">Not saved yet.</div>
+      <div class="reveal-wrap">
+        <button class="reveal-btn">Reveal model answer</button>
+        <div class="model-answer"><div class="inner">
+          <b>Example: Duolingo's streak-freeze monetization (from Module 1's case study, revisited).</b><br><br>
+          <b>Technique:</b> the streak counter manufactures loss-aversion anxiety, then sells a "streak freeze" to relieve the anxiety it created.<br>
+          <b>Matrix quadrant:</b> borderline "serves business only + hidden" — the anxiety is a side effect most users don't consciously register as manufactured.<br>
+          <b>5-point check:</b> fails explainability (most users don't realize the mechanic is designed to create this exact feeling) and fails the "family member" test for anyone prone to anxiety around habit-breaking.<br>
+          <b>Fix without killing the mechanic:</b> keep the streak (it does drive genuine habit formation, per the Hook Model) but make freezes free or included by default up to a reasonable cap, rather than a paid relief valve for manufactured anxiety — removes the "pay to fix what we broke" dynamic while keeping the underlying motivational structure.
+        </div></div>
+      </div>
     </div>
 
     <div class="complete-row"><button class="complete-btn" data-module="m5">Mark module complete</button></div>
@@ -747,6 +1058,16 @@
     refreshUI();
   });
   refreshUI();
+
+  // Model-answer reveal toggle
+  document.addEventListener('click',function(e){
+    var btn=e.target.closest('.reveal-btn');
+    if(!btn) return;
+    var wrap=btn.closest('.reveal-wrap');
+    var ans=wrap.querySelector('.model-answer');
+    var showing=ans.classList.toggle('show');
+    btn.textContent = showing ? 'Hide model answer' : 'Reveal model answer';
+  });
 
   // Checklist persistence
   document.querySelectorAll('.checklist input[type=checkbox]').forEach(function(cb){
