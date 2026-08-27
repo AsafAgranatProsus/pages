@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hard-candy-calc-v2';
+const CACHE_NAME = 'hard-candy-calc-v3';
 const ASSETS = [
   './',
   './index.html',

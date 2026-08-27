@@ -217,8 +217,8 @@
     padding:16px;
     margin-top:8px;
     display:flex;
-    justify-content:space-between;
-    align-items:baseline;
+    flex-direction:column;
+    gap:8px;
   }
   .total-row .label{
     font-weight:700;
@@ -226,8 +226,18 @@
     text-transform:uppercase;
     letter-spacing:0.06em;
   }
-  .total-row .value{font-size:20px; font-weight:800;}
-  .total-row .value .alt{color:var(--muted);}
+  .total-row .value{
+    font-size:20px;
+    font-weight:800;
+    text-align:right;
+  }
+  .total-row .value .alt{
+    display:block;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:500;
+    margin-top:2px;
+  }
   footer{
     text-align:center;
     font-size:11px;
