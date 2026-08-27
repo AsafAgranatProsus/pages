@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#c0392b">
+<title>Hard Candy Calculator</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+  :root{
+    --red:#c0392b;
+    --red-dark:#96281b;
+    --amber:#f4a83b;
+    --cream:#fff8ef;
+    --ink:#2b1c14;
+    --muted:#8a7566;
+    --line:#eee0d0;
+    --card:#ffffff;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(180deg,#fff3e2 0%,var(--cream) 40%);
+    color:var(--ink);
+    min-height:100vh;
+    padding-bottom:48px;
+  }
+  header{
+    padding:28px 20px 18px;
+    text-align:center;
+  }
+  header .glyph{
+    font-size:38px;
+    display:block;
+    margin-bottom:4px;
+  }
+  header h1{
+    margin:0;
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  header p{
+    margin:6px 0 0;
+    font-size:13.5px;
+    color:var(--muted);
+  }
+  main{
+    max-width:520px;
+    margin:0 auto;
+    padding:0 16px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow:0 6px 24px rgba(150,40,27,0.08);
+    margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  .card h2{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--muted);
+    margin:0 0 14px;
+    font-weight:700;
+  }
+  .mode-toggle{
+    display:flex;
+    background:#f7ede1;
+    border-radius:12px;
+    padding:4px;
+    margin-bottom:16px;
+  }
+  .mode-toggle button{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:10px 8px;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--muted);
+    border-radius:9px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .mode-toggle button.active{
+    background:var(--red);
+    color:#fff;
+    box-shadow:0 3px 10px rgba(192,57,43,0.35);
+  }
+  .field-row{
+    display:flex;
+    gap:10px;
+    align-items:stretch;
+  }
+  .field-row input{
+    flex:1;
+    font-size:22px;
+    font-weight:700;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1.5px solid var(--line);
+    color:var(--ink);
+    background:#fffaf4;
+    -webkit-appearance:none;
+  }
+  .field-row input:focus{
+    outline:none;
+    border-color:var(--red);
+  }
+  .unit-toggle{
+    display:flex;
+    border-radius:12px;
+    overflow:hidden;
+    border:1.5px solid var(--line);
+  }
+  .unit-toggle button{
+    border:none;
+    background:#fffaf4;
+    padding:0 14px;
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--muted);
+    cursor:pointer;
+  }
+  .unit-toggle button.active{
+    background:var(--amber);
+    color:#4a2c07;
+  }
+  .hint{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:8px;
+    line-height:1.4;
+  }
+  .results{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+  }
+  .result-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    padding:13px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .result-row:last-child{border-bottom:none;}
+  .result-row .label{
+    font-size:14.5px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .result-row .label small{
+    display:block;
+    font-size:11.5px;
+    font-weight:400;
+    color:var(--muted);
+    margin-top:1px;
+  }
+  .result-row .value{
+    font-size:17px;
+    font-weight:700;
+    color:var(--red-dark);
+    text-align:right;
+    white-space:nowrap;
+  }
+  .result-row .value .alt{
+    display:block;
+    font-size:12px;
+    font-weight:500;
+    color:var(--muted);
+    margin-top:1px;
+  }
+  .total-row{
+    background:linear-gradient(135deg,#fff0da,#ffe6c2);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-top:6px;
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+  .total-row .label{font-weight:700; font-size:14.5px;}
+  .total-row .value{font-size:19px; font-weight:800; color:var(--red-dark);}
+  footer{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--muted);
+    padding:20px 20px 0;
+    line-height:1.6;
+  }
+  .install-banner{
+    max-width:520px;
+    margin:0 auto 16px;
+    padding:0 16px;
+    display:none;
+  }
+  .install-banner.show{display:block;}
+  .install-banner button{
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    border:none;
+    background:var(--red);
+    color:#fff;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="glyph">🍬</span>
+  <h1>Hard Candy Calculator</h1>
+  <p>Scale the base recipe to any batch size</p>
+</header>
+
+<div class="install-banner" id="installBanner">
+  <button id="installBtn">Install app</button>
+</div>
+
+<main>
+
+  <div class="card">
+    <h2>Batch size</h2>
+    <div class="mode-toggle">
+      <button id="modeSugar" class="active">By sugar</button>
+      <button id="modeTotal">By finished weight</button>
+    </div>
+
+    <div class="field-row">
+      <input id="amountInput" type="number" inputmode="decimal" min="0" step="0.1" value="1" placeholder="Amount">
+      <div class="unit-toggle">
+        <button id="unitKg" class="active">kg</button>
+        <button id="unitLb">lb</button>
+      </div>
+    </div>
+
+    <div class="hint" id="hintText">Enter how much sugar you're starting with.</div>
+  </div>
+
+  <div class="card">
+    <h2>Recipe</h2>
+    <div class="results">
+      <div class="result-row">
+        <div class="label">Sugar<small>base ingredient</small></div>
+        <div class="value" id="rSugar">—</div>
+      </div>
+      <div class="result-row">
+        <div class="label">Water<small>dissolves sugar — boils off during cook</small></div>
+        <div class="value" id="rWater">—</div>
+      </div>
+      <div class="result-row">
+        <div class="label">Glucose (corn syrup)<small>prevents crystallization</small></div>
+        <div class="value" id="rGlucose">—</div>
+      </div>
+      <div class="result-row">
+        <div class="label">Aroma / flavor<small>added off heat</small></div>
+        <div class="value" id="rAroma">—</div>
+      </div>
+    </div>
+    <div class="total-row">
+      <div class="label">Finished candy weight</div>
+      <div class="value" id="rTotal">—</div>
+    </div>
+  </div>
+
+  <footer>
+    Ratios: 250 ml water, 280–300 g glucose, 10 ml aroma per kg sugar.<br>
+    Finished weight ≈ 1.28–1.30 kg per kg sugar (water evaporates on cook).<br>
+    Works offline once installed.
+  </footer>
+
+</main>
+
+<script>
+(function(){
+  // --- conversion constants ---
+  const KG_TO_LB = 2.20462262185;
+  const ML_TO_FLOZ = 0.033814022702;
+  const G_TO_OZ = 0.03527396195;
+
+  // per-kg-of-sugar ratios, derived + verified against the source table
+  const WATER_ML_PER_KG = 250;
+  const GLUCOSE_G_PER_KG_LOW = 280;
+  const GLUCOSE_G_PER_KG_HIGH = 300;
+  const AROMA_ML_PER_KG = 10;
+  const TOTAL_FACTOR_LOW = 1.28;
+  const TOTAL_FACTOR_HIGH = 1.30;
+  // midpoint used only when solving backwards from a target finished weight
+  const TOTAL_FACTOR_MID = (TOTAL_FACTOR_LOW + TOTAL_FACTOR_HIGH) / 2;
+
+  let mode = 'sugar'; // 'sugar' or 'total'
+  let unit = 'kg';    // 'kg' or 'lb'
+
+  const amountInput = document.getElementById('amountInput');
+  const modeSugarBtn = document.getElementById('modeSugar');
+  const modeTotalBtn = document.getElementById('modeTotal');
+  const unitKgBtn = document.getElementById('unitKg');
+  const unitLbBtn = document.getElementById('unitLb');
+  const hintText = document.getElementById('hintText');
+
+  const rSugar = document.getElementById('rSugar');
+  const rWater = document.getElementById('rWater');
+  const rGlucose = document.getElementById('rGlucose');
+  const rAroma = document.getElementById('rAroma');
+  const rTotal = document.getElementById('rTotal');
+
+  function fmt(n, d){
+    if (!isFinite(n)) return '—';
+    return n.toLocaleString(undefined, {minimumFractionDigits:d, maximumFractionDigits:d});
+  }
+
+  function altUnit(kgVal, isWeight){
+    // returns a small alt-unit string for metric<->imperial cross reference
+    if (isWeight) return fmt(kgVal * KG_TO_LB, 2) + ' lb';
+    return '';
+  }
+
+  function render(){
+    const raw = parseFloat(amountInput.value);
+    const amount = isFinite(raw) && raw > 0 ? raw : 0;
+
+    // normalize input to kg sugar-equivalent depending on mode/unit
+    let amountKg = unit === 'kg' ? amount : amount / KG_TO_LB;
+    let sugarKg;
+
+    if (mode === 'sugar'){
+      sugarKg = amountKg;
+    } else {
+      // amountKg is the desired TOTAL finished weight; solve for sugar
+      sugarKg = amountKg / TOTAL_FACTOR_MID;
+    }
+
+    const waterMl = sugarKg * WATER_ML_PER_KG;
+    const glucoseGLow = sugarKg * GLUCOSE_G_PER_KG_LOW;
+    const glucoseGHigh = sugarKg * GLUCOSE_G_PER_KG_HIGH;
+    const aromaMl = sugarKg * AROMA_ML_PER_KG;
+    const totalKgLow = sugarKg * TOTAL_FACTOR_LOW;
+    const totalKgHigh = sugarKg * TOTAL_FACTOR_HIGH;
+
+    // sugar display
+    rSugar.innerHTML = unit === 'kg'
+      ? fmt(sugarKg, sugarKg < 2 ? 2 : 1) + ' kg' + '<span class="alt">' + fmt(sugarKg*KG_TO_LB,2) + ' lb</span>'
+      : fmt(sugarKg*KG_TO_LB, sugarKg*KG_TO_LB < 2 ? 2 : 1) + ' lb' + '<span class="alt">' + fmt(sugarKg,2) + ' kg</span>';
+
+    // water
+    const waterFlOz = waterMl * ML_TO_FLOZ;
+    rWater.innerHTML = fmt(waterMl,0) + ' ml' + '<span class="alt">' + fmt(waterFlOz,1) + ' fl oz</span>';
+
+    // glucose (range)
+    const glucOzLow = glucoseGLow * G_TO_OZ;
+    const glucOzHigh = glucoseGHigh * G_TO_OZ;
+    rGlucose.innerHTML = fmt(glucoseGLow,0) + '–' + fmt(glucoseGHigh,0) + ' g' +
+      '<span class="alt">' + fmt(glucOzLow,1) + '–' + fmt(glucOzHigh,1) + ' oz</span>';
+
+    // aroma
+    rAroma.innerHTML = fmt(aromaMl,1) + ' ml' + '<span class="alt">' + fmt(aromaMl*ML_TO_FLOZ,2) + ' fl oz</span>';
+
+    // total
+    const totalLbLow = totalKgLow * KG_TO_LB;
+    const totalLbHigh = totalKgHigh * KG_TO_LB;
+    rTotal.innerHTML = fmt(totalKgLow,2) + '–' + fmt(totalKgHigh,2) + ' kg' +
+      '<span class="alt" style="color:#7a5a2c">' + fmt(totalLbLow,2) + '–' + fmt(totalLbHigh,2) + ' lb</span>';
+  }
+
+  modeSugarBtn.addEventListener('click', function(){
+    mode = 'sugar';
+    modeSugarBtn.classList.add('active');
+    modeTotalBtn.classList.remove('active');
+    hintText.textContent = "Enter how much sugar you're starting with.";
+    render();
+  });
+  modeTotalBtn.addEventListener('click', function(){
+    mode = 'total';
+    modeTotalBtn.classList.add('active');
+    modeSugarBtn.classList.remove('active');
+    hintText.textContent = "Enter how much finished candy you want to end up with — sugar and everything else scales backward from that.";
+    render();
+  });
+  unitKgBtn.addEventListener('click', function(){
+    if (unit === 'kg') return;
+    const raw = parseFloat(amountInput.value) || 0;
+    amountInput.value = (raw / KG_TO_LB).toFixed(2);
+    unit = 'kg';
+    unitKgBtn.classList.add('active');
+    unitLbBtn.classList.remove('active');
+    render();
+  });
+  unitLbBtn.addEventListener('click', function(){
+    if (unit === 'lb') return;
+    const raw = parseFloat(amountInput.value) || 0;
+    amountInput.value = (raw * KG_TO_LB).toFixed(2);
+    unit = 'lb';
+    unitLbBtn.classList.add('active');
+    unitKgBtn.classList.remove('active');
+    render();
+  });
+  amountInput.addEventListener('input', render);
+
+  render();
+
+  // --- PWA install prompt ---
+  let deferredPrompt;
+  const banner = document.getElementById('installBanner');
+  const installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    banner.classList.add('show');
+  });
+  installBtn && installBtn.addEventListener('click', async function(){
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    banner.classList.remove('show');
+  });
+  window.addEventListener('appinstalled', function(){
+    banner.classList.remove('show');
+  });
+
+  // --- service worker registration ---
+  if ('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>
