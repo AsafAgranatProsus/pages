@@ -507,18 +507,26 @@
         </div>
       </div>
 
-      <div class="hint">Levain is subtracted from the flour/water you add separately — its own flour and water count toward the totals below, not on top of them.</div>
+      <div class="field">
+        <div class="field-label">Levain method</div>
+        <div class="anchor-toggle" id="levainModeToggle">
+          <button id="levainOnTop" class="active">On top</button>
+          <button id="levainSubtracted">Subtracted</button>
+        </div>
+      </div>
+
+      <div class="hint" id="levainModeHint"></div>
     </div>
 
     <div class="card">
       <h2>Final recipe — add these</h2>
       <div class="results">
         <div class="result-row">
-          <div class="label">Flour<small>to add, excl. levain's own flour</small></div>
+          <div class="label">Flour<small>to add</small></div>
           <div class="value" id="rFlour">—</div>
         </div>
         <div class="result-row">
-          <div class="label">Water<small>to add, excl. levain's own water</small></div>
+          <div class="label">Water<small>to add</small></div>
           <div class="value" id="rWater">—</div>
         </div>
         <div class="result-row">
@@ -664,7 +672,8 @@
     hydrationPct: 75,
     saltPct: 2,
     levainPct: 20,
-    levainHydPct: 100
+    levainHydPct: 100,
+    levainMode: 'onTop'   // 'onTop' (added extra) | 'subtracted' (netted from 100% flour)
   };
 
   const el = {
@@ -691,16 +700,23 @@
     return Math.round(n).toLocaleString();
   }
 
-  // Derive flourWeight (the 100% baseline) from current state.
-  function computeFlourWeight(){
+  // Total-dough factor relative to the flour baseline, given current ratios.
+  // 'onTop': levain is an extra ingredient added on top of the 100% flour.
+  // 'subtracted': levain's own flour/water is already counted inside the
+  // 100% flour baseline (classic baker's-percentage / prefermented-flour method).
+  function totalFactor(){
     const h = state.hydrationPct / 100;
     const s = state.saltPct / 100;
-    // total dough = flour * (1 + hydration + salt)   [levain nets out, see note]
-    const factor = 1 + h + s;
+    const l = state.levainPct / 100;
+    return 1 + h + s + (state.levainMode === 'onTop' ? l : 0);
+  }
+
+  // Derive flourWeight (the 100% baseline) from current state.
+  function computeFlourWeight(){
     if (state.anchorMode === 'flour'){
       return state.anchorValue;
     }
-    return state.anchorValue / factor;
+    return state.anchorValue / totalFactor();
   }
 
   function recalc(){
@@ -710,26 +726,34 @@
     const l = state.levainPct / 100;
     const lh = state.levainHydPct / 100;
 
-    const totalWater = flour * h;
-    const totalSalt = flour * s;
+    const waterAmt = flour * h;   // baker's-% water, relative to flour baseline
+    const saltAmt = flour * s;
     const levainTotal = flour * l;
-    // levain's own internal flour/water (split by its own hydration ratio)
-    const levainFlour = levainTotal / (1 + lh);
-    const levainWater = levainTotal - levainFlour;
 
-    const flourToAdd = flour - levainFlour;
-    const waterToAdd = totalWater - levainWater;
-    const total = flour + totalWater + totalSalt; // levain already counted inside flour+water
+    let flourToAdd, waterToAdd, total;
+
+    if (state.levainMode === 'onTop'){
+      flourToAdd = flour;
+      waterToAdd = waterAmt;
+      total = flour + waterAmt + saltAmt + levainTotal;
+    } else {
+      // levain's own internal flour/water, split by its own hydration ratio
+      const levainFlour = levainTotal / (1 + lh);
+      const levainWater = levainTotal - levainFlour;
+      flourToAdd = flour - levainFlour;
+      waterToAdd = waterAmt - levainWater;
+      total = flour + waterAmt + saltAmt; // levain already counted inside flour+water
+    }
 
     el.rFlour.textContent = fmt(flourToAdd) + ' g';
     el.rWater.textContent = fmt(waterToAdd) + ' g';
-    el.rSalt.textContent = fmt(totalSalt) + ' g';
+    el.rSalt.textContent = fmt(saltAmt) + ' g';
     el.rLevain.textContent = fmt(levainTotal) + ' g';
     el.rTotal.textContent = fmt(total) + ' g';
 
     // sync dual % / g fields (without feedback loops — these are pure display)
-    el.hydrationG.value = Math.round(totalWater);
-    el.saltG.value = (Math.round(totalSalt * 10) / 10);
+    el.hydrationG.value = Math.round(waterAmt);
+    el.saltG.value = (Math.round(saltAmt * 10) / 10);
     el.levainG.value = Math.round(levainTotal);
   }
 
@@ -782,9 +806,7 @@
   el.anchorTotalBtn.addEventListener('click', function(){
     if (state.anchorMode === 'total') return;
     const flour = computeFlourWeight();
-    const h = state.hydrationPct / 100;
-    const s = state.saltPct / 100;
-    const total = flour * (1 + h + s);
+    const total = flour * totalFactor();
     state.anchorMode = 'total';
     state.anchorValue = Math.round(total);
     el.anchorInput.value = state.anchorValue;
@@ -793,6 +815,34 @@
     el.anchorFlourBtn.classList.remove('active');
     recalc();
   });
+
+  // ---- Levain method toggle (on top vs subtracted) ----
+  const levainOnTopBtn = document.getElementById('levainOnTop');
+  const levainSubBtn = document.getElementById('levainSubtracted');
+  const levainModeHint = document.getElementById('levainModeHint');
+
+  function updateLevainModeHint(){
+    levainModeHint.textContent = state.levainMode === 'onTop'
+      ? "Levain is added as an extra ingredient on top — flour/water % above are relative to the flour you add directly, and the total dough weight includes the full levain weight in addition."
+      : "Levain's own flour and water are counted inside the 100% flour/water totals above (classic prefermented-flour method) — netted out of what you add separately so nothing is double-counted.";
+  }
+  levainOnTopBtn.addEventListener('click', function(){
+    if (state.levainMode === 'onTop') return;
+    state.levainMode = 'onTop';
+    levainOnTopBtn.classList.add('active');
+    levainSubBtn.classList.remove('active');
+    updateLevainModeHint();
+    recalc();
+  });
+  levainSubBtn.addEventListener('click', function(){
+    if (state.levainMode === 'subtracted') return;
+    state.levainMode = 'subtracted';
+    levainSubBtn.classList.add('active');
+    levainOnTopBtn.classList.remove('active');
+    updateLevainModeHint();
+    recalc();
+  });
+  updateLevainModeHint();
 
   recalc();
 
