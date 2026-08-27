@@ -591,6 +591,12 @@
       </div>
       <div class="lap-list" id="lapList"></div>
     </div>
+
+    <div class="card">
+      <h2>Bake notes</h2>
+      <textarea id="bakeNotes" class="lap-note-input" rows="4" placeholder="Flour used, ratio, addins, ambient conditions, anything worth remembering..." style="resize:vertical;"></textarea>
+      <div class="hint">Saved with this bake when you press Finish bake. The current recipe (grams + ratios) is also snapshotted automatically.</div>
+    </div>
   </div>
 
   <!-- HISTORY PANEL -->
@@ -602,7 +608,7 @@
         <button class="btn" id="exportJson">Export JSON</button>
         <button class="btn" id="exportCsv">Export CSV</button>
       </div>
-      <div class="hint">Export includes every saved bake's date, total time, and all laps with notes.</div>
+      <div class="hint">Export includes every saved bake's date, total time, the recipe actually used, bake notes, and all laps with their notes.</div>
     </div>
   </div>
 
@@ -676,6 +682,24 @@
     levainMode: 'onTop'   // 'onTop' (added extra) | 'subtracted' (netted from 100% flour)
   };
 
+  // Persist last-used recipe numbers so reopening the app keeps your usual
+  // ratios instead of resetting to defaults — you tweak slightly, not from scratch.
+  const RECIPE_KEY = 'sourdough-last-recipe';
+  function loadSavedRecipe(){
+    try{
+      const raw = localStorage.getItem(RECIPE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    }catch(e){ return null; }
+  }
+  function saveRecipeState(){
+    localStorage.setItem(RECIPE_KEY, JSON.stringify(state));
+  }
+  const savedRecipe = loadSavedRecipe();
+  if (savedRecipe){
+    Object.assign(state, savedRecipe);
+  }
+
   const el = {
     anchorFlourBtn: document.getElementById('anchorFlour'),
     anchorTotalBtn: document.getElementById('anchorTotal'),
@@ -719,6 +743,8 @@
     return state.anchorValue / totalFactor();
   }
 
+  let lastRecipeResult = {};
+
   function recalc(){
     const flour = computeFlourWeight();
     const h = state.hydrationPct / 100;
@@ -755,6 +781,24 @@
     el.hydrationG.value = Math.round(waterAmt);
     el.saltG.value = (Math.round(saltAmt * 10) / 10);
     el.levainG.value = Math.round(levainTotal);
+
+    // snapshot of the currently-displayed recipe, referenced when a bake is
+    // finished so the saved history entry captures what was actually mixed
+    lastRecipeResult = {
+      anchorMode: state.anchorMode,
+      hydrationPct: state.hydrationPct,
+      saltPct: state.saltPct,
+      levainPct: state.levainPct,
+      levainHydPct: state.levainHydPct,
+      levainMode: state.levainMode,
+      flourG: Math.round(flourToAdd),
+      waterG: Math.round(waterToAdd),
+      saltG: Math.round(saltAmt * 10) / 10,
+      levainG: Math.round(levainTotal),
+      totalG: Math.round(total)
+    };
+
+    saveRecipeState();
   }
 
   function bindPctGramPair(pctInput, gInput, stateKey, gramsToPct){
@@ -844,6 +888,26 @@
   });
   updateLevainModeHint();
 
+  // Reflect any restored (persisted) recipe state into the visible inputs
+  // and toggle buttons before the first render — otherwise the DOM would
+  // still show the hardcoded defaults while `state` holds saved values.
+  function applyStateToInputs(){
+    el.anchorInput.value = state.anchorValue;
+    el.anchorLabel.textContent = state.anchorMode === 'flour' ? 'Flour weight (g)' : 'Total dough weight (g)';
+    el.anchorFlourBtn.classList.toggle('active', state.anchorMode === 'flour');
+    el.anchorTotalBtn.classList.toggle('active', state.anchorMode === 'total');
+
+    el.hydrationPct.value = state.hydrationPct;
+    el.saltPct.value = state.saltPct;
+    el.levainPct.value = state.levainPct;
+    el.levainHydPct.value = state.levainHydPct;
+
+    levainOnTopBtn.classList.toggle('active', state.levainMode === 'onTop');
+    levainSubBtn.classList.toggle('active', state.levainMode === 'subtracted');
+    updateLevainModeHint();
+  }
+  applyStateToInputs();
+
   recalc();
 
   // ============ DDT CALCULATOR ============
@@ -881,12 +945,14 @@
     lap: document.getElementById('swLap'),
     reset: document.getElementById('swReset'),
     finish: document.getElementById('swFinish'),
-    lapList: document.getElementById('lapList')
+    lapList: document.getElementById('lapList'),
+    bakeNotes: document.getElementById('bakeNotes')
   };
 
   // session shape: { startedAt: epoch_ms|null, pausedAt: epoch_ms|null,
   //                  accumulatedMs: number (from prior pause cycles),
-  //                  running: bool, laps: [{ id, atMs (absolute elapsed ms), note }] }
+  //                  running: bool, laps: [{ id, atMs (absolute elapsed ms), note }],
+  //                  notes: string (free-text bake notes, e.g. flour/ratio/addins) }
   function loadSession(){
     try{
       const raw = localStorage.getItem(SW_KEY);
@@ -906,8 +972,14 @@
     running: false,
     accumulatedMs: 0,
     lastResumeAt: null,
-    laps: []
+    laps: [],
+    notes: ''
   };
+  swEl.bakeNotes.value = session.notes || '';
+  swEl.bakeNotes.addEventListener('input', function(){
+    session.notes = swEl.bakeNotes.value;
+    saveSession(session);
+  });
 
   let tickHandle = null;
 
@@ -1013,7 +1085,8 @@
       if (!confirm('Reset clears the current timeline (unsaved). Continue?')) return;
     }
     stopTicking();
-    session = { startedAt: null, running: false, accumulatedMs: 0, lastResumeAt: null, laps: [] };
+    session = { startedAt: null, running: false, accumulatedMs: 0, lastResumeAt: null, laps: [], notes: '' };
+    swEl.bakeNotes.value = '';
     clearSession();
     renderAll();
   });
@@ -1025,14 +1098,17 @@
       id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
       date: new Date().toISOString(),
       totalMs: finalMs,
-      laps: session.laps.map(function(l){ return { atMs: l.atMs, note: l.note || '' }; })
+      laps: session.laps.map(function(l){ return { atMs: l.atMs, note: l.note || '' }; }),
+      notes: session.notes || '',
+      recipe: Object.assign({}, lastRecipeResult)
     };
     const history = loadHistory();
     history.unshift(bake);
     saveHistory(history);
 
     stopTicking();
-    session = { startedAt: null, running: false, accumulatedMs: 0, lastResumeAt: null, laps: [] };
+    session = { startedAt: null, running: false, accumulatedMs: 0, lastResumeAt: null, laps: [], notes: '' };
+    swEl.bakeNotes.value = '';
     clearSession();
     renderAll();
     toast('Bake saved to history');
@@ -1078,6 +1154,33 @@
 
       const detail = document.createElement('div');
       detail.className = 'history-detail';
+
+      const r = bake.recipe;
+      if (r && r.totalG){
+        const recipeBox = document.createElement('div');
+        recipeBox.style.marginBottom = '12px';
+        recipeBox.style.paddingBottom = '12px';
+        recipeBox.style.borderBottom = '1px solid var(--line-soft)';
+        recipeBox.innerHTML =
+          '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;">Recipe</div>' +
+          '<div style="font-size:13px;line-height:1.7;">' +
+          'Flour ' + r.flourG + 'g · Water ' + r.waterG + 'g · Salt ' + r.saltG + 'g · Levain ' + r.levainG + 'g (' + r.levainMode + ')<br>' +
+          'Hydration ' + r.hydrationPct + '% · Salt ' + r.saltPct + '% · Levain ' + r.levainPct + '% @ ' + r.levainHydPct + '% hyd. · Total ' + r.totalG + 'g' +
+          '</div>';
+        detail.appendChild(recipeBox);
+      }
+
+      if (bake.notes){
+        const notesBox = document.createElement('div');
+        notesBox.style.marginBottom = '12px';
+        notesBox.style.paddingBottom = '12px';
+        notesBox.style.borderBottom = '1px solid var(--line-soft)';
+        notesBox.innerHTML =
+          '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;">Notes</div>' +
+          '<div style="font-size:13px;line-height:1.5;white-space:pre-wrap;">' + escapeHtml(bake.notes) + '</div>';
+        detail.appendChild(notesBox);
+      }
+
       let prevMs = 0;
       bake.laps.forEach(function(lap, idx){
         const splitMs = lap.atMs - prevMs;
@@ -1095,6 +1198,12 @@
     });
   }
 
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
   document.getElementById('exportJson').addEventListener('click', function(){
     const history = loadHistory();
     if (history.length === 0){ toast('No bakes to export'); return; }
@@ -1105,16 +1214,19 @@
   document.getElementById('exportCsv').addEventListener('click', function(){
     const history = loadHistory();
     if (history.length === 0){ toast('No bakes to export'); return; }
-    const rows = [['bake_date','bake_total_time','lap_number','lap_absolute_time','lap_split_time','note']];
+    const rows = [['bake_date','bake_total_time','flour_g','water_g','salt_g','levain_g','levain_mode','hydration_pct','salt_pct','levain_pct','levain_hyd_pct','bake_notes','lap_number','lap_absolute_time','lap_split_time','lap_note']];
+    function csvField(s){ return '"' + String(s == null ? '' : s).replace(/"/g,'""') + '"'; }
     history.forEach(function(bake){
+      const r = bake.recipe || {};
+      const recipeCols = [r.flourG||'', r.waterG||'', r.saltG||'', r.levainG||'', r.levainMode||'', r.hydrationPct||'', r.saltPct||'', r.levainPct||'', r.levainHydPct||''];
       let prevMs = 0;
       if (bake.laps.length === 0){
-        rows.push([bake.date, fmtHMS(bake.totalMs), '', '', '', '']);
+        rows.push([bake.date, fmtHMS(bake.totalMs)].concat(recipeCols).concat([csvField(bake.notes), '', '', '', '']));
       }
       bake.laps.forEach(function(lap, idx){
         const splitMs = lap.atMs - prevMs;
         prevMs = lap.atMs;
-        rows.push([bake.date, fmtHMS(bake.totalMs), idx+1, fmtHMS(lap.atMs), fmtHMS(splitMs), '"' + (lap.note||'').replace(/"/g,'""') + '"']);
+        rows.push([bake.date, fmtHMS(bake.totalMs)].concat(recipeCols).concat([csvField(bake.notes), idx+1, fmtHMS(lap.atMs), fmtHMS(splitMs), csvField(lap.note)]));
       });
     });
     const csv = rows.map(function(r){ return r.join(','); }).join('\n');
