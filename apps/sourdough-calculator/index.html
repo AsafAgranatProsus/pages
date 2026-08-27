@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Sourdough Calculator</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+  :root{
+    --bg:#ffffff;
+    --fg:#000000;
+    --muted:#6b6b6b;
+    --line:#000000;
+    --line-soft:#e2e2e2;
+    --card:#ffffff;
+    --invert-fg:#ffffff;
+    --invert-bg:#000000;
+  }
+  html[data-theme="dark"]{
+    --bg:#000000;
+    --fg:#ffffff;
+    --muted:#9a9a9a;
+    --line:#ffffff;
+    --line-soft:#2a2a2a;
+    --card:#000000;
+    --invert-fg:#000000;
+    --invert-bg:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--fg);
+    min-height:100vh;
+    padding-bottom:56px;
+    transition:background .15s ease, color .15s ease;
+  }
+  header{
+    padding:28px 20px 20px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    max-width:560px;
+    margin:0 auto;
+  }
+  header .title-block h1{
+    margin:0;
+    font-size:24px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    text-transform:uppercase;
+    line-height:1.05;
+  }
+  header .title-block p{
+    margin:6px 0 0;
+    font-size:12.5px;
+    color:var(--muted);
+    letter-spacing:0.02em;
+  }
+  .theme-switch{
+    border:2px solid var(--fg);
+    background:var(--bg);
+    color:var(--fg);
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+    font-size:18px;
+    transition:background .15s ease, color .15s ease;
+  }
+  .theme-switch:active{
+    background:var(--fg);
+    color:var(--bg);
+  }
+  main{
+    max-width:560px;
+    margin:0 auto;
+    padding:0 16px;
+  }
+  .card{
+    background:var(--card);
+    border:2px solid var(--line);
+    padding:20px;
+    margin-bottom:16px;
+  }
+  .card h2{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    color:var(--muted);
+    margin:0 0 16px;
+    font-weight:700;
+  }
+  .tabs{
+    display:flex;
+    border:2px solid var(--line);
+    margin-bottom:16px;
+  }
+  .tabs button{
+    flex:1;
+    border:none;
+    background:var(--bg);
+    color:var(--fg);
+    padding:12px 6px;
+    font-size:11.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    cursor:pointer;
+  }
+  .tabs button:not(:last-child){border-right:2px solid var(--line);}
+  .tabs button.active{
+    background:var(--invert-bg);
+    color:var(--invert-fg);
+  }
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .field{
+    margin-bottom:14px;
+  }
+  .field-label{
+    font-size:11.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--muted);
+    margin-bottom:6px;
+    display:flex;
+    justify-content:space-between;
+  }
+  .field-label .sub{font-weight:500; text-transform:none; letter-spacing:0;}
+  .dual-row{
+    display:flex;
+    gap:0;
+    min-width:0;
+  }
+  .dual-row input{
+    flex:1;
+    min-width:0;
+    width:100%;
+    font-size:20px;
+    font-weight:800;
+    padding:12px 12px;
+    border:2px solid var(--line);
+    color:var(--fg);
+    background:var(--bg);
+    -webkit-appearance:none;
+    font-family:inherit;
+    text-align:right;
+  }
+  .dual-row input.pct{border-right:none;}
+  .dual-row .unit-label{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 12px;
+    border:2px solid var(--line);
+    border-right:none;
+    font-size:12px;
+    font-weight:700;
+    color:var(--muted);
+    background:var(--line-soft);
+    min-width:32px;
+  }
+  .dual-row .unit-label.g{border-right:2px solid var(--line);}
+  .field.simple input{
+    width:100%;
+    font-size:20px;
+    font-weight:800;
+    padding:12px 12px;
+    border:2px solid var(--line);
+    color:var(--fg);
+    background:var(--bg);
+    -webkit-appearance:none;
+    font-family:inherit;
+  }
+  .anchor-toggle{
+    display:flex;
+    border:2px solid var(--line);
+    margin-bottom:16px;
+  }
+  .anchor-toggle button{
+    flex:1;
+    border:none;
+    background:var(--bg);
+    color:var(--fg);
+    padding:11px 6px;
+    font-size:11.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+    cursor:pointer;
+  }
+  .anchor-toggle button:first-child{border-right:2px solid var(--line);}
+  .anchor-toggle button.active{
+    background:var(--invert-bg);
+    color:var(--invert-fg);
+  }
+  .results{display:flex; flex-direction:column;}
+  .result-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    padding:13px 0;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .result-row:last-child{border-bottom:none;}
+  .result-row .label{
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--fg);
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+  }
+  .result-row .label small{
+    display:block;
+    font-size:10.5px;
+    font-weight:400;
+    color:var(--muted);
+    margin-top:2px;
+    text-transform:none;
+    letter-spacing:0;
+  }
+  .result-row .value{
+    font-size:17px;
+    font-weight:800;
+    color:var(--fg);
+    text-align:right;
+    white-space:nowrap;
+  }
+  .total-row{
+    background:var(--invert-bg);
+    color:var(--invert-fg);
+    padding:16px;
+    margin-top:8px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .total-row .label{
+    font-weight:700;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .total-row .value{font-size:19px; font-weight:800; text-align:right;}
+
+  /* DDT panel */
+  .ddt-result{
+    background:var(--invert-bg);
+    color:var(--invert-fg);
+    padding:20px;
+    text-align:center;
+    margin-top:4px;
+  }
+  .ddt-result .big{
+    font-size:34px;
+    font-weight:800;
+    letter-spacing:-0.02em;
+  }
+  .ddt-result .small{
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--muted);
+    margin-top:4px;
+  }
+  .grid-2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+
+  /* Stopwatch */
+  .sw-display{
+    font-size:44px;
+    font-weight:800;
+    text-align:center;
+    letter-spacing:-0.01em;
+    font-variant-numeric:tabular-nums;
+    padding:20px 0 8px;
+  }
+  .sw-controls{
+    display:flex;
+    gap:10px;
+    margin-bottom:8px;
+  }
+  .btn{
+    flex:1;
+    border:2px solid var(--line);
+    background:var(--bg);
+    color:var(--fg);
+    padding:14px 10px;
+    font-size:13px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    cursor:pointer;
+  }
+  .btn.primary{background:var(--invert-bg); color:var(--invert-fg);}
+  .btn:disabled{opacity:0.35; cursor:not-allowed;}
+  .lap-list{margin-top:16px;}
+  .lap-item{
+    border-bottom:1px solid var(--line-soft);
+    padding:12px 0;
+  }
+  .lap-item:last-child{border-bottom:none;}
+  .lap-item .lap-meta{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    color:var(--muted);
+    font-weight:700;
+    margin-bottom:6px;
+    font-variant-numeric:tabular-nums;
+  }
+  .lap-item .lap-meta .split{color:var(--fg);}
+  .lap-note-input{
+    width:100%;
+    border:2px solid var(--line-soft);
+    background:var(--bg);
+    color:var(--fg);
+    padding:9px 10px;
+    font-size:14px;
+    font-family:inherit;
+  }
+  .lap-note-input:focus{outline:none; border-color:var(--line);}
+  .empty-note{color:var(--muted);}
+
+  .history-item{
+    border:2px solid var(--line);
+    padding:14px;
+    margin-bottom:10px;
+    cursor:pointer;
+  }
+  .history-item .h-date{
+    font-weight:800;
+    font-size:14px;
+    text-transform:uppercase;
+  }
+  .history-item .h-meta{
+    font-size:11.5px;
+    color:var(--muted);
+    margin-top:4px;
+  }
+  .history-detail{
+    display:none;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid var(--line-soft);
+  }
+  .history-item.open .history-detail{display:block;}
+  .history-detail .lap-item{padding:8px 0;}
+  .history-empty{
+    color:var(--muted);
+    font-size:13px;
+    text-align:center;
+    padding:20px 0;
+  }
+  .export-row{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+  }
+  .hint{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:10px;
+    line-height:1.5;
+  }
+  footer{
+    text-align:center;
+    font-size:11px;
+    color:var(--muted);
+    padding:20px 20px 0;
+    line-height:1.7;
+    letter-spacing:0.01em;
+  }
+  .toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--invert-bg);
+    color:var(--invert-fg);
+    padding:12px 20px;
+    font-size:13px;
+    font-weight:700;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:100;
+    white-space:nowrap;
+  }
+  .toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+  .install-banner{
+    max-width:560px;
+    margin:0 auto 16px;
+    padding:0 16px;
+    display:none;
+  }
+  .install-banner.show{display:block;}
+  .install-banner button{
+    width:100%;
+    padding:14px;
+    border:2px solid var(--fg);
+    background:var(--fg);
+    color:var(--bg);
+    font-weight:800;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="title-block">
+    <h1>Sourdough<br>Calculator</h1>
+    <p>Baker's math · DDT · bake timer</p>
+  </div>
+  <button class="theme-switch" id="themeSwitch" aria-label="Toggle dark mode">◐</button>
+</header>
+
+<div class="install-banner" id="installBanner">
+  <button id="installBtn">Install app</button>
+</div>
+
+<main>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="recipe">Recipe</button>
+    <button class="tab-btn" data-tab="ddt">DDT</button>
+    <button class="tab-btn" data-tab="stopwatch">Stopwatch</button>
+    <button class="tab-btn" data-tab="history">History</button>
+  </div>
+
+  <!-- RECIPE PANEL -->
+  <div class="panel active" id="panel-recipe">
+    <div class="card">
+      <h2>Anchor</h2>
+      <div class="anchor-toggle">
+        <button id="anchorFlour" class="active">By flour weight</button>
+        <button id="anchorTotal">By total dough weight</button>
+      </div>
+      <div class="field simple">
+        <div class="field-label" id="anchorLabel">Flour weight (g)</div>
+        <input id="anchorInput" type="number" inputmode="decimal" min="0" step="1" value="500">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Ratios</h2>
+
+      <div class="field">
+        <div class="field-label">Hydration <span class="sub">water ÷ flour</span></div>
+        <div class="dual-row">
+          <input id="hydrationPct" type="number" inputmode="decimal" step="0.5" value="75" class="pct">
+          <div class="unit-label">%</div>
+          <input id="hydrationG" type="number" inputmode="decimal" step="1" value="375">
+          <div class="unit-label g">g</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Salt <span class="sub">of total flour</span></div>
+        <div class="dual-row">
+          <input id="saltPct" type="number" inputmode="decimal" step="0.1" value="2" class="pct">
+          <div class="unit-label">%</div>
+          <input id="saltG" type="number" inputmode="decimal" step="0.5" value="10">
+          <div class="unit-label g">g</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Levain <span class="sub">of total flour</span></div>
+        <div class="dual-row">
+          <input id="levainPct" type="number" inputmode="decimal" step="1" value="20" class="pct">
+          <div class="unit-label">%</div>
+          <input id="levainG" type="number" inputmode="decimal" step="1" value="100">
+          <div class="unit-label g">g</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Levain hydration <span class="sub">starter's own ratio</span></div>
+        <div class="dual-row">
+          <input id="levainHydPct" type="number" inputmode="decimal" step="1" value="100" class="pct">
+          <div class="unit-label">%</div>
+          <div class="unit-label" style="flex:1; border-right:2px solid var(--line);">&nbsp;</div>
+        </div>
+      </div>
+
+      <div class="hint">Levain is subtracted from the flour/water you add separately — its own flour and water count toward the totals below, not on top of them.</div>
+    </div>
+
+    <div class="card">
+      <h2>Final recipe — add these</h2>
+      <div class="results">
+        <div class="result-row">
+          <div class="label">Flour<small>to add, excl. levain's own flour</small></div>
+          <div class="value" id="rFlour">—</div>
+        </div>
+        <div class="result-row">
+          <div class="label">Water<small>to add, excl. levain's own water</small></div>
+          <div class="value" id="rWater">—</div>
+        </div>
+        <div class="result-row">
+          <div class="label">Salt</div>
+          <div class="value" id="rSalt">—</div>
+        </div>
+        <div class="result-row">
+          <div class="label">Levain<small>total, ready to use</small></div>
+          <div class="value" id="rLevain">—</div>
+        </div>
+      </div>
+      <div class="total-row">
+        <div class="label">Total dough weight</div>
+        <div class="value" id="rTotal">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DDT PANEL -->
+  <div class="panel" id="panel-ddt">
+    <div class="card">
+      <h2>Desired dough temperature</h2>
+      <div class="grid-2">
+        <div class="field simple">
+          <div class="field-label">Desired dough temp (°C)</div>
+          <input id="ddtTarget" type="number" inputmode="decimal" step="0.5" value="25">
+        </div>
+        <div class="field simple">
+          <div class="field-label">Room temp (°C)</div>
+          <input id="ddtRoom" type="number" inputmode="decimal" step="0.5" value="21">
+        </div>
+        <div class="field simple">
+          <div class="field-label">Flour temp (°C)</div>
+          <input id="ddtFlour" type="number" inputmode="decimal" step="0.5" value="21">
+        </div>
+        <div class="field simple">
+          <div class="field-label">Levain temp (°C) <span class="sub" style="display:block;font-weight:400;">blank = room temp</span></div>
+          <input id="ddtLevain" type="number" inputmode="decimal" step="0.5" placeholder="—">
+        </div>
+      </div>
+
+      <div class="ddt-result">
+        <div class="big" id="ddtOutput">— °C</div>
+        <div class="small">target water temperature</div>
+      </div>
+      <div class="hint">Formula: water temp = (DDT × 4) − (room + flour + levain temp). Standard 4-factor method for levain-built doughs.</div>
+    </div>
+  </div>
+
+  <!-- STOPWATCH PANEL -->
+  <div class="panel" id="panel-stopwatch">
+    <div class="card">
+      <h2>Bake timeline</h2>
+      <div class="sw-display" id="swDisplay">00:00:00</div>
+      <div class="sw-controls">
+        <button class="btn primary" id="swStartPause">Start</button>
+        <button class="btn" id="swLap" disabled>Lap</button>
+      </div>
+      <div class="sw-controls">
+        <button class="btn" id="swReset">Reset</button>
+        <button class="btn" id="swFinish" disabled>Finish bake</button>
+      </div>
+      <div class="lap-list" id="lapList"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY PANEL -->
+  <div class="panel" id="panel-history">
+    <div class="card">
+      <h2>Saved bakes</h2>
+      <div id="historyList"></div>
+      <div class="export-row">
+        <button class="btn" id="exportJson">Export JSON</button>
+        <button class="btn" id="exportCsv">Export CSV</button>
+      </div>
+      <div class="hint">Export includes every saved bake's date, total time, and all laps with notes.</div>
+    </div>
+  </div>
+
+  <footer>
+    Baker's math is flour-relative (100%). Levain's internal flour/water is netted out of the totals above so nothing is double-counted.
+  </footer>
+
+</main>
+
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+  // ============ THEME ============
+  const THEME_KEY = 'sourdough-calc-theme';
+  const root = document.documentElement;
+  const themeSwitch = document.getElementById('themeSwitch');
+
+  function applyTheme(theme){
+    root.setAttribute('data-theme', theme);
+    themeSwitch.textContent = theme === 'dark' ? '◑' : '◐';
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#000000' : '#ffffff');
+  }
+  function getInitialTheme(){
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === 'dark' || saved === 'light') return saved;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  let currentTheme = getInitialTheme();
+  applyTheme(currentTheme);
+  themeSwitch.addEventListener('click', function(){
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(THEME_KEY, currentTheme);
+    applyTheme(currentTheme);
+  });
+
+  // ============ TABS ============
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.panel');
+  tabButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      tabButtons.forEach(function(b){ b.classList.remove('active'); });
+      panels.forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+      if (btn.dataset.tab === 'history') renderHistory();
+    });
+  });
+
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toast._tm);
+    toast._tm = setTimeout(function(){ t.classList.remove('show'); }, 1800);
+  }
+
+  // ============ RECIPE CALCULATOR ============
+  // Canonical state: percentages (of flour) + an anchor weight (either flour
+  // weight or total dough weight). Editing any % or gram field updates the
+  // canonical percentages, then everything re-renders from there — one
+  // source of truth per ingredient, so this stays fully reactive with no
+  // circular update loops.
+  const state = {
+    anchorMode: 'flour', // 'flour' | 'total'
+    anchorValue: 500,     // grams, meaning depends on anchorMode
+    hydrationPct: 75,
+    saltPct: 2,
+    levainPct: 20,
+    levainHydPct: 100
+  };
+
+  const el = {
+    anchorFlourBtn: document.getElementById('anchorFlour'),
+    anchorTotalBtn: document.getElementById('anchorTotal'),
+    anchorLabel: document.getElementById('anchorLabel'),
+    anchorInput: document.getElementById('anchorInput'),
+    hydrationPct: document.getElementById('hydrationPct'),
+    hydrationG: document.getElementById('hydrationG'),
+    saltPct: document.getElementById('saltPct'),
+    saltG: document.getElementById('saltG'),
+    levainPct: document.getElementById('levainPct'),
+    levainG: document.getElementById('levainG'),
+    levainHydPct: document.getElementById('levainHydPct'),
+    rFlour: document.getElementById('rFlour'),
+    rWater: document.getElementById('rWater'),
+    rSalt: document.getElementById('rSalt'),
+    rLevain: document.getElementById('rLevain'),
+    rTotal: document.getElementById('rTotal')
+  };
+
+  function fmt(n){
+    if (!isFinite(n)) return '—';
+    return Math.round(n).toLocaleString();
+  }
+
+  // Derive flourWeight (the 100% baseline) from current state.
+  function computeFlourWeight(){
+    const h = state.hydrationPct / 100;
+    const s = state.saltPct / 100;
+    // total dough = flour * (1 + hydration + salt)   [levain nets out, see note]
+    const factor = 1 + h + s;
+    if (state.anchorMode === 'flour'){
+      return state.anchorValue;
+    }
+    return state.anchorValue / factor;
+  }
+
+  function recalc(){
+    const flour = computeFlourWeight();
+    const h = state.hydrationPct / 100;
+    const s = state.saltPct / 100;
+    const l = state.levainPct / 100;
+    const lh = state.levainHydPct / 100;
+
+    const totalWater = flour * h;
+    const totalSalt = flour * s;
+    const levainTotal = flour * l;
+    // levain's own internal flour/water (split by its own hydration ratio)
+    const levainFlour = levainTotal / (1 + lh);
+    const levainWater = levainTotal - levainFlour;
+
+    const flourToAdd = flour - levainFlour;
+    const waterToAdd = totalWater - levainWater;
+    const total = flour + totalWater + totalSalt; // levain already counted inside flour+water
+
+    el.rFlour.textContent = fmt(flourToAdd) + ' g';
+    el.rWater.textContent = fmt(waterToAdd) + ' g';
+    el.rSalt.textContent = fmt(totalSalt) + ' g';
+    el.rLevain.textContent = fmt(levainTotal) + ' g';
+    el.rTotal.textContent = fmt(total) + ' g';
+
+    // sync dual % / g fields (without feedback loops — these are pure display)
+    el.hydrationG.value = Math.round(totalWater);
+    el.saltG.value = (Math.round(totalSalt * 10) / 10);
+    el.levainG.value = Math.round(levainTotal);
+  }
+
+  function bindPctGramPair(pctInput, gInput, stateKey, gramsToPct){
+    pctInput.addEventListener('input', function(){
+      const v = parseFloat(pctInput.value);
+      if (isFinite(v)) state[stateKey] = v;
+      recalc();
+    });
+    gInput.addEventListener('input', function(){
+      const g = parseFloat(gInput.value);
+      if (!isFinite(g)) return;
+      const flour = computeFlourWeight();
+      if (flour <= 0) return;
+      const pct = gramsToPct(g, flour);
+      state[stateKey] = pct;
+      pctInput.value = Math.round(pct * 100) / 100;
+      recalc();
+    });
+  }
+
+  bindPctGramPair(el.hydrationPct, el.hydrationG, 'hydrationPct', function(g, flour){ return (g / flour) * 100; });
+  bindPctGramPair(el.saltPct, el.saltG, 'saltPct', function(g, flour){ return (g / flour) * 100; });
+  bindPctGramPair(el.levainPct, el.levainG, 'levainPct', function(g, flour){ return (g / flour) * 100; });
+
+  el.levainHydPct.addEventListener('input', function(){
+    const v = parseFloat(el.levainHydPct.value);
+    if (isFinite(v)) state.levainHydPct = v;
+    recalc();
+  });
+
+  el.anchorInput.addEventListener('input', function(){
+    const v = parseFloat(el.anchorInput.value);
+    if (isFinite(v) && v >= 0) state.anchorValue = v;
+    recalc();
+  });
+
+  el.anchorFlourBtn.addEventListener('click', function(){
+    if (state.anchorMode === 'flour') return;
+    // convert current total-dough anchor value into an equivalent flour weight
+    const flour = computeFlourWeight();
+    state.anchorMode = 'flour';
+    state.anchorValue = Math.round(flour);
+    el.anchorInput.value = state.anchorValue;
+    el.anchorLabel.textContent = 'Flour weight (g)';
+    el.anchorFlourBtn.classList.add('active');
+    el.anchorTotalBtn.classList.remove('active');
+    recalc();
+  });
+  el.anchorTotalBtn.addEventListener('click', function(){
+    if (state.anchorMode === 'total') return;
+    const flour = computeFlourWeight();
+    const h = state.hydrationPct / 100;
+    const s = state.saltPct / 100;
+    const total = flour * (1 + h + s);
+    state.anchorMode = 'total';
+    state.anchorValue = Math.round(total);
+    el.anchorInput.value = state.anchorValue;
+    el.anchorLabel.textContent = 'Total dough weight (g)';
+    el.anchorTotalBtn.classList.add('active');
+    el.anchorFlourBtn.classList.remove('active');
+    recalc();
+  });
+
+  recalc();
+
+  // ============ DDT CALCULATOR ============
+  const ddt = {
+    target: document.getElementById('ddtTarget'),
+    room: document.getElementById('ddtRoom'),
+    flour: document.getElementById('ddtFlour'),
+    levain: document.getElementById('ddtLevain'),
+    output: document.getElementById('ddtOutput')
+  };
+  function recalcDdt(){
+    const target = parseFloat(ddt.target.value);
+    const room = parseFloat(ddt.room.value);
+    const flourT = parseFloat(ddt.flour.value);
+    const levainT = ddt.levain.value.trim() === '' ? room : parseFloat(ddt.levain.value);
+    if (![target, room, flourT, levainT].every(function(n){ return isFinite(n); })){
+      ddt.output.textContent = '— °C';
+      return;
+    }
+    const water = (target * 4) - (room + flourT + levainT);
+    ddt.output.textContent = (Math.round(water * 10) / 10) + ' °C';
+  }
+  [ddt.target, ddt.room, ddt.flour, ddt.levain].forEach(function(input){
+    input.addEventListener('input', recalcDdt);
+  });
+  recalcDdt();
+
+  // ============ STOPWATCH ============
+  const SW_KEY = 'sourdough-sw-session';
+  const HISTORY_KEY = 'sourdough-bake-history';
+
+  const swEl = {
+    display: document.getElementById('swDisplay'),
+    startPause: document.getElementById('swStartPause'),
+    lap: document.getElementById('swLap'),
+    reset: document.getElementById('swReset'),
+    finish: document.getElementById('swFinish'),
+    lapList: document.getElementById('lapList')
+  };
+
+  // session shape: { startedAt: epoch_ms|null, pausedAt: epoch_ms|null,
+  //                  accumulatedMs: number (from prior pause cycles),
+  //                  running: bool, laps: [{ id, atMs (absolute elapsed ms), note }] }
+  function loadSession(){
+    try{
+      const raw = localStorage.getItem(SW_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    }catch(e){ return null; }
+  }
+  function saveSession(s){
+    localStorage.setItem(SW_KEY, JSON.stringify(s));
+  }
+  function clearSession(){
+    localStorage.removeItem(SW_KEY);
+  }
+
+  let session = loadSession() || {
+    startedAt: null,
+    running: false,
+    accumulatedMs: 0,
+    lastResumeAt: null,
+    laps: []
+  };
+
+  let tickHandle = null;
+
+  function currentElapsedMs(){
+    let ms = session.accumulatedMs;
+    if (session.running && session.lastResumeAt){
+      ms += (Date.now() - session.lastResumeAt);
+    }
+    return ms;
+  }
+
+  function fmtHMS(ms){
+    const totalSec = Math.floor(ms / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    function pad(n){ return String(n).padStart(2,'0'); }
+    return pad(h) + ':' + pad(m) + ':' + pad(s);
+  }
+
+  function renderDisplay(){
+    swEl.display.textContent = fmtHMS(currentElapsedMs());
+  }
+
+  function renderLaps(){
+    swEl.lapList.innerHTML = '';
+    let prevMs = 0;
+    session.laps.forEach(function(lap, idx){
+      const splitMs = lap.atMs - prevMs;
+      prevMs = lap.atMs;
+      const item = document.createElement('div');
+      item.className = 'lap-item';
+      const meta = document.createElement('div');
+      meta.className = 'lap-meta';
+      meta.innerHTML = '<span>#' + (idx+1) + '</span><span class="split">+' + fmtHMS(splitMs) + '</span><span>' + fmtHMS(lap.atMs) + '</span>';
+      const noteInput = document.createElement('input');
+      noteInput.className = 'lap-note-input';
+      noteInput.placeholder = 'Note (e.g. stretch & fold #1)';
+      noteInput.value = lap.note || '';
+      noteInput.addEventListener('input', function(){
+        lap.note = noteInput.value;
+        saveSession(session);
+      });
+      item.appendChild(meta);
+      item.appendChild(noteInput);
+      swEl.lapList.appendChild(item);
+    });
+  }
+
+  function updateControls(){
+    const hasStarted = session.startedAt !== null;
+    swEl.startPause.textContent = session.running ? 'Pause' : (hasStarted ? 'Resume' : 'Start');
+    swEl.lap.disabled = !session.running;
+    swEl.finish.disabled = !hasStarted;
+  }
+
+  function tick(){
+    renderDisplay();
+  }
+
+  function startTicking(){
+    if (tickHandle) return;
+    tickHandle = setInterval(tick, 1000);
+  }
+  function stopTicking(){
+    clearInterval(tickHandle);
+    tickHandle = null;
+  }
+
+  function renderAll(){
+    renderDisplay();
+    renderLaps();
+    updateControls();
+  }
+
+  swEl.startPause.addEventListener('click', function(){
+    if (!session.running){
+      // start or resume
+      if (session.startedAt === null) session.startedAt = Date.now();
+      session.running = true;
+      session.lastResumeAt = Date.now();
+      startTicking();
+    } else {
+      // pause
+      session.accumulatedMs += (Date.now() - session.lastResumeAt);
+      session.lastResumeAt = null;
+      session.running = false;
+      stopTicking();
+    }
+    saveSession(session);
+    renderAll();
+  });
+
+  swEl.lap.addEventListener('click', function(){
+    if (!session.running) return;
+    session.laps.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2,7), atMs: currentElapsedMs(), note: '' });
+    saveSession(session);
+    renderLaps();
+  });
+
+  swEl.reset.addEventListener('click', function(){
+    if (session.laps.length > 0 || session.startedAt !== null){
+      if (!confirm('Reset clears the current timeline (unsaved). Continue?')) return;
+    }
+    stopTicking();
+    session = { startedAt: null, running: false, accumulatedMs: 0, lastResumeAt: null, laps: [] };
+    clearSession();
+    renderAll();
+  });
+
+  swEl.finish.addEventListener('click', function(){
+    if (session.startedAt === null){ return; }
+    const finalMs = currentElapsedMs();
+    const bake = {
+      id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
+      date: new Date().toISOString(),
+      totalMs: finalMs,
+      laps: session.laps.map(function(l){ return { atMs: l.atMs, note: l.note || '' }; })
+    };
+    const history = loadHistory();
+    history.unshift(bake);
+    saveHistory(history);
+
+    stopTicking();
+    session = { startedAt: null, running: false, accumulatedMs: 0, lastResumeAt: null, laps: [] };
+    clearSession();
+    renderAll();
+    toast('Bake saved to history');
+  });
+
+  // resume ticking on load if a session was mid-run
+  if (session.running) startTicking();
+  renderAll();
+
+  // ============ HISTORY ============
+  function loadHistory(){
+    try{
+      const raw = localStorage.getItem(HISTORY_KEY);
+      if (!raw) return [];
+      return JSON.parse(raw);
+    }catch(e){ return []; }
+  }
+  function saveHistory(h){
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+  }
+
+  function fmtDate(iso){
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }) +
+           ' ' + d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+  }
+
+  function renderHistory(){
+    const list = document.getElementById('historyList');
+    const history = loadHistory();
+    list.innerHTML = '';
+    if (history.length === 0){
+      list.innerHTML = '<div class="history-empty">No saved bakes yet — finish a bake from the Stopwatch tab.</div>';
+      return;
+    }
+    history.forEach(function(bake){
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      const head = document.createElement('div');
+      head.innerHTML = '<div class="h-date">' + fmtDate(bake.date) + '</div>' +
+                        '<div class="h-meta">Total: ' + fmtHMS(bake.totalMs) + ' · ' + bake.laps.length + ' laps</div>';
+      item.appendChild(head);
+
+      const detail = document.createElement('div');
+      detail.className = 'history-detail';
+      let prevMs = 0;
+      bake.laps.forEach(function(lap, idx){
+        const splitMs = lap.atMs - prevMs;
+        prevMs = lap.atMs;
+        const row = document.createElement('div');
+        row.className = 'lap-item';
+        row.innerHTML = '<div class="lap-meta"><span>#' + (idx+1) + '</span><span class="split">+' + fmtHMS(splitMs) + '</span><span>' + fmtHMS(lap.atMs) + '</span></div>' +
+                         '<div' + (lap.note ? '' : ' class="empty-note"') + '>' + (lap.note || 'no note') + '</div>';
+        detail.appendChild(row);
+      });
+      item.appendChild(detail);
+
+      head.addEventListener('click', function(){ item.classList.toggle('open'); });
+      list.appendChild(item);
+    });
+  }
+
+  document.getElementById('exportJson').addEventListener('click', function(){
+    const history = loadHistory();
+    if (history.length === 0){ toast('No bakes to export'); return; }
+    const blob = new Blob([JSON.stringify(history, null, 2)], { type: 'application/json' });
+    downloadBlob(blob, 'sourdough-bakes-' + todayStamp() + '.json');
+  });
+
+  document.getElementById('exportCsv').addEventListener('click', function(){
+    const history = loadHistory();
+    if (history.length === 0){ toast('No bakes to export'); return; }
+    const rows = [['bake_date','bake_total_time','lap_number','lap_absolute_time','lap_split_time','note']];
+    history.forEach(function(bake){
+      let prevMs = 0;
+      if (bake.laps.length === 0){
+        rows.push([bake.date, fmtHMS(bake.totalMs), '', '', '', '']);
+      }
+      bake.laps.forEach(function(lap, idx){
+        const splitMs = lap.atMs - prevMs;
+        prevMs = lap.atMs;
+        rows.push([bake.date, fmtHMS(bake.totalMs), idx+1, fmtHMS(lap.atMs), fmtHMS(splitMs), '"' + (lap.note||'').replace(/"/g,'""') + '"']);
+      });
+    });
+    const csv = rows.map(function(r){ return r.join(','); }).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    downloadBlob(blob, 'sourdough-bakes-' + todayStamp() + '.csv');
+  });
+
+  function todayStamp(){
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function downloadBlob(blob, filename){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+
+  // ============ PWA install + SW ============
+  let deferredPrompt;
+  const banner = document.getElementById('installBanner');
+  const installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    banner.classList.add('show');
+  });
+  installBtn && installBtn.addEventListener('click', async function(){
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    banner.classList.remove('show');
+  });
+  window.addEventListener('appinstalled', function(){
+    banner.classList.remove('show');
+  });
+  if ('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+})();
+
+</script>
+</body>
+</html>
