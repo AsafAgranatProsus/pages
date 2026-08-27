@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hard-candy-calc-v4';
+const CACHE_NAME = 'hard-candy-calc-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -9,7 +9,16 @@ const ASSETS = [
 self.addEventListener('install', function(event){
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache){
-      return cache.addAll(ASSETS);
+      // bypass the browser's HTTP cache during precache — otherwise a stale
+      // cached response can get baked into the new SW cache even after
+      // bumping CACHE_NAME, defeating the whole point of versioning it.
+      return Promise.all(
+        ASSETS.map(function(url){
+          return fetch(url, { cache: 'no-store' }).then(function(response){
+            return cache.put(url, response);
+          });
+        })
+      );
     })
   );
   self.skipWaiting();
@@ -31,7 +40,7 @@ self.addEventListener('fetch', function(event){
   event.respondWith(
     caches.match(event.request).then(function(cached){
       if (cached) return cached;
-      return fetch(event.request).then(function(response){
+      return fetch(event.request, { cache: 'no-store' }).then(function(response){
         if (response && response.status === 200 && event.request.method === 'GET'){
           const clone = response.clone();
           caches.open(CACHE_NAME).then(function(cache){ cache.put(event.request, clone); });
