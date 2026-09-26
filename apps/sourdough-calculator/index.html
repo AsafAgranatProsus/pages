@@ -45,7 +45,7 @@
   header{
     padding:28px 20px 20px;
     display:flex;
-    align-items:flex-start;
+    align-items:center;
     justify-content:space-between;
     max-width:560px;
     margin:0 auto;
@@ -58,31 +58,22 @@
     text-transform:uppercase;
     line-height:1.05;
   }
-  header .title-block p{
-    margin:6px 0 0;
-    font-size:12.5px;
-    color:var(--muted);
-    letter-spacing:0.02em;
-  }
   .theme-switch{
-    border:2px solid var(--fg);
-    background:var(--bg);
+    border:none;
+    background:transparent;
     color:var(--fg);
-    width:44px;
-    height:44px;
-    border-radius:50%;
+    width:48px;
+    height:48px;
     display:flex;
     align-items:center;
     justify-content:center;
     cursor:pointer;
     flex-shrink:0;
-    font-size:18px;
-    transition:background .15s ease, color .15s ease;
+    font-size:36px;
+    line-height:1;
+    padding:0;
   }
-  .theme-switch:active{
-    background:var(--fg);
-    color:var(--bg);
-  }
+  .theme-switch:active{opacity:0.45;}
   main{
     max-width:560px;
     margin:0 auto;
@@ -327,6 +318,23 @@
     font-variant-numeric:tabular-nums;
   }
   .lap-item .lap-meta .split{color:var(--fg);}
+  .lap-time-input{
+    width:8ch;
+    border:none;
+    border-bottom:2px solid transparent;
+    background:transparent;
+    color:var(--fg);
+    font:inherit;
+    font-size:12px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+    text-align:right;
+    padding:0 0 1px;
+  }
+  .lap-time-input:focus{
+    outline:none;
+    border-bottom-color:var(--line);
+  }
   .lap-note-input{
     width:100%;
     border:2px solid var(--line-soft);
@@ -343,8 +351,14 @@
     border:2px solid var(--line);
     padding:14px;
     margin-bottom:10px;
-    cursor:pointer;
   }
+  .h-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .h-main{cursor:pointer; flex:1; min-width:0;}
   .history-item .h-date{
     font-weight:800;
     font-size:14px;
@@ -355,6 +369,20 @@
     color:var(--muted);
     margin-top:4px;
   }
+  .h-delete{
+    border:none;
+    background:transparent;
+    color:var(--muted);
+    font:inherit;
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    cursor:pointer;
+    padding:2px 0;
+    flex-shrink:0;
+  }
+  .h-delete:active{color:var(--fg);}
   .history-detail{
     display:none;
     margin-top:10px;
@@ -433,7 +461,6 @@
 <header>
   <div class="title-block">
     <h1>Sourdough<br>Calculator</h1>
-    <p>Baker's math · DDT · bake timer</p>
   </div>
   <button class="theme-switch" id="themeSwitch" aria-label="Toggle dark mode">◐</button>
 </header>
@@ -595,7 +622,7 @@
     <div class="card">
       <h2>Bake notes</h2>
       <textarea id="bakeNotes" class="lap-note-input" rows="4" placeholder="Flour used, ratio, addins, ambient conditions, anything worth remembering..." style="resize:vertical;"></textarea>
-      <div class="hint">Saved with this bake when you press Finish bake. The current recipe (grams + ratios) is also snapshotted automatically.</div>
+      <div class="hint">Saved from the moment the timer starts, and updated as the bake runs. Finish bake marks it complete. The current recipe is snapshotted with it.</div>
     </div>
   </div>
 
@@ -654,7 +681,10 @@
       panels.forEach(function(p){ p.classList.remove('active'); });
       btn.classList.add('active');
       document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
-      if (btn.dataset.tab === 'history') renderHistory();
+      if (btn.dataset.tab === 'history'){
+        syncRunningBake();
+        renderHistory();
+      }
     });
   });
 
@@ -799,6 +829,7 @@
     };
 
     saveRecipeState();
+    if (bakeTracking) syncRunningBake();
   }
 
   function bindPctGramPair(pctInput, gInput, stateKey, gramsToPct){
@@ -908,6 +939,7 @@
   }
   applyStateToInputs();
 
+  var bakeTracking = false;
   recalc();
 
   // ============ DDT CALCULATOR ============
@@ -935,7 +967,7 @@
   });
   recalcDdt();
 
-  // ============ STOPWATCH ============
+  // ============ STOPWATCH + BAKE LOG ============
   const SW_KEY = 'sourdough-sw-session';
   const HISTORY_KEY = 'sourdough-bake-history';
 
@@ -949,10 +981,8 @@
     bakeNotes: document.getElementById('bakeNotes')
   };
 
-  // session shape: { startedAt: epoch_ms|null, pausedAt: epoch_ms|null,
-  //                  accumulatedMs: number (from prior pause cycles),
-  //                  running: bool, laps: [{ id, atMs (absolute elapsed ms), note }],
-  //                  notes: string (free-text bake notes, e.g. flour/ratio/addins) }
+  // session shape: { startedAt, startedAtIso, historyId, running,
+  //   accumulatedMs, lastResumeAt, laps: [{ id, atMs, note }], notes }
   function loadSession(){
     try{
       const raw = localStorage.getItem(SW_KEY);
@@ -966,19 +996,39 @@
   function clearSession(){
     localStorage.removeItem(SW_KEY);
   }
+  function emptySession(){
+    return {
+      startedAt: null,
+      startedAtIso: null,
+      historyId: null,
+      running: false,
+      accumulatedMs: 0,
+      lastResumeAt: null,
+      laps: [],
+      notes: ''
+    };
+  }
+  function loadHistory(){
+    try{
+      const raw = localStorage.getItem(HISTORY_KEY);
+      if (!raw) return [];
+      return JSON.parse(raw);
+    }catch(e){ return []; }
+  }
+  function saveHistory(h){
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+  }
 
-  let session = loadSession() || {
-    startedAt: null,
-    running: false,
-    accumulatedMs: 0,
-    lastResumeAt: null,
-    laps: [],
-    notes: ''
-  };
+  let session = loadSession() || emptySession();
+  if (session.startedAt && !session.historyId){
+    session.historyId = session.startedAt + '-bake';
+    session.startedAtIso = session.startedAtIso || new Date(session.startedAt).toISOString();
+  }
   swEl.bakeNotes.value = session.notes || '';
   swEl.bakeNotes.addEventListener('input', function(){
     session.notes = swEl.bakeNotes.value;
     saveSession(session);
+    syncRunningBake();
   });
 
   let tickHandle = null;
@@ -992,12 +1042,54 @@
   }
 
   function fmtHMS(ms){
+    ms = Math.max(0, ms);
     const totalSec = Math.floor(ms / 1000);
     const h = Math.floor(totalSec / 3600);
     const m = Math.floor((totalSec % 3600) / 60);
     const s = totalSec % 60;
     function pad(n){ return String(n).padStart(2,'0'); }
     return pad(h) + ':' + pad(m) + ':' + pad(s);
+  }
+  function fmtSplit(ms){
+    return (ms < 0 ? '−' : '+') + fmtHMS(Math.abs(ms));
+  }
+  function parseHMS(str){
+    const parts = String(str).trim().split(':');
+    if (parts.length < 1 || parts.length > 3) return null;
+    if (parts.some(function(p){ return !/^\d+$/.test(p); })) return null;
+    let h = 0, m = 0, s = 0;
+    if (parts.length === 3){
+      h = parseInt(parts[0], 10);
+      m = parseInt(parts[1], 10);
+      s = parseInt(parts[2], 10);
+    } else if (parts.length === 2){
+      m = parseInt(parts[0], 10);
+      s = parseInt(parts[1], 10);
+    } else {
+      s = parseInt(parts[0], 10);
+    }
+    if (m > 59 || s > 59) return null;
+    return ((h * 3600) + (m * 60) + s) * 1000;
+  }
+  function currentBakeEntry(){
+    return {
+      id: session.historyId,
+      date: session.startedAtIso || new Date(session.startedAt).toISOString(),
+      totalMs: currentElapsedMs(),
+      laps: session.laps.map(function(l){ return { atMs: l.atMs, note: l.note || '' }; }),
+      notes: session.notes || '',
+      recipe: Object.assign({}, lastRecipeResult),
+      status: session.running ? 'running' : 'paused'
+    };
+  }
+  function syncRunningBake(){
+    if (!session || !session.startedAt || !session.historyId) return;
+    const history = loadHistory();
+    const entry = currentBakeEntry();
+    const idx = history.findIndex(function(b){ return b.id === session.historyId; });
+    if (idx === -1) history.unshift(entry);
+    else history[idx] = entry;
+    saveHistory(history);
   }
 
   function renderDisplay(){
@@ -1014,7 +1106,38 @@
       item.className = 'lap-item';
       const meta = document.createElement('div');
       meta.className = 'lap-meta';
-      meta.innerHTML = '<span>#' + (idx+1) + '</span><span class="split">+' + fmtHMS(splitMs) + '</span><span>' + fmtHMS(lap.atMs) + '</span>';
+
+      const num = document.createElement('span');
+      num.textContent = '#' + (idx + 1);
+      const split = document.createElement('span');
+      split.className = 'split';
+      split.textContent = fmtSplit(splitMs);
+      const timeInput = document.createElement('input');
+      timeInput.className = 'lap-time-input';
+      timeInput.type = 'text';
+      timeInput.inputMode = 'numeric';
+      timeInput.spellcheck = false;
+      timeInput.autocomplete = 'off';
+      timeInput.setAttribute('aria-label', 'Lap ' + (idx + 1) + ' time');
+      timeInput.value = fmtHMS(lap.atMs);
+      timeInput.addEventListener('keydown', function(e){
+        if (e.key === 'Enter'){ e.preventDefault(); timeInput.blur(); }
+      });
+      timeInput.addEventListener('change', function(){
+        const ms = parseHMS(timeInput.value);
+        if (ms === null){
+          timeInput.value = fmtHMS(lap.atMs);
+          return;
+        }
+        lap.atMs = ms;
+        saveSession(session);
+        syncRunningBake();
+        renderLaps();
+      });
+      meta.appendChild(num);
+      meta.appendChild(split);
+      meta.appendChild(timeInput);
+
       const noteInput = document.createElement('input');
       noteInput.className = 'lap-note-input';
       noteInput.placeholder = 'Note (e.g. stretch & fold #1)';
@@ -1022,6 +1145,7 @@
       noteInput.addEventListener('input', function(){
         lap.note = noteInput.value;
         saveSession(session);
+        syncRunningBake();
       });
       item.appendChild(meta);
       item.appendChild(noteInput);
@@ -1038,6 +1162,8 @@
 
   function tick(){
     renderDisplay();
+    const live = document.querySelector('[data-live-total]');
+    if (live) live.textContent = fmtHMS(currentElapsedMs());
   }
 
   function startTicking(){
@@ -1057,19 +1183,22 @@
 
   swEl.startPause.addEventListener('click', function(){
     if (!session.running){
-      // start or resume
-      if (session.startedAt === null) session.startedAt = Date.now();
+      if (session.startedAt === null){
+        session.startedAt = Date.now();
+        session.startedAtIso = new Date(session.startedAt).toISOString();
+        session.historyId = Date.now() + '-' + Math.random().toString(36).slice(2,7);
+      }
       session.running = true;
       session.lastResumeAt = Date.now();
       startTicking();
     } else {
-      // pause
       session.accumulatedMs += (Date.now() - session.lastResumeAt);
       session.lastResumeAt = null;
       session.running = false;
       stopTicking();
     }
     saveSession(session);
+    syncRunningBake();
     renderAll();
   });
 
@@ -1077,15 +1206,19 @@
     if (!session.running) return;
     session.laps.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2,7), atMs: currentElapsedMs(), note: '' });
     saveSession(session);
+    syncRunningBake();
     renderLaps();
   });
 
   swEl.reset.addEventListener('click', function(){
-    if (session.laps.length > 0 || session.startedAt !== null){
-      if (!confirm('Reset clears the current timeline (unsaved). Continue?')) return;
+    if (session.laps.length > 0 || session.startedAt !== null || (session.notes && session.notes.length)){
+      if (!confirm('Reset discards this bake, including its notes. Continue?')) return;
+    }
+    if (session.historyId){
+      saveHistory(loadHistory().filter(function(b){ return b.id !== session.historyId; }));
     }
     stopTicking();
-    session = { startedAt: null, running: false, accumulatedMs: 0, lastResumeAt: null, laps: [], notes: '' };
+    session = emptySession();
     swEl.bakeNotes.value = '';
     clearSession();
     renderAll();
@@ -1093,42 +1226,41 @@
 
   swEl.finish.addEventListener('click', function(){
     if (session.startedAt === null){ return; }
-    const finalMs = currentElapsedMs();
-    const bake = {
-      id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
-      date: new Date().toISOString(),
-      totalMs: finalMs,
-      laps: session.laps.map(function(l){ return { atMs: l.atMs, note: l.note || '' }; }),
-      notes: session.notes || '',
-      recipe: Object.assign({}, lastRecipeResult)
-    };
+    if (session.running){
+      session.accumulatedMs += (Date.now() - session.lastResumeAt);
+      session.lastResumeAt = null;
+      session.running = false;
+      stopTicking();
+    }
     const history = loadHistory();
-    history.unshift(bake);
+    const bake = currentBakeEntry();
+    bake.status = 'finished';
+    bake.totalMs = session.accumulatedMs;
+    const idx = history.findIndex(function(b){ return b.id === bake.id; });
+    if (idx === -1) history.unshift(bake);
+    else history[idx] = bake;
     saveHistory(history);
 
-    stopTicking();
-    session = { startedAt: null, running: false, accumulatedMs: 0, lastResumeAt: null, laps: [], notes: '' };
+    session = emptySession();
     swEl.bakeNotes.value = '';
     clearSession();
     renderAll();
-    toast('Bake saved to history');
+    toast('Bake finished');
   });
 
-  // resume ticking on load if a session was mid-run
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'hidden' && session.startedAt){
+      saveSession(session);
+      syncRunningBake();
+    }
+  });
+
+  if (session.startedAt) syncRunningBake();
+  bakeTracking = true;
   if (session.running) startTicking();
   renderAll();
 
   // ============ HISTORY ============
-  function loadHistory(){
-    try{
-      const raw = localStorage.getItem(HISTORY_KEY);
-      if (!raw) return [];
-      return JSON.parse(raw);
-    }catch(e){ return []; }
-  }
-  function saveHistory(h){
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
-  }
 
   function fmtDate(iso){
     const d = new Date(iso);
@@ -1141,16 +1273,33 @@
     const history = loadHistory();
     list.innerHTML = '';
     if (history.length === 0){
-      list.innerHTML = '<div class="history-empty">No saved bakes yet — finish a bake from the Stopwatch tab.</div>';
+      list.innerHTML = '<div class="history-empty">No saved bakes yet. Start one from the Bake tab.</div>';
       return;
     }
     history.forEach(function(bake){
       const item = document.createElement('div');
       item.className = 'history-item';
+      const top = document.createElement('div');
+      top.className = 'h-top';
       const head = document.createElement('div');
+      head.className = 'h-main';
+      const status = bake.status === 'running' ? 'Currently running' : (bake.status === 'paused' ? 'Paused' : '');
+      const totalHtml = bake.status === 'running'
+        ? '<span data-live-total>' + fmtHMS(currentElapsedMs()) + '</span>'
+        : fmtHMS(bake.totalMs);
       head.innerHTML = '<div class="h-date">' + fmtDate(bake.date) + '</div>' +
-                        '<div class="h-meta">Total: ' + fmtHMS(bake.totalMs) + ' · ' + bake.laps.length + ' laps</div>';
-      item.appendChild(head);
+                        '<div class="h-meta">' + (status ? status + ' · ' : '') + 'Total: ' + totalHtml + ' · ' + bake.laps.length + ' laps</div>';
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'h-delete';
+      removeBtn.textContent = 'Remove';
+      removeBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        deleteBake(bake.id);
+      });
+      top.appendChild(head);
+      top.appendChild(removeBtn);
+      item.appendChild(top);
 
       const detail = document.createElement('div');
       detail.className = 'history-detail';
@@ -1187,7 +1336,7 @@
         prevMs = lap.atMs;
         const row = document.createElement('div');
         row.className = 'lap-item';
-        row.innerHTML = '<div class="lap-meta"><span>#' + (idx+1) + '</span><span class="split">+' + fmtHMS(splitMs) + '</span><span>' + fmtHMS(lap.atMs) + '</span></div>' +
+        row.innerHTML = '<div class="lap-meta"><span>#' + (idx+1) + '</span><span class="split">' + fmtSplit(splitMs) + '</span><span>' + fmtHMS(lap.atMs) + '</span></div>' +
                          '<div' + (lap.note ? '' : ' class="empty-note"') + '>' + (lap.note || 'no note') + '</div>';
         detail.appendChild(row);
       });
@@ -1198,6 +1347,19 @@
     });
   }
 
+  function deleteBake(id){
+    if (!confirm('Remove this bake from history?')) return;
+    saveHistory(loadHistory().filter(function(b){ return b.id !== id; }));
+    if (session.historyId === id){
+      stopTicking();
+      session = emptySession();
+      swEl.bakeNotes.value = '';
+      clearSession();
+      renderAll();
+    }
+    renderHistory();
+  }
+
   function escapeHtml(str){
     const d = document.createElement('div');
     d.textContent = str;
@@ -1205,6 +1367,7 @@
   }
 
   document.getElementById('exportJson').addEventListener('click', function(){
+    syncRunningBake();
     const history = loadHistory();
     if (history.length === 0){ toast('No bakes to export'); return; }
     const blob = new Blob([JSON.stringify(history, null, 2)], { type: 'application/json' });
@@ -1212,6 +1375,7 @@
   });
 
   document.getElementById('exportCsv').addEventListener('click', function(){
+    syncRunningBake();
     const history = loadHistory();
     if (history.length === 0){ toast('No bakes to export'); return; }
     const rows = [['bake_date','bake_total_time','flour_g','water_g','salt_g','levain_g','levain_mode','hydration_pct','salt_pct','levain_pct','levain_hyd_pct','bake_notes','lap_number','lap_absolute_time','lap_split_time','lap_note']];
@@ -1226,7 +1390,7 @@
       bake.laps.forEach(function(lap, idx){
         const splitMs = lap.atMs - prevMs;
         prevMs = lap.atMs;
-        rows.push([bake.date, fmtHMS(bake.totalMs)].concat(recipeCols).concat([csvField(bake.notes), idx+1, fmtHMS(lap.atMs), fmtHMS(splitMs), csvField(lap.note)]));
+        rows.push([bake.date, fmtHMS(bake.totalMs)].concat(recipeCols).concat([csvField(bake.notes), idx+1, fmtHMS(lap.atMs), fmtSplit(splitMs), csvField(lap.note)]));
       });
     });
     const csv = rows.map(function(r){ return r.join(','); }).join('\n');

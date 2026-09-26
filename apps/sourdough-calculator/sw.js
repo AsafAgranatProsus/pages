@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sourdough-calc-v3';
+const CACHE_NAME = 'sourdough-calc-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -34,6 +34,11 @@ self.addEventListener('activate', function(event){
 });
 
 self.addEventListener('fetch', function(event){
+  var path = new URL(event.request.url).pathname;
+  if (path.endsWith('/sw.js')) {
+    event.respondWith(fetch(event.request, { cache: 'no-store' }));
+    return;
+  }
   event.respondWith(
     caches.match(event.request).then(function(cached){
       if (cached) return cached;
